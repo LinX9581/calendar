@@ -40,11 +40,11 @@
         'clickDayname': function(date) {
             console.log('clickDayname', date);
         },
-        'beforeCreateSchedule': function(e) {
+        'beforeCreateSchedule': function(e) {       //再空白處新增event 會把title location紀錄在e
             console.log('beforeCreateSchedule', e);
             saveNewSchedule(e);
         },
-        'beforeUpdateSchedule': function(e) {
+        'beforeUpdateSchedule': function(e) {       //event 被移動時觸發
             var schedule = e.schedule;
             var changes = e.changes;
 
@@ -57,7 +57,7 @@
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             refreshScheduleVisibility();
         },
-        'beforeDeleteSchedule': function(e) {
+        'beforeDeleteSchedule': function(e) {       //event被刪除
             console.log('beforeDeleteSchedule', e);
             cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
         },
@@ -126,8 +126,8 @@
         var options = cal.getOptions();
         var viewName = '';
 
-        console.log(target);
-        console.log(action);
+        console.log(target + "target onClickMenu");
+        console.log(action + "action onClickMenu");
         switch (action) {
             case 'toggle-daily':
                 viewName = 'day';
@@ -382,6 +382,7 @@
       return currentDate.format(format);
     }
 
+    //上下頁旁邊的 range date
     function setRenderRangeText() {
         var renderRange = document.getElementById('renderRange');
         var options = cal.getOptions();
@@ -417,7 +418,7 @@
         $('#btn-save-schedule').on('click', onNewSchedule);
         $('#btn-new-schedule').on('click', createNewSchedule);
 
-        $('#dropdownMenu-calendars-list').on('click', onChangeNewScheduleCalendar);
+        // $('#dropdownMenu-calendars-list').on('click', onChangeNewScheduleCalendar);
 
         window.addEventListener('resize', resizeThrottled);
     }

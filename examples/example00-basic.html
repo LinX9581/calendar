@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>TOAST UI Calendar App DEMO</title>
@@ -10,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="./css/default.css">
     <link rel="stylesheet" type="text/css" href="./css/icons.css">
 </head>
+
 <body>
     <div id="top">
         <a href="https://github.com/nhn/tui.calendar">
@@ -18,7 +20,8 @@
     </div>
     <div id="lnb">
         <div class="lnb-new-schedule">
-            <button id="btn-new-schedule" type="button" class="btn btn-default btn-block lnb-new-schedule-btn" data-toggle="modal">
+            <button id="btn-new-schedule" type="button" class="btn btn-default btn-block lnb-new-schedule-btn"
+                data-toggle="modal">
                 New schedule</button>
         </div>
         <div id="lnb-calendars" class="lnb-calendars">
@@ -41,8 +44,8 @@
     <div id="right">
         <div id="menu">
             <span class="dropdown">
-                <button id="dropdownMenu-calendarType" class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="true">
+                <button id="dropdownMenu-calendarType" class="btn btn-default btn-sm dropdown-toggle" type="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     <i id="calendarTypeIcon" class="calendar-icon ic_view_month" style="margin-right: 4px;"></i>
                     <span id="calendarTypeName">Dropdown</span>&nbsp;
                     <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
@@ -76,7 +79,8 @@
                     <li role="presentation" class="dropdown-divider"></li>
                     <li role="presentation">
                         <a role="menuitem" data-action="toggle-workweek">
-                            <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-workweek" checked>
+                            <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-workweek"
+                                checked>
                             <span class="checkbox-title"></span>Show weekends
                         </a>
                     </li>
@@ -88,7 +92,8 @@
                     </li>
                     <li role="presentation">
                         <a role="menuitem" data-action="toggle-narrow-weekend">
-                            <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-narrow-weekend">
+                            <input type="checkbox" class="tui-full-calendar-checkbox-square"
+                                value="toggle-narrow-weekend">
                             <span class="checkbox-title"></span>Narrower than weekdays
                         </a>
                     </li>
@@ -108,7 +113,8 @@
         <div id="calendar"></div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="https://uicdn.toast.com/tui.code-snippet/v1.5.2/tui-code-snippet.min.js"></script>
@@ -121,5 +127,30 @@
     <script src="./js/data/schedules.js"></script>
     <!-- <script src="./js/theme/dooray.js"></script> -->
     <script src="./js/app.js"></script>
+
+    <script>
+        cal.createSchedules([
+            {
+                id: '1',
+                calendarId: '1',
+                title: 'my schedule',
+                category: 'time',
+                dueDateClass: '',
+                start: '2021-06-01T22:30:00+09:00',
+                end: '2021-06-02T02:30:00+09:00'
+            },
+            {
+                id: '2',
+                calendarId: '1',
+                title: 'second schedule',
+                category: 'time',
+                dueDateClass: '',
+                start: '2021-06-02T22:30:00+09:00',
+                end: '2021-06-03T02:30:00+09:00',
+                isReadOnly: true    // schedule is read-only
+            }
+        ]);
+    </script>
 </body>
+
 </html>

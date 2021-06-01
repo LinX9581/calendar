@@ -152,12 +152,12 @@ function generateRandomSchedule(calendar, renderStart, renderEnd) {
 function generateSchedule(viewName, renderStart, renderEnd) {
     ScheduleList = [];
     CalendarList.forEach(function(calendar) {
-        var i = 0, length = 10;
-        if (viewName === 'month') {
-            length = 3;
-        } else if (viewName === 'day') {
-            length = 4;
-        }
+        var i = 0, length = 1;
+        // if (viewName === 'month') {
+        //     length = 3;
+        // } else if (viewName === 'day') {
+        //     length = 4;
+        // }
         for (; i < length; i += 1) {
             generateRandomSchedule(calendar, renderStart, renderEnd);
         }

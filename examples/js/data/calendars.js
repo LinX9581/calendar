@@ -124,4 +124,14 @@ function hexToRGBA(hex) {
     calendar.dragBgColor = '#ff4040';
     calendar.borderColor = '#ff4040';
     addCalendar(calendar);
+
+    calendar = new CalendarInfo();
+    id += 1;
+    calendar.id = String(id);
+    calendar.name = 'test2';
+    calendar.color = '#ffffff';
+    calendar.bgColor = 'black';
+    calendar.dragBgColor = 'black';
+    calendar.borderColor = 'black';
+    addCalendar(calendar);
 })();
