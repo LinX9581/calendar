@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* eslint-env jquery */
 /* global moment, tui, chance */
-/* global findCalendar, CalendarList, ScheduleList, generateSchedule */
+/* global findCalendar, CalendarList, ScheduleList */
 
 (function(window, Calendar) {
     var cal, resizeThrottled;
@@ -40,11 +40,11 @@
         'clickDayname': function(date) {
             console.log('clickDayname', date);
         },
-        'beforeCreateSchedule': function(e) {
+        'beforeCreateSchedule': function(e) {       //建立新的scedule
             console.log('beforeCreateSchedule', e);
             saveNewSchedule(e);
         },
-        'beforeUpdateSchedule': function(e) {
+        'beforeUpdateSchedule': function(e) {       //移動schedule
             var schedule = e.schedule;
             var changes = e.changes;
 
@@ -177,7 +177,7 @@
 
         setDropdownCalendarType();
         setRenderRangeText();
-        setSchedules();
+        // setSchedules();
     }
 
     function onClickNavi(e) {
@@ -402,10 +402,6 @@
     }
 
     function setSchedules() {
-        cal.clear();
-        generateSchedule(cal.getViewName(), cal.getDateRangeStart(), cal.getDateRangeEnd());
-        cal.createSchedules(ScheduleList);
-
         refreshScheduleVisibility();
     }
 
