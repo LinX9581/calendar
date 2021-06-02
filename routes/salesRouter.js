@@ -15,6 +15,14 @@ router.get('/', async function (req, res) {
     console.log("booking connect")
 });
 
+router.post('/renderSchedule', async function (req, res) {
+    let beforeCreateScheduleSql = "select * from booking.event"
+    let allSchedule = await query(beforeCreateScheduleSql)
+    res.send(JSON.stringify({
+        'schedule': allSchedule,
+        'render schedule': 'succeed',
+    }));
+})
 router.post('/beforeCreateSchedule', async function (req, res) {
     let id = req.body.id
     let calendarId = req.body.calendarId
@@ -26,13 +34,13 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     let state = req.body.state
 
     let beforeCreateScheduleSql = "INSERT INTO booking.event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`)VALUES(?,?,?,?,?,?,?,?);"
-    let newScheduleData = [id,calendarId,title,isAllDay,start,end,category,state]
-    await query(beforeCreateScheduleSql,newScheduleData)
+    let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state]
+    await query(beforeCreateScheduleSql, newScheduleData)
     res.send(JSON.stringify({
-        '成功':'成功',
+        '成功': '成功',
     }));
 })
-router.get('/beforeUpdateSchedule', async function (req, res) {
+router.post('/beforeUpdateSchedule', async function (req, res) {
     let centerMember = 'asd'
     let sql = 'SELECT User, Host FROM mysql.user;'
     let a = await query(sql)

@@ -53,8 +53,8 @@
             if (changes && !changes.isAllDay && schedule.category === 'allday') {
                 changes.category = 'time';
             }
-            let updateStart = moment(changes.start._date).format('YYYY-MM-DD HH:mm:ss')
-            let updateEnd = moment(changes.end._date).format('YYYY-MM-DD HH:mm:ss')
+            // let updateStart = moment(changes.start._date).format('YYYY-MM-DD HH:mm:ss')
+            // let updateEnd = moment(changes.end._date).format('YYYY-MM-DD HH:mm:ss')
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             refreshScheduleVisibility();
         },
