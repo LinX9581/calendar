@@ -44,7 +44,7 @@
             console.log('beforeCreateSchedule', e);
             saveNewSchedule(e);
         },
-        'beforeUpdateSchedule': function (e) {       //移動schedule
+        'beforeUpdateSchedule': async function (e) {       //移動schedule
             var schedule = e.schedule;
             var changes = e.changes;
 
@@ -53,8 +53,21 @@
             if (changes && !changes.isAllDay && schedule.category === 'allday') {
                 changes.category = 'time';
             }
-            // let updateStart = moment(changes.start._date).format('YYYY-MM-DD HH:mm:ss')
-            // let updateEnd = moment(changes.end._date).format('YYYY-MM-DD HH:mm:ss')
+            let updateStart = moment(changes.start._date).format('YYYY-MM-DD HH:mm:ss')
+            let updateEnd = moment(changes.end._date).format('YYYY-MM-DD HH:mm:ss')
+            await fetch('/beforeUpdateSchedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "updateId": schedule.id,
+                    "updateStart": updateStart,
+                    "updateEnd": updateEnd,
+                })
+            }).then(res => res.json()).then((jsonData) => {
+                return 0;
+            })
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             refreshScheduleVisibility();
         },

@@ -41,12 +41,15 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     }));
 })
 router.post('/beforeUpdateSchedule', async function (req, res) {
-    let centerMember = 'asd'
-    let sql = 'SELECT User, Host FROM mysql.user;'
-    let a = await query(sql)
-    console.log(a);
+    let updateId = req.body.updateId
+    let updateStart = req.body.updateStart
+    let updateEnd = req.body.updateEnd
+    let beforeUpdateScheduleSql = "UPDATE booking.event SET start = ?, end = ? WHERE id = ?"
+    let updateScheduleData = [updateStart,updateEnd,updateId]
+    let updateResult = await query(beforeUpdateScheduleSql,updateScheduleData)
+    console.log(updateResult);
     res.send(JSON.stringify({
-        centerMember,
+        '成功': '成功',
     }));
 })
 router.get('/test', async function (req, res) {
