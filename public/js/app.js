@@ -4,7 +4,6 @@
 /* eslint-env jquery */
 /* global moment, tui, chance */
 /* global findCalendar, CalendarList, ScheduleList */
-
 (function (window, Calendar) {
     var cal, resizeThrottled;
     var useCreationPopup = true;
@@ -44,17 +43,21 @@
             console.log('beforeCreateSchedule', e);
             saveNewSchedule(e);
         },
-        'beforeUpdateSchedule': async function (e) {       //移動schedule
+        'beforeUpdateSchedule': async function (e) {       //任何更新都會觸發
             var schedule = e.schedule;
             var changes = e.changes;
-
+            console.log(changes + '更改');
             console.log('beforeUpdateSchedule', e);
 
             if (changes && !changes.isAllDay && schedule.category === 'allday') {
                 changes.category = 'time';
             }
-            let updateStart = moment(changes.start._date).format('YYYY-MM-DD HH:mm:ss')
-            let updateEnd = moment(changes.end._date).format('YYYY-MM-DD HH:mm:ss')
+            let updateTitle = changes?.title ?? schedule.title
+            let updateLocation = changes?.location ?? schedule.location
+            let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
+            let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
+            console.log(updateTitle);
+            console.log(updateLocation);
             await fetch('/beforeUpdateSchedule', {
                 method: 'POST',
                 headers: {
@@ -62,6 +65,8 @@
                 },
                 body: JSON.stringify({
                     "updateId": schedule.id,
+                    "updateTitle": updateTitle,
+                    "updateLocation": updateLocation,
                     "updateStart": updateStart,
                     "updateEnd": updateEnd,
                 })
@@ -71,8 +76,19 @@
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             refreshScheduleVisibility();
         },
-        'beforeDeleteSchedule': function (e) {
+        'beforeDeleteSchedule': async function (e) {
             console.log('beforeDeleteSchedule', e);
+            await fetch('/beforeDeleteSchedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "deleteId": e.schedule.id,
+                })
+            }).then(res => res.json()).then((jsonData) => {
+                return 0;
+            })
             cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
         },
         'afterRenderSchedule': function (e) {

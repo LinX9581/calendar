@@ -40,13 +40,25 @@ router.post('/beforeCreateSchedule', async function (req, res) {
         '成功': '成功',
     }));
 })
+router.post('/beforeDeleteSchedule', async function (req, res) {
+    let deleteId = req.body.deleteId
+
+    let beforeDeleteScheduleSql = "delete from booking.event where id = ?"
+    let deleteScheduleData = [deleteId]
+    await query(beforeDeleteScheduleSql, deleteScheduleData)
+    res.send(JSON.stringify({
+        '成功': '成功',
+    }));
+})
 router.post('/beforeUpdateSchedule', async function (req, res) {
     let updateId = req.body.updateId
+    let updateTitle = req.body.updateTitle
+    let updateLocation = req.body.updateLocation
     let updateStart = req.body.updateStart
     let updateEnd = req.body.updateEnd
-    let beforeUpdateScheduleSql = "UPDATE booking.event SET start = ?, end = ? WHERE id = ?"
-    let updateScheduleData = [updateStart,updateEnd,updateId]
-    let updateResult = await query(beforeUpdateScheduleSql,updateScheduleData)
+    let beforeUpdateScheduleSql = "UPDATE booking.event SET title = ?, location = ?, start = ?, end = ? WHERE id = ?"
+    let updateScheduleData = [updateTitle, updateLocation, updateStart, updateEnd, updateId]
+    let updateResult = await query(beforeUpdateScheduleSql, updateScheduleData)
     console.log(updateResult);
     res.send(JSON.stringify({
         '成功': '成功',
