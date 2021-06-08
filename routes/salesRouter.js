@@ -23,6 +23,15 @@ router.post('/renderSchedule', async function (req, res) {
         'render schedule': 'succeed',
     }));
 })
+router.post('/renderCalendar', async function (req, res) {
+    let beforeCreateCalendarSql = "select * from booking.calendar_list"
+    let allCalendar = await query(beforeCreateCalendarSql)
+    console.log(allCalendar);
+    res.send(JSON.stringify({
+        'calendar': allCalendar,
+        'render Calendar': 'succeed',
+    }));
+})
 router.post('/beforeCreateSchedule', async function (req, res) {
     let id = req.body.id
     let calendarId = req.body.calendarId
