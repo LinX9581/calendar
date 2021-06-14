@@ -152,14 +152,15 @@
     <script src="./js/app.js"></script>
     <script>
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-(async function() {
-    await sleep(3000)
-    await cal.render()
-})();
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        afterAllEventRender()
+        async function afterAllEventRender(){
+            await sleep(2000)
+            console.log("rerender");
+            $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
+        }
     </script>
 </body>
 

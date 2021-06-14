@@ -4,7 +4,8 @@
 /* eslint-env jquery */
 /* global moment, tui, chance */
 /* global findCalendar, CalendarList, ScheduleList */
-(function (window, Calendar) {
+
+(async function (window, Calendar) {
     var cal, resizeThrottled;
     var useCreationPopup = true;
     var useDetailPopup = true;
@@ -50,23 +51,35 @@
             console.log('beforeUpdateSchedule', e);
 
             if (changes && !changes.isAllDay && schedule.category === 'allday') {
+                console.log("all day");
                 changes.category = 'time';
             }
+            console.log(changes + '更改');
+            console.log(changes);
+            let updateId = changes?.calendarId ?? schedule.id
             let updateTitle = changes?.title ?? schedule.title
             let updateLocation = changes?.location ?? schedule.location
+            // let updateBorderColor = changes?.borderColor ?? schedule.borderColor
+            // let updateBgColor = changes?.updatebgColor ?? schedule.bgColor
+            // let updateColor = changes?.color ?? schedule.color
+            // let updatedragBgColor = changes?.dragBgColor ?? schedule.dragBgColor
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
-            console.log(updateTitle);
-            console.log(updateLocation);
             await fetch('/beforeUpdateSchedule', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    "updateId": schedule.id,
+                    "change": changes,
+                    "scheduleId": schedule.id,
+                    "updateId": updateId,
                     "updateTitle": updateTitle,
                     "updateLocation": updateLocation,
+                    // "updateBorderColor": updateBorderColor,
+                    // "updateBgColor": updateBgColor,
+                    // "updateColor": updateColor,
+                    // "updatedragBgColor": updatedragBgColor,
                     "updateStart": updateStart,
                     "updateEnd": updateEnd,
                 })
@@ -155,9 +168,6 @@
         var action = getDataAction(target);
         var options = cal.getOptions();
         var viewName = '';
-
-        console.log(target + "target onClickMenu");
-        console.log(action + "action onClickMenu");
         switch (action) {
             case 'toggle-daily':
                 viewName = 'day';
@@ -238,7 +248,6 @@
         var start = datePicker.getStartDate();
         var end = datePicker.getEndDate();
         var calendar = selectedCalendar ? selectedCalendar : CalendarList[0];
-
         if (!title) {
             return;
         }
@@ -272,6 +281,7 @@
     }
 
     function changeNewScheduleCalendar(calendarId) {
+        console.log(calendarId + 'changeNewScheduleCalendar');
         var calendarNameElement = document.getElementById('calendarName');
         var calendar = findCalendar(calendarId);
         var html = [];
@@ -296,6 +306,8 @@
         }
     }
     async function saveNewSchedule(scheduleData) {
+        console.log('建立新事件');
+        console.log(scheduleData);
         var calendar = scheduleData.calendar || findCalendar(scheduleData.calendarId);
         var schedule = {
             id: String(chance.guid()),
@@ -321,7 +333,7 @@
             schedule.bgColor = calendar.bgColor;
             schedule.borderColor = calendar.borderColor;
         }
-
+        console.log(schedule.calendarId + ' schedule ID');
         await fetch('/beforeCreateSchedule', {
             method: 'POST',
             headers: {
@@ -337,17 +349,22 @@
                 "category": schedule.category,
                 "dueDateClass": schedule.dueDateClass,
                 "state": schedule.state,
+                "color": schedule.color,
+                "bgColor": schedule.bgColor,
+                "dragBgColor": schedule.dragBgColor,
+                "borderColor": schedule.borderColor,
             })
         }).then(res => res.json()).then((jsonData) => {
             return 0;
         })
 
         cal.createSchedules([schedule]);
-        console.log(schedule);
         refreshScheduleVisibility();
     }
 
     function onChangeCalendars(e) {
+        console.log('calendar 被改變');
+        console.log(e);
         var calendarId = e.target.value;
         var checked = e.target.checked;
         var viewAll = document.querySelector('.lnb-calendars-item input');
@@ -467,7 +484,7 @@
 
         window.addEventListener('resize', resizeThrottled);
     }
-
+ 
     function getDataAction(target) {
         return target.dataset ? target.dataset.action : target.getAttribute('data-action');
     }
@@ -486,9 +503,11 @@
 
 // set calendars
 (function () {
+    console.log('rerender calendar');
     var calendarList = document.getElementById('calendarList');
     var html = [];
     CalendarList.forEach(function (calendar) {
+        console.log(calendar);
         html.push('<div class="lnb-calendars-item"><label>' +
             '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
             '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
