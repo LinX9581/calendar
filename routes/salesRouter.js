@@ -13,7 +13,7 @@ router.get('/', async function (req, res) {
 });
 
 router.post('/renderSchedule', async function (req, res) {
-    let beforeCreateScheduleSql = "select * from booking.event"
+    let beforeCreateScheduleSql = "select * from booking.schedule_event"
     let allSchedule = await query(beforeCreateScheduleSql)
     res.send(JSON.stringify({
         'schedule': allSchedule,
@@ -26,6 +26,16 @@ router.post('/renderCalendar', async function (req, res) {
     res.send(JSON.stringify({
         'calendar': allCalendar,
         'render Calendar': 'succeed',
+    }));
+})
+router.post('/deleteCalendar', async function (req, res) {
+    let delCalId = req.body.delCalId;
+    let delCalSql = 'DELETE booking.schedule_event FROM booking.schedule_event INNER JOIN booking.calendar_list ON schedule_event.calendarId = calendar_list.id WHERE calendar_list.id = ?'
+    let delCalSqlData = [delCalId]
+    let allCalendar = await query(delCalSql,delCalSqlData)
+    console.log(allCalendar);
+    res.send(JSON.stringify({
+        'Delete Calendar': 'succeed',
     }));
 })
 router.post('/createCalendarList', async function (req, res) {
@@ -59,7 +69,7 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     // let beforeCreateScheduleSql = "INSERT INTO booking.event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`color`,`bgColor`,`dragBgColor`,`borderColor`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
     // let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, color, bgColor, dragBgColor, borderColor]
 
-    let beforeCreateScheduleSql = "INSERT INTO booking.event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`)VALUES(?,?,?,?,?,?,?,?);"
+    let beforeCreateScheduleSql = "INSERT INTO booking.schedule_event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`)VALUES(?,?,?,?,?,?,?,?);"
     let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state]
     await query(beforeCreateScheduleSql, newScheduleData)
     res.send(JSON.stringify({
@@ -68,7 +78,7 @@ router.post('/beforeCreateSchedule', async function (req, res) {
 })
 router.post('/beforeDeleteSchedule', async function (req, res) {
     let deleteId = req.body.deleteId
-    let beforeDeleteScheduleSql = "delete from booking.event where id = ?"
+    let beforeDeleteScheduleSql = "delete from booking.schedule_event where id = ?"
     let deleteScheduleData = [deleteId]
     await query(beforeDeleteScheduleSql, deleteScheduleData)
     res.send(JSON.stringify({
@@ -90,7 +100,7 @@ router.post('/beforeUpdateSchedule', async function (req, res) {
     // let updateScheduleData = [updateId, updateTitle, updateLocation, updateBgColor, updateBorderColor, updateColor, updateDragBgColor, updateStart, updateEnd, scheduleId]
 
     let updateScheduleData = [updateId, updateTitle, updateLocation, updateStart, updateEnd, scheduleId]
-    let beforeUpdateScheduleSql = "UPDATE booking.event SET calendarId = ?, title = ?, location = ?, start = ?, end = ? WHERE id = ?"
+    let beforeUpdateScheduleSql = "UPDATE booking.schedule_event SET calendarId = ?, title = ?, location = ?, start = ?, end = ? WHERE id = ?"
     await query(beforeUpdateScheduleSql, updateScheduleData)
 
     res.send(JSON.stringify({

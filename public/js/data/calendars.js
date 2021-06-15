@@ -29,6 +29,9 @@ function findCalendar(id) {
 
     return found || CalendarList[0];
 }
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 var calendar;
 var html = [];
@@ -38,8 +41,30 @@ async function serverRenderInit() {
     console.log('serverRenderInit');
     await renderCalendar()
     await renderSchedule()
+    await sleep(2000)
+    await afterAllEventRender()
 }
-
+async function afterAllEventRender() {
+    console.log("afterAllEventReadyRerender");
+    $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
+    $('.delBtn').click(async function () {
+        let delCalId = $(this).attr('delId')
+        let delCalName = $(this).attr('delName')
+        alert('確定刪除 ' + delCalName + ' ?')
+        await fetch('/deleteCalendar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                "delCalId":delCalId
+            })
+        }).then(res => res.json()).then((jsonData) => {
+            cal.createSchedules(jsonData.schedule)
+        })
+        console.log(delCalId);
+        console.log(delCalName);
+    })
+}
 async function renderCalendar() {
     await fetch('/renderCalendar', {
         method: 'POST',
@@ -61,11 +86,11 @@ async function renderCalendar() {
         }
 
         CalendarList.forEach(function (calendar) {
-            html.push('<div class="lnb-calendars-item"><label>' +
+            html.push('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
                 '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
                 '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
-                '<span>' + calendar.name + '</span>' +
-                '</label></div>'
+                '<span>' + calendar.name + '</span> ' +
+                '</label></div><div class="col-3 py-2 delBtn" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>'
             );
         });
         calendarList.innerHTML = html.join('\n');
@@ -86,11 +111,13 @@ async function renderSchedule() {
 $('#addListBtn').click(async function () {
     await addCalendarInfo()
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
+    $('#addListInput').val('')
+    $('#addListColorInput').val('')
 })
 
 async function addCalendarInfo() {
     let calendarName = $('#addListInput').val()
-    let calendarColor = $('#listColor').val()
+    let calendarColor = $('#addListColorInput').val()
     if (calendarName != '' && calendarColor != '') {
         calendarInfo(calendarName, calendarColor)
     }
@@ -106,11 +133,11 @@ async function calendarInfo(calendarName, calendarColor) {
     calendar.borderColor = calendarColor;
     addCalendar(calendar);
 
-    $('#calendarList').append('<div class="lnb-calendars-item"><label>' +
+    $('#calendarList').append('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
         '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
         '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
-        '<span>' + calendar.name + '</span>' +
-        '</label></div>')
+        '<span>' + calendar.name + '</span> ' +
+        '</label></div><div class="col-3 py-2 delBtn" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>')
 
     await fetch('/createCalendarList', {
         method: 'POST',
@@ -118,7 +145,7 @@ async function calendarInfo(calendarName, calendarColor) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            "calendarList":CalendarList,
+            "calendarList": CalendarList,
             "calendarId": calendar.id,
             "calendarName": calendarName,
             "calendarColor": '#ffffff',
