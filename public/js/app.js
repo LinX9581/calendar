@@ -47,24 +47,22 @@
         'beforeUpdateSchedule': async function (e) {       //任何更新都會觸發
             var schedule = e.schedule;
             var changes = e.changes;
-            console.log(changes + '更改');
             console.log('beforeUpdateSchedule', e);
 
             if (changes && !changes.isAllDay && schedule.category === 'allday') {
-                console.log("all day");
                 changes.category = 'time';
             }
-            console.log(changes + '更改');
-            console.log(changes);
+
             let updateId = changes?.calendarId ?? schedule.id
             let updateTitle = changes?.title ?? schedule.title
             let updateLocation = changes?.location ?? schedule.location
+            let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
+            let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
             // let updateBorderColor = changes?.borderColor ?? schedule.borderColor
             // let updateBgColor = changes?.updatebgColor ?? schedule.bgColor
             // let updateColor = changes?.color ?? schedule.color
             // let updatedragBgColor = changes?.dragBgColor ?? schedule.dragBgColor
-            let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
-            let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
+
             await fetch('/beforeUpdateSchedule', {
                 method: 'POST',
                 headers: {
@@ -76,12 +74,12 @@
                     "updateId": updateId,
                     "updateTitle": updateTitle,
                     "updateLocation": updateLocation,
+                    "updateStart": updateStart,
+                    "updateEnd": updateEnd,
                     // "updateBorderColor": updateBorderColor,
                     // "updateBgColor": updateBgColor,
                     // "updateColor": updateColor,
                     // "updatedragBgColor": updatedragBgColor,
-                    "updateStart": updateStart,
-                    "updateEnd": updateEnd,
                 })
             }).then(res => res.json()).then((jsonData) => {
                 return 0;
@@ -281,7 +279,6 @@
     }
 
     function changeNewScheduleCalendar(calendarId) {
-        console.log(calendarId + 'changeNewScheduleCalendar');
         var calendarNameElement = document.getElementById('calendarName');
         var calendar = findCalendar(calendarId);
         var html = [];
@@ -306,8 +303,6 @@
         }
     }
     async function saveNewSchedule(scheduleData) {
-        console.log('建立新事件');
-        console.log(scheduleData);
         var calendar = scheduleData.calendar || findCalendar(scheduleData.calendarId);
         var schedule = {
             id: String(chance.guid()),
@@ -327,13 +322,14 @@
             },
             state: scheduleData.state
         };
+
         if (calendar) {
             schedule.calendarId = calendar.id;
             schedule.color = calendar.color;
             schedule.bgColor = calendar.bgColor;
             schedule.borderColor = calendar.borderColor;
         }
-        console.log(schedule.calendarId + ' schedule ID');
+
         await fetch('/beforeCreateSchedule', {
             method: 'POST',
             headers: {
@@ -354,8 +350,8 @@
                 "dragBgColor": schedule.dragBgColor,
                 "borderColor": schedule.borderColor,
             })
-        }).then(res => res.json()).then((jsonData) => {
-            return 0;
+        }).then(res => res.json()).then((beforeCreateScheduleRes) => {
+            console.log(beforeCreateScheduleRes);
         })
 
         cal.createSchedules([schedule]);
@@ -363,8 +359,6 @@
     }
 
     function onChangeCalendars(e) {
-        console.log('calendar 被改變');
-        console.log(e);
         var calendarId = e.target.value;
         var checked = e.target.checked;
         var viewAll = document.querySelector('.lnb-calendars-item input');
@@ -503,11 +497,9 @@
 
 // set calendars
 (function () {
-    console.log('rerender calendar');
     var calendarList = document.getElementById('calendarList');
     var html = [];
     CalendarList.forEach(function (calendar) {
-        console.log(calendar);
         html.push('<div class="lnb-calendars-item"><label>' +
             '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
             '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +

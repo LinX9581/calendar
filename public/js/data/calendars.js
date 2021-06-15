@@ -15,12 +15,10 @@ function CalendarInfo() {
 }
 
 function addCalendar(calendar) {
-    console.log('add calendar');
     CalendarList.push(calendar);
 }
 
 function findCalendar(id) {
-    console.log(id + 'find id');
     var found;
 
     CalendarList.forEach(function (calendar) {
@@ -32,23 +30,17 @@ function findCalendar(id) {
     return found || CalendarList[0];
 }
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 var calendar;
-var calendarList = document.getElementById('calendarList');
 var html = [];
-var id = 0;
-test2()
-async function test2() {
-    console.log('teset2');
+
+serverRenderInit()
+async function serverRenderInit() {
+    console.log('serverRenderInit');
     await renderCalendar()
     await renderSchedule()
 }
 
 async function renderCalendar() {
-    console.log('render Calendar');
     await fetch('/renderCalendar', {
         method: 'POST',
         headers: {
@@ -57,7 +49,6 @@ async function renderCalendar() {
         body: JSON.stringify({
         })
     }).then(res => res.json()).then((jsonData) => {
-        console.log(jsonData.calendar);
         for (let i = 0; i < jsonData.calendar.length; i++) {
             calendar = new CalendarInfo();
             calendar.id = jsonData.calendar[i].id;
@@ -91,11 +82,12 @@ async function renderSchedule() {
         cal.createSchedules(jsonData.schedule)
     })
 }
-let ids = 1;
+
 $('#addListBtn').click(async function () {
     await addCalendarInfo()
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
 })
+
 async function addCalendarInfo() {
     let calendarName = $('#addListInput').val()
     let calendarColor = $('#listColor').val()
@@ -113,15 +105,13 @@ async function calendarInfo(calendarName, calendarColor) {
     calendar.dragBgColor = calendarColor;
     calendar.borderColor = calendarColor;
     addCalendar(calendar);
-    console.log(calendar.id + 'add calendar id');
-    var calendarList1 = document.getElementById('calendarList');
 
     $('#calendarList').append('<div class="lnb-calendars-item"><label>' +
         '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
         '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
         '<span>' + calendar.name + '</span>' +
         '</label></div>')
-    // calendarList.innerHTML = html.join('\n');
+
     await fetch('/createCalendarList', {
         method: 'POST',
         headers: {
@@ -136,8 +126,8 @@ async function calendarInfo(calendarName, calendarColor) {
             "calendarDragBgColor": calendarColor,
             "calendarBorderColor": calendarColor
         })
-    }).then(res => res.json()).then((jsonData) => {
-        console.log(jsonData);
+    }).then(res => res.json()).then((createCalendarListRes) => {
+        console.log(createCalendarListRes);
     })
 }
 
