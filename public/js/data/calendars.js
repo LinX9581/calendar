@@ -44,25 +44,29 @@ async function serverRenderInit() {
     await sleep(2000)
     await afterAllEventRender()
 }
+
 async function afterAllEventRender() {
     console.log("afterAllEventReadyRerender");
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
     $('.delBtn').click(async function () {
         let delCalId = $(this).attr('delId')
         let delCalName = $(this).attr('delName')
-        alert('確定刪除 ' + delCalName + ' ?')
-        await fetch('/deleteCalendar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }, body: JSON.stringify({
-                "delCalId":delCalId
+        let isDel = confirm('確定刪除 ' + delCalName + ' ?')
+        if (isDel) {
+            $(this).parent().remove()
+            await fetch('/deleteCalendar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }, body: JSON.stringify({
+                    "delCalId": delCalId
+                })
+            }).then(res => res.json()).then((delIdRes) => {
+                for (const delIdIndex of delIdRes.delIdArray) {
+                    cal.deleteSchedule(delIdIndex.id,delCalId); //需要即時同步
+                }
             })
-        }).then(res => res.json()).then((jsonData) => {
-            cal.createSchedules(jsonData.schedule)
-        })
-        console.log(delCalId);
-        console.log(delCalName);
+        }
     })
 }
 async function renderCalendar() {

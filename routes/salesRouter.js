@@ -29,13 +29,22 @@ router.post('/renderCalendar', async function (req, res) {
     }));
 })
 router.post('/deleteCalendar', async function (req, res) {
+    let delIdArray = []
     let delCalId = req.body.delCalId;
-    let delCalSql = 'DELETE booking.schedule_event FROM booking.schedule_event INNER JOIN booking.calendar_list ON schedule_event.calendarId = calendar_list.id WHERE calendar_list.id = ?'
+    let delCalSql = 'DELETE FROM booking.calendar_list WHERE id = ?'
+    let delCalScheduleSql = 'DELETE FROM booking.schedule_event WHERE calendarId = ?'
+    let delCalScheduleIdSql = 'SELECT id FROM booking.schedule_event WHERE calendarId = ?'
     let delCalSqlData = [delCalId]
-    let allCalendar = await query(delCalSql,delCalSqlData)
-    console.log(allCalendar);
+    let delScheduleId = await query(delCalScheduleIdSql, delCalSqlData)
+
+    for (const delId of delScheduleId) {
+        delIdArray.push(delId)
+    }
+    await query(delCalSql, delCalSqlData)
+    await query(delCalScheduleSql, delCalSqlData)
     res.send(JSON.stringify({
         'Delete Calendar': 'succeed',
+        'delIdArray': delIdArray
     }));
 })
 router.post('/createCalendarList', async function (req, res) {
