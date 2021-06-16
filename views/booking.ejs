@@ -154,10 +154,12 @@
     <script src="./js/app.js"></script>
 
     <script>
-        $('.delBtn').click(async function () {
-            let delCalId = $(this).attr('delId')
-            console.log("asdasdasdasdasd");
-        })
+        (function () {
+            $('.delBtn').on('click', function () {
+                let delCalId = $(this).attr('delId')
+                console.log("asdasdasdasdasd");
+            })
+        })();
     </script>
 </body>
 
