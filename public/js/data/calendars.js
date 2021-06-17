@@ -1,7 +1,7 @@
 'use strict';
 
 /* eslint-disable require-jsdoc, no-unused-vars */
-
+var socket = io();
 var CalendarList = [];
 
 function CalendarInfo() {
@@ -75,7 +75,7 @@ async function renderCalendar() {
                 '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
                 '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
                 '<span>' + calendar.name + '</span> ' +
-                '</label></div><div class="col-3 py-2 delBtn" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>'
+                '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>'
             );
         });
         calendarList.innerHTML = html.join('\n');
@@ -93,13 +93,16 @@ async function renderSchedule() {
     })
 }
 
-async function calendarDel(){
+async function calendarDel() {
     $('.delBtn').on('click', async function () {
         let delCalId = $(this).attr('delId')
         let delCalName = $(this).attr('delName')
         let isDel = confirm('確定刪除 ' + delCalName + ' ?')
+
         if (isDel) {
             $(this).parent().remove()
+            socket.emit('delete calendar', delCalId);
+
             await fetch('/deleteCalendar', {
                 method: 'POST',
                 headers: {
@@ -107,9 +110,10 @@ async function calendarDel(){
                 }, body: JSON.stringify({
                     "delCalId": delCalId
                 })
-            }).then(res => res.json()).then((delIdRes) => {
-                for (const delIdIndex of delIdRes.delIdArray) {
-                    cal.deleteSchedule(delIdIndex.id, delCalId); //需要即時同步
+            }).then(res => res.json()).then((delScheduleIdRes) => {
+                socket.emit('delete calendar relate to the schedule', delScheduleIdRes, delCalId);
+                for (const delScheduleIdIndex of delScheduleIdRes.delIdArray) {
+                    cal.deleteSchedule(delScheduleIdIndex.id, delCalId);
                 }
             })
         }
@@ -128,7 +132,10 @@ async function addCalendarInfo() {
     let calendarName = $('#addListInput').val()
     let calendarColor = $('#addListColorInput').val()
     if (calendarName != '' && calendarColor != '') {
+        socket.emit('create calendar', calendarName, calendarColor);
         calendarInfo(calendarName, calendarColor)
+    } else {
+        alert('name、color 不得為空')
     }
 }
 
@@ -146,7 +153,7 @@ async function calendarInfo(calendarName, calendarColor) {
         '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
         '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
         '<span>' + calendar.name + '</span> ' +
-        '</label></div><div class="col-3 py-2 delBtn" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>')
+        '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>')
 
     await fetch('/createCalendarList', {
         method: 'POST',

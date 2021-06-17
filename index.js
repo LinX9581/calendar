@@ -10,9 +10,9 @@ const io = require('socket.io')(http);
 
 app.use(session({
     secret: 'mySecret',
-    name: 'user', 
+    name: 'user',
     saveUninitialized: false,
-    resave: true, 
+    resave: true,
     cookie: { maxAge: 3600 * 1000 }
 }));
 
@@ -28,8 +28,17 @@ io.on('connection', function (socket) {
     socket.on('create schedule', function (schedule) {
         socket.broadcast.emit('create schedule', schedule);
     });
-    socket.on('delete schedule', function (scheduleId,calId) {
-        socket.broadcast.emit('delete schedule', scheduleId,calId);
+    socket.on('delete schedule', function (scheduleId, calId) {
+        socket.broadcast.emit('delete schedule', scheduleId, calId);
+    });
+    socket.on('create calendar', function (calendarName, calendarColor) {
+        socket.broadcast.emit('create calendar', calendarName, calendarColor);
+    });
+    socket.on('delete calendar', function (delCalId) {
+        socket.broadcast.emit('delete calendar', delCalId);
+    });
+    socket.on('delete schedule relattive to the calendar', function (delScheduleIdRes, delCalId) {
+        socket.broadcast.emit('delete schedule relattive to the calendar', delScheduleIdRes, delCalId);
     });
 });
 
@@ -37,6 +46,6 @@ io.on('connection', function (socket) {
 const host = '0.0.0.0';
 const port = process.env.PORT || 3100;
 
-http.listen(port, host, function() {
+http.listen(port, host, function () {
     console.log("Server started.......");
 });

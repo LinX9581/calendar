@@ -155,6 +155,7 @@
     <script>
         var socket = io();
         socket.on('create schedule', function (schedule) {
+            console.log(schedule);
             console.log('get server create schedule socket');
             cal.createSchedules([
                 {
@@ -170,7 +171,37 @@
             ]);
         });
         socket.on('delete schedule', function (scheduleId, calId) {
+            console.log('get server delete schedule socket');
             cal.deleteSchedule(scheduleId, calId);
+        });
+        socket.on('create calendar', function (calendarName, calendarColor) {
+            console.log('get server create calendar socket');
+            calendar = new CalendarInfo();
+            calendar.id = String(Date.now());
+            calendar.name = calendarName;
+            calendar.color = '#ffffff';
+            calendar.bgColor = calendarColor;
+            calendar.dragBgColor = calendarColor;
+            calendar.borderColor = calendarColor;
+            addCalendar(calendar);
+
+            $('#calendarList').append('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
+                '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
+                '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
+                '<span>' + calendar.name + '</span> ' +
+                '</label></div><div class="col-3 py-2 delBtn" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>')
+
+        });
+        socket.on('delete calendar', function (delCalId) {
+            console.log('get server delete calendar socket');
+            $('.' + delCalId).parent().remove()
+        });
+        socket.on('delete schedule relattive to the calendar', function (delScheduleIdRes, delCalId) {
+            console.log('delScheduleIdRes' + delScheduleIdRes);
+            console.log('get server delete schedule relattive to the calendar socket');
+            for (const delScheduleIdIndex of delScheduleIdRes.delIdArray) {
+                cal.deleteSchedule(delScheduleIdIndex.id, delCalId);
+            }
         });
 
     </script>
