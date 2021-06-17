@@ -31,8 +31,8 @@ io.on('connection', function (socket) {
     socket.on('delete schedule', function (scheduleId, calId) {
         socket.broadcast.emit('delete schedule', scheduleId, calId);
     });
-    socket.on('create calendar', function (calendarName, calendarColor) {
-        socket.broadcast.emit('create calendar', calendarName, calendarColor);
+    socket.on('create calendar', function (calendarId, calendarName, calendarColor) {
+        socket.broadcast.emit('create calendar', calendarId, calendarName, calendarColor);
     });
     socket.on('delete calendar', function (delCalId) {
         socket.broadcast.emit('delete calendar', delCalId);

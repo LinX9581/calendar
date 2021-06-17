@@ -96,6 +96,7 @@ async function renderSchedule() {
 async function calendarDel() {
     $('.delBtn').on('click', async function () {
         let delCalId = $(this).attr('delId')
+        console.log(delCalId + 'deleteid');
         let delCalName = $(this).attr('delName')
         let isDel = confirm('確定刪除 ' + delCalName + ' ?')
 
@@ -132,7 +133,6 @@ async function addCalendarInfo() {
     let calendarName = $('#addListInput').val()
     let calendarColor = $('#addListColorInput').val()
     if (calendarName != '' && calendarColor != '') {
-        socket.emit('create calendar', calendarName, calendarColor);
         calendarInfo(calendarName, calendarColor)
     } else {
         alert('name、color 不得為空')
@@ -148,6 +148,7 @@ async function calendarInfo(calendarName, calendarColor) {
     calendar.dragBgColor = calendarColor;
     calendar.borderColor = calendarColor;
     addCalendar(calendar);
+    socket.emit('create calendar', calendar.id, calendarName, calendarColor);
 
     $('#calendarList').append('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
         '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
