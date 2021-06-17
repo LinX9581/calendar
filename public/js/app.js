@@ -4,6 +4,7 @@
 /* eslint-env jquery */
 /* global moment, tui, chance */
 /* global findCalendar, CalendarList, ScheduleList */
+var socket = io();
 
 (async function (window, Calendar) {
     var cal, resizeThrottled;
@@ -100,6 +101,7 @@
             }).then(res => res.json()).then((jsonData) => {
                 return 0;
             })
+            socket.emit('delete schedule', e.schedule.id, e.schedule.calendarId);
             cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
         },
         'afterRenderSchedule': function (e) {
@@ -353,7 +355,7 @@
         }).then(res => res.json()).then((beforeCreateScheduleRes) => {
             console.log(beforeCreateScheduleRes);
         })
-
+        socket.emit('create schedule', [schedule]);
         cal.createSchedules([schedule]);
         refreshScheduleVisibility();
     }
@@ -478,7 +480,7 @@
 
         window.addEventListener('resize', resizeThrottled);
     }
- 
+
     function getDataAction(target) {
         return target.dataset ? target.dataset.action : target.getAttribute('data-action');
     }

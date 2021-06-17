@@ -131,7 +131,7 @@
         </div>
         <div id="calendar"></div>
     </div>
-
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="./js/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
         integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
@@ -152,14 +152,27 @@
     <script src="./js/data/calendars.js"></script>
     <script src="./js/data/schedules.js"></script>
     <script src="./js/app.js"></script>
-
     <script>
-        (function () {
-            $('.delBtn').on('click', function () {
-                let delCalId = $(this).attr('delId')
-                console.log("asdasdasdasdasd");
-            })
-        })();
+        var socket = io();
+        socket.on('create schedule', function (schedule) {
+            console.log('get server create schedule socket');
+            cal.createSchedules([
+                {
+                    id: schedule[0].id,
+                    calendarId: schedule[0].calendarId,
+                    title: schedule[0].title,
+                    location: schedule[0].location,
+                    category: 'time',
+                    dueDateClass: '',
+                    start: schedule[0].start._date,
+                    end: schedule[0].end._date,
+                }
+            ]);
+        });
+        socket.on('delete schedule', function (scheduleId, calId) {
+            cal.deleteSchedule(scheduleId, calId);
+        });
+
     </script>
 </body>
 

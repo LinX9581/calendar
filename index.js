@@ -6,6 +6,8 @@ import sitRouter from './routes/salesRouter';
 
 const app = express();
 const http = require('http').Server(app);
+const io = require('socket.io')(http);
+
 app.use(session({
     secret: 'mySecret',
     name: 'user', 
@@ -21,6 +23,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.static('public'));
 app.use('/', sitRouter);
+
+io.on('connection', function (socket) {
+    socket.on('create schedule', function (schedule) {
+        socket.broadcast.emit('create schedule', schedule);
+    });
+    socket.on('delete schedule', function (scheduleId,calId) {
+        socket.broadcast.emit('delete schedule', scheduleId,calId);
+    });
+});
+
 
 const host = '0.0.0.0';
 const port = process.env.PORT || 3100;
