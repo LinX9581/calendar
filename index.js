@@ -28,6 +28,9 @@ io.on('connection', function (socket) {
     socket.on('create schedule', function (schedule) {
         socket.broadcast.emit('create schedule', schedule);
     });
+    socket.on('update schedule', function (scheduleId, calId, changes) {
+        socket.broadcast.emit('update schedule', scheduleId, calId, changes);
+    });
     socket.on('delete schedule', function (scheduleId, calId) {
         socket.broadcast.emit('delete schedule', scheduleId, calId);
     });

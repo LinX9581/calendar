@@ -11,6 +11,16 @@ router.get('/', async function (req, res) {
     console.log("booking connect")
 });
 
+router.get('/petsmao', async function (req, res) {
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let channel = 'petsmao'
+    res.render('petsmao', {
+        today,
+        channel
+    });
+    console.log("booking connect")
+});
+
 router.post('/renderSchedule', async function (req, res) {
     let beforeCreateScheduleSql = "select * from booking.schedule_event"
     let allSchedule = await query(beforeCreateScheduleSql)

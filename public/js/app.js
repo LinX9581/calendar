@@ -85,6 +85,7 @@ var socket = io();
             }).then(res => res.json()).then((jsonData) => {
                 return 0;
             })
+            socket.emit('update schedule', schedule.id, schedule.calendarId, changes);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             refreshScheduleVisibility();
         },
