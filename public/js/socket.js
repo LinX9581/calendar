@@ -1,7 +1,5 @@
 var socket = io();
-socket.on('create schedule', function (schedule) {
-    console.log(schedule);
-    console.log('get server create schedule socket');
+socket.on(channel + 'create schedule', function (schedule) {
     cal.createSchedules([
         {
             id: schedule[0].id,
@@ -15,11 +13,11 @@ socket.on('create schedule', function (schedule) {
         }
     ]);
 });
-socket.on('update schedule', function (scheduleId, calId, changes) {
+socket.on(channel + 'update schedule', function (scheduleId, calId, changes) {
     console.log('get server update schedule socket');
     cal.updateSchedule(scheduleId, calId, changes);
 });
-socket.on('delete schedule', function (scheduleId, calId) {
+socket.on(channel + 'delete schedule', function (scheduleId, calId) {
     console.log('get server delete schedule socket');
     cal.deleteSchedule(scheduleId, calId);
 });

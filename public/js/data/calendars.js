@@ -57,6 +57,7 @@ async function renderCalendar() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            "channel": channel,
         })
     }).then(res => res.json()).then((jsonData) => {
         for (let i = 0; i < jsonData.calendar.length; i++) {
@@ -87,7 +88,10 @@ async function renderSchedule() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+            "channel": channel,
+        })
     }).then(res => res.json()).then((jsonData) => {
         cal.createSchedules(jsonData.schedule)
     })

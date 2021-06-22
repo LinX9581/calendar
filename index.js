@@ -25,14 +25,14 @@ app.use(express.static('public'));
 app.use('/', sitRouter);
 
 io.on('connection', function (socket) {
-    socket.on('create schedule', function (schedule) {
-        socket.broadcast.emit('create schedule', schedule);
+    socket.on('create schedule', function (schedule, channel) {
+        socket.broadcast.emit(channel + 'create schedule', schedule);
     });
-    socket.on('update schedule', function (scheduleId, calId, changes) {
-        socket.broadcast.emit('update schedule', scheduleId, calId, changes);
+    socket.on('update schedule', function (scheduleId, calId, changes, channel) {
+        socket.broadcast.emit(channel + 'update schedule', scheduleId, calId, changes);
     });
-    socket.on('delete schedule', function (scheduleId, calId) {
-        socket.broadcast.emit('delete schedule', scheduleId, calId);
+    socket.on('delete schedule', function (scheduleId, calId, channel) {
+        socket.broadcast.emit(channel + 'delete schedule', scheduleId, calId);
     });
     socket.on('create calendar', function (calendarId, calendarName, calendarColor) {
         socket.broadcast.emit('create calendar', calendarId, calendarName, calendarColor);

@@ -5,8 +5,11 @@ import moment from 'moment';
 let router = express.Router();
 router.get('/', async function (req, res) {
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let channel = 'www'
+    req.session.channel = channel;
     res.render('booking', {
         today,
+        channel
     });
     console.log("booking connect")
 });
@@ -22,8 +25,10 @@ router.get('/petsmao', async function (req, res) {
 });
 
 router.post('/renderSchedule', async function (req, res) {
-    let beforeCreateScheduleSql = "select * from booking.schedule_event"
-    let allSchedule = await query(beforeCreateScheduleSql)
+    let channel = req.body.channel;
+    let beforeCreateScheduleSql = "select * from booking.schedule_event where channel = ?"
+    let beforeCreateScheduleData = [channel]
+    let allSchedule = await query(beforeCreateScheduleSql,beforeCreateScheduleData)
     res.send(JSON.stringify({
         'schedule': allSchedule,
         'render schedule': 'succeed',
@@ -80,6 +85,7 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     let end = moment(req.body.end._date).format('YYYY-MM-DD HH:mm:ss')
     let category = req.body.category
     let state = req.body.state
+    let channel = req.body.channel;
     // let color = req.body.color
     // let bgColor = req.body.bgColor
     // let dragBgColor = req.body.dragBgColor
@@ -87,8 +93,8 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     // let beforeCreateScheduleSql = "INSERT INTO booking.event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`color`,`bgColor`,`dragBgColor`,`borderColor`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
     // let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, color, bgColor, dragBgColor, borderColor]
 
-    let beforeCreateScheduleSql = "INSERT INTO booking.schedule_event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`)VALUES(?,?,?,?,?,?,?,?);"
-    let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state]
+    let beforeCreateScheduleSql = "INSERT INTO booking.schedule_event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`)VALUES(?,?,?,?,?,?,?,?,?);"
+    let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, channel]
     await query(beforeCreateScheduleSql, newScheduleData)
     res.send(JSON.stringify({
         'beforeCreateSchedule': 'succeed',

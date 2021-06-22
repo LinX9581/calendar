@@ -85,7 +85,7 @@ var socket = io();
             }).then(res => res.json()).then((jsonData) => {
                 return 0;
             })
-            socket.emit('update schedule', schedule.id, schedule.calendarId, changes);
+            socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             refreshScheduleVisibility();
         },
@@ -102,7 +102,7 @@ var socket = io();
             }).then(res => res.json()).then((jsonData) => {
                 return 0;
             })
-            socket.emit('delete schedule', e.schedule.id, e.schedule.calendarId);
+            socket.emit('delete schedule', e.schedule.id, e.schedule.calendarId, channel);
             cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
         },
         'afterRenderSchedule': function (e) {
@@ -332,7 +332,7 @@ var socket = io();
             schedule.bgColor = calendar.bgColor;
             schedule.borderColor = calendar.borderColor;
         }
-
+        console.log(channel + ' begin');
         await fetch('/beforeCreateSchedule', {
             method: 'POST',
             headers: {
@@ -352,11 +352,12 @@ var socket = io();
                 "bgColor": schedule.bgColor,
                 "dragBgColor": schedule.dragBgColor,
                 "borderColor": schedule.borderColor,
+                "channel": channel,
             })
         }).then(res => res.json()).then((beforeCreateScheduleRes) => {
             console.log(beforeCreateScheduleRes);
         })
-        socket.emit('create schedule', [schedule]);
+        socket.emit('create schedule', [schedule], channel);
         cal.createSchedules([schedule]);
         refreshScheduleVisibility();
     }
