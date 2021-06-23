@@ -21,7 +21,7 @@ socket.on(channel + 'delete schedule', function (scheduleId, calId) {
     console.log('get server delete schedule socket');
     cal.deleteSchedule(scheduleId, calId);
 });
-socket.on('create calendar', function (calendarId, calendarName, calendarColor) {
+socket.on(channel + 'create calendar', function (calendarId, calendarName, calendarColor) {
     console.log('get server create calendar socket');
     calendar = new CalendarInfo();
     calendar.id = calendarId;
@@ -39,12 +39,12 @@ socket.on('create calendar', function (calendarId, calendarName, calendarColor) 
         '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>')
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
 });
-socket.on('delete calendar', async function (delCalId) {
+socket.on(channel + 'delete calendar', async function (delCalId) {
     console.log('get server delete calendar socket  ' + delCalId);
     await calendarDel()
     $('.' + delCalId).parent().remove()
 });
-socket.on('delete schedule relattive to the calendar', function (delScheduleIdRes, delCalId) {
+socket.on(channel + 'delete schedule relattive to the calendar', function (delScheduleIdRes, delCalId) {
     console.log('get server delete schedule relattive to the calendar socket');
     for (const delScheduleIdIndex of delScheduleIdRes.delIdArray) {
         cal.deleteSchedule(delScheduleIdIndex.id, delCalId);

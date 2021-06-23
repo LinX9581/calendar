@@ -106,7 +106,7 @@ async function calendarDel() {
 
         if (isDel) {
             $(this).parent().remove()
-            socket.emit('delete calendar', delCalId);
+            socket.emit('delete calendar', delCalId, channel);
 
             await fetch('/deleteCalendar', {
                 method: 'POST',
@@ -116,7 +116,7 @@ async function calendarDel() {
                     "delCalId": delCalId
                 })
             }).then(res => res.json()).then((delScheduleIdRes) => {
-                socket.emit('delete calendar relate to the schedule', delScheduleIdRes, delCalId);
+                socket.emit('delete calendar relate to the schedule', delScheduleIdRes, delCalId, channel);
                 for (const delScheduleIdIndex of delScheduleIdRes.delIdArray) {
                     cal.deleteSchedule(delScheduleIdIndex.id, delCalId);
                 }
@@ -137,13 +137,13 @@ async function addCalendarInfo() {
     let calendarName = $('#addListInput').val()
     let calendarColor = $('#addListColorInput').val()
     if (calendarName != '' && calendarColor != '') {
-        calendarInfo(calendarName, calendarColor)
+        calendarInfo(calendarName, calendarColor, channel)
     } else {
         alert('name、color 不得為空')
     }
 }
 
-async function calendarInfo(calendarName, calendarColor) {
+async function calendarInfo(calendarName, calendarColor, channel) {
     calendar = new CalendarInfo();
     calendar.id = String(Date.now());
     calendar.name = calendarName;
@@ -152,7 +152,7 @@ async function calendarInfo(calendarName, calendarColor) {
     calendar.dragBgColor = calendarColor;
     calendar.borderColor = calendarColor;
     addCalendar(calendar);
-    socket.emit('create calendar', calendar.id, calendarName, calendarColor);
+    socket.emit('create calendar', calendar.id, calendarName, calendarColor, channel);
 
     $('#calendarList').append('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
         '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
@@ -172,7 +172,8 @@ async function calendarInfo(calendarName, calendarColor) {
             "calendarColor": '#ffffff',
             "calendarBgColor": calendarColor,
             "calendarDragBgColor": calendarColor,
-            "calendarBorderColor": calendarColor
+            "calendarBorderColor": calendarColor,
+            "channel": channel
         })
     }).then(res => res.json()).then((createCalendarListRes) => {
         console.log(createCalendarListRes);

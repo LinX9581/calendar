@@ -28,15 +28,17 @@ router.post('/renderSchedule', async function (req, res) {
     let channel = req.body.channel;
     let beforeCreateScheduleSql = "select * from booking.schedule_event where channel = ?"
     let beforeCreateScheduleData = [channel]
-    let allSchedule = await query(beforeCreateScheduleSql,beforeCreateScheduleData)
+    let allSchedule = await query(beforeCreateScheduleSql, beforeCreateScheduleData)
     res.send(JSON.stringify({
         'schedule': allSchedule,
         'render schedule': 'succeed',
     }));
 })
 router.post('/renderCalendar', async function (req, res) {
-    let beforeCreateCalendarSql = "select * from booking.calendar_list order by orderKey"
-    let allCalendar = await query(beforeCreateCalendarSql)
+    let channel = req.body.channel;
+    let beforeCreateCalendarSql = "select * from booking.calendar_list where channel = ? order by orderKey"
+    let beforeCreateCalendarData = [channel]
+    let allCalendar = await query(beforeCreateCalendarSql, beforeCreateCalendarData)
     res.send(JSON.stringify({
         'calendar': allCalendar,
         'render Calendar': 'succeed',
@@ -68,8 +70,9 @@ router.post('/createCalendarList', async function (req, res) {
     let calendarBgColor = req.body.calendarBgColor;
     let calendarDragBgColor = req.body.calendarDragBgColor;
     let calendarBorderColor = req.body.calendarBorderColor;
-    let calendarListSql = 'insert into booking.calendar_list (id,name,color,bgcolor,dragbgcolor,bordercolor) values (?,?,?,?,?,?)'
-    let calendarListData = [calendarId, calendarName, calendarColor, calendarBgColor, calendarDragBgColor, calendarBorderColor]
+    let channel = req.body.channel;
+    let calendarListSql = 'insert into booking.calendar_list (id,name,color,bgcolor,dragbgcolor,bordercolor,channel) values (?,?,?,?,?,?,?)'
+    let calendarListData = [calendarId, calendarName, calendarColor, calendarBgColor, calendarDragBgColor, calendarBorderColor, channel]
     await query(calendarListSql, calendarListData)
 
     res.send(JSON.stringify({

@@ -34,14 +34,14 @@ io.on('connection', function (socket) {
     socket.on('delete schedule', function (scheduleId, calId, channel) {
         socket.broadcast.emit(channel + 'delete schedule', scheduleId, calId);
     });
-    socket.on('create calendar', function (calendarId, calendarName, calendarColor) {
-        socket.broadcast.emit('create calendar', calendarId, calendarName, calendarColor);
+    socket.on('create calendar', function (calendarId, calendarName, calendarColor, channel) {
+        socket.broadcast.emit(channel + 'create calendar', calendarId, calendarName, calendarColor);
     });
-    socket.on('delete calendar', function (delCalId) {
-        socket.broadcast.emit('delete calendar', delCalId);
+    socket.on('delete calendar', function (delCalId, channel) {
+        socket.broadcast.emit(channel + 'delete calendar', delCalId);
     });
-    socket.on('delete schedule relattive to the calendar', function (delScheduleIdRes, delCalId) {
-        socket.broadcast.emit('delete schedule relattive to the calendar', delScheduleIdRes, delCalId);
+    socket.on('delete schedule relattive to the calendar', function (delScheduleIdRes, delCalId, channel) {
+        socket.broadcast.emit(channel + 'delete schedule relattive to the calendar', delScheduleIdRes, delCalId);
     });
 });
 
