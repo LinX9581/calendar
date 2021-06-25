@@ -3,7 +3,17 @@ import express from 'express';
 import moment from 'moment';
 
 let router = express.Router();
-router.get('/', async function (req, res) {
+router.get('/', function (req, res) {
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    res.render('login', {
+        today,
+        title
+    });
+    console.log("sit connect")
+});
+
+router.get('/www', async function (req, res) {
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     let channel = 'www'
     req.session.channel = channel;

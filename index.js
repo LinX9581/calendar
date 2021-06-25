@@ -2,7 +2,8 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
-import sitRouter from './routes/salesRouter';
+import calendarRouter from './routes/calendarRouter';
+import bookingRouter from './routes/bookingRouter';
 
 const app = express();
 const http = require('http').Server(app);
@@ -22,7 +23,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.static('public'));
-app.use('/', sitRouter);
+app.use('/', calendarRouter);
+app.use('/', bookingRouter);
 
 io.on('connection', function (socket) {
     socket.on('create schedule', function (schedule, channel) {

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>委刊單</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="css/index/all.min.css">
+    <link rel="stylesheet" href="css/fontawesome/fontawesome.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="css/index/adminlte.min.css">
+    <link rel="stylesheet" href="css/index/jquery-ui.min.css">
+    <link rel="stylesheet" href="css/index/bootstrap.min.css">
+    <link rel="stylesheet" href="css/index/jquery.scrolling-tabs.min.css">
+    <!-- datatables -->
+    <link rel="stylesheet" href="css/index/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="css/index/fixedColumns.bootstrap4.min.css">
+    <!-- modify style -->
+    <link rel="stylesheet" href="css/index/style.css">
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+        </ul>
+        <!-- Right navbar links -->
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#"> 張永仁
+                    <i class="fas fa-user-circle"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-sign-out-alt"></i> 登出
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a href="index" class="brand-link">
+            <img src="images/logo-old-150x150.jpg" alt="" class="brand-image pt-1">
+            <span class="brand-text"><img src="images/logo-text-white.png" class="h30"></span>
+        </a>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Sidebar Menu -->
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                    data-accordion="true">
+                    <li class="nav-item  menu-open">
+                        <a href="#" class="nav-link active">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p> 委刊單管理
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>委刊單</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="booking" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>預約排程</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="customer" class="nav-link">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p>客戶資料</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="position" class="nav-link">
+                            <i class="nav-icon far fa-eye"></i>
+                            <p>廣告版面</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="channel" class="nav-link">
+                            <i class="nav-icon fas fa-photo-video"></i>
+                            <p>頻道管理</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="privilege" class="nav-link">
+                            <i class="nav-icon fas fa-user-cog"></i>
+                            <p>帳號管理</p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index"><i class="fa fa-home"></i> 委刊單</a>
+                            </li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <!-- Main row -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-warning card-outline">
+                            <form>
+                                <div class="card-body">
+                                    <div class="tab-content">
+                                        <div class="row">
+                                            <div class="col-md-4 col-xl-3 form-group">
+                                                <input class="form-control bg-search" type="text" placeholder="搜尋">
+                                            </div>
+                                            <div class="col-md-4 col-xl-2 form-group">
+                                                <button class="btn btn-primary" type="button">搜尋委刊單</button>
+                                            </div>
+                                            <div class="col-md-4 col-xl-2 form-group">
+                                                <a href="order-add.html">
+                                                    <button class="btn btn-primary" type="button">新增委刊單</button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade show active" id="tab1">
+                                            <div class="data-table">
+                                                <table class="table nowrap hover" style="width: 100%;">
+                                                    <thead>
+                                                    <tr>
+                                                        <th width="40px" style="text-align: center;"></th>
+                                                        <th>委刊單</th>
+                                                        <th>客戶名稱</th>
+                                                        <th>活動名稱</th>
+                                                        <th>類型</th>
+                                                        <th>業務</th>
+                                                        <th>備註</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <th><a href="#"><i class="far fa-edit"></i></a></th>
+                                                        <td>20210101001</td>
+                                                        <td>橘子數網股份有限公司</td>
+                                                        <td>天堂</td>
+                                                        <td>cpc</td>
+                                                        <td>曾誠</td>
+                                                        <td>備註</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><a href="#"><i class="far fa-edit"></i></a></th>
+                                                        <td>20210101002</td>
+                                                        <td>橘子數網股份有限公司</td>
+                                                        <td>天堂</td>
+                                                        <td>cpc</td>
+                                                        <td>曾誠</td>
+                                                        <td>備註</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><a href="#"><i class="far fa-edit"></i></a></th>
+                                                        <td>20210101003</td>
+                                                        <td>橘子數網股份有限公司</td>
+                                                        <td>天堂</td>
+                                                        <td>cpc</td>
+                                                        <td>曾誠</td>
+                                                        <td>備註</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th><a href="#"><i class="far fa-edit"></i></a></th>
+                                                        <td>20210101004</td>
+                                                        <td>橘子數網股份有限公司</td>
+                                                        <td>天堂</td>
+                                                        <td>cpc</td>
+                                                        <td>曾誠</td>
+                                                        <td>備註</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row (main row) -->
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer class="main-footer">
+        &copy; 2020 <a href="https://www.nownews.com/">NOWnews今日新聞</a>. All rights reserved.
+        <!--<div class="float-right d-none d-sm-inline-block">
+        <b>Version</b> 3.0.5
+      </div>-->
+    </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="js/jquery-3.5.1.js"></script>
+<script src="js/index/jquery-ui.min.js"></script>
+<script>
+    $(function () {
+      $(".datepicker").datepicker();
+    });
+
+
+</script>
+<!-- Bootstrap 4 -->
+<script src="js/index/bootstrap.bundle.min.js"></script>
+<script src="js/index/jquery.scrolling-tabs.min.js"></script>
+<!-- AdminLTE App -->
+<script src="js/index/adminlte.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="js/index/demo.js"></script>
+<!-- datatables-->
+<script src="js/index/jquery.dataTables.min.js"></script>
+<script src="js/index/dataTables.fixedColumns.min.js"></script>
+<!-- modify js -->
+<script src="js/index/script.js"></script>
+<!-- fontawesom -->
+<script src="js/fontawesome/fontawesome.js"></script>
+
+</body>
+
+</html>

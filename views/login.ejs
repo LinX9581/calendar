@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/png" href="https://www.nownews.com/icon/icon-48x48.png">
+    <link rel="icon" rel="preload" type="image/png" size="96x96" href="https://www.nownews.com/icon/icon-96x96.png">
+    <link rel="icon" rel="preload" type="image/png" size="144x144" href="https://www.nownews.com/icon/icon-144x144.png">
+    <link rel="icon" rel="preload" type="image/png" size="192x192" href="https://www.nownews.com/icon/icon-192x192.png">
+    <link rel="apple-touch-icon" rel="preload" size="192x192" href="https://www.nownews.com/icon/icon-192x192.png">
+
+    <link rel="stylesheet" type="text/css"
+        href="https://technext.github.io/material_able/assets/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://technext.github.io/material_able/assets/pages/waves/css/waves.min.css"
+        type="text/css" media="all">
+    <link rel="stylesheet" type="text/css"
+        href="https://technext.github.io/material_able/assets/icon/themify-icons/themify-icons.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://technext.github.io/material_able/assets/icon/icofont/css/icofont.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://technext.github.io/material_able/assets/icon/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/mtstyle.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/2.18.0/js/md5.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f3f3f3;
+            font-size: 1em;
+            overflow-x: hidden;
+            color: #455a64;
+            font-family: "Open Sans", sans-serif;
+            background-attachment: fixed;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.18) 40%, rgba(255, 255, 255, 0.9) 0%) !important;
+        }
+    </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-4021556-67"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-4021556-67');
+    </script> -->
+    <script>
+        function pwd_handler(pwd) {
+            let form = document.contact;
+            if ($('#password').val() != '') {
+                $('#md5password').val(md5($('#password').val()))
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    <body themebg-pattern="theme1">
+        <section class="login-block">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="md-float-material form-material" role="form" action="/" method="post" onsubmit="">
+                            <div class="text-center nnlogo">
+                                <a href="https://www.nownews.com/" target="_blank">
+                                    <img src="../images/logo-nownews.svg" alt="logo">
+                                </a>
+                            </div>
+                            <div class="auth-box card">
+                                <div class="card-block">
+                                    <div class="row m-b-20">
+                                        <div class="col-md-12">
+                                            <h3 class="text-center">NOW Report</h3>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-primary form-static-label mb-5">
+                                        <input name="account" type="text" id="account" class="form-control">
+                                        <span class="form-bar"></span>
+                                        <label class="float-label">請輸入帳號</label>
+                                    </div>
+                                    <div class="form-group form-primary form-static-label">
+                                        <input name="password" type="Password" id="password" class="form-control">
+                                        <input name="md5password" type="hidden" id="md5password" />
+                                        <span class="form-bar"></span>
+                                        <label class="float-label">請輸入密碼</label>
+                                    </div>
+                                    <!-- <div class="row m-t-25 text-left">
+                                        <div class="col-12">
+                                            <div class="checkbox-fade fade-in-primary d-">
+                                                <label>
+                                                    <input type="checkbox" value="">
+                                                    <span class="cr"><i
+                                                            class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                                                    <span class="text-inverse">記住帳號</span>
+                                                </label>
+                                            </div>
+                                            <div class="forgot-phone text-right f-right">
+                                                <a href="auth-reset-password.html" class="text-right f-w-600">忘記密碼？</a>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <div class="row m-t-30">
+                                        <div class="col-md-12">
+                                            <button id="loginBTN" type="submit"
+                                                class="btn btn-primary btn-md btn-block waves-effect waves-light text-center m-b-20">登
+                                                入</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Required Jquery -->
+            <script type="text/javascript"
+                src="https://technext.github.io/material_able/assets/js/jquery/jquery.min.js"></script>
+            <script type="text/javascript"
+                src="https://technext.github.io/material_able/assets/js/jquery-ui/jquery-ui.min.js"></script>
+            <script type="text/javascript"
+                src="https://technext.github.io/material_able/assets/js/popper.js/popper.min.js"></script>
+            <script type="text/javascript"
+                src="assets/js/bootstrap/js/bootstrap.min.js https://technext.github.io/material_able/assets/js/bootstrap/js/bootstrap.min.js"></script>
+
+            <script src="https://technext.github.io/material_able/assets/pages/waves/js/waves.min.js"></script>
+            <script type="text/javascript"
+                src="https://technext.github.io/material_able/assets/js/jquery-slimscroll/jquery.slimscroll.js"></script>
+            <script type="text/javascript"
+                src="https://technext.github.io/material_able/assets/js/common-pages.js"></script>
+
+    </body>
+
+</html>

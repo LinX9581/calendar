@@ -1,0 +1,515 @@
+body {
+    font-family: arial, "Microsoft JhengHei", "å¾®è»Ÿæ­£é»‘é«”", sans-serif;
+  }
+.h30 {
+    width: auto;
+    height: 30px;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+}
+
+.bg-search {
+    background-image: url(../images/search-solid.png);
+    background-repeat: no-repeat;
+    background-position: 7px 9px;
+    background-size: 16px 16px;
+    text-indent: 1rem;
+}
+.bg-time {
+    background-image: url(../images/clock-regular.png);
+    background-repeat: no-repeat;
+    background-position: 5px 5px;
+    background-size: 16px 16px;
+    text-indent: 1.5rem;
+}
+
+.photo img {
+    max-width: 100%;
+    height: auto;
+}
+.card-title {
+    margin-bottom: 0;
+}
+.card-body {
+    padding: 1rem !important;
+}
+
+   .form-group,button {
+    width: 100%;
+} 
+
+.form-group span {
+    color: #999;
+    float: right;
+}
+
+.form-group .tag-item {
+    background-color: #999;
+    color: #fff;
+    border: 0;
+    outline: none;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+}
+
+.checkbox label {
+    margin-right: 10px;
+    font-weight: normal !important;
+}
+
+.checkbox-tag label {
+    padding: 0;
+    margin-right: 3px;
+    cursor: pointer;
+}
+
+.checkbox-tag input[type=checkbox] {
+    display: none;
+}
+
+.checkbox-tag input[type=checkbox]+span {
+    display: inline-block;
+    padding: 5px 10px;
+    color: #666;
+    background-color: #ddd;
+    user-select: none;
+}
+
+.checkbox-tag input[type=checkbox]:checked+span {
+    color: #666;
+    background-color: #ffce2d;
+}
+
+.form-group>.row {
+    margin: 0;
+}
+
+.date-group {
+    border: #ddd 1px solid;
+    padding: 5px;
+    border-radius: 3px;
+    display: flex;
+}
+
+.date-group input {
+    border: none;
+    outline: none;
+    width: 100%;
+}
+
+.date-group .datepicker {
+    width: 46.7%;
+}
+.content .nav {
+   /* flex-wrap: initial;
+    display: initial;*/
+}
+.content .nav-tabs {
+    padding-bottom: 13px;
+}
+.scrollmenu {
+    overflow: hidden;
+    margin:20px 20px 0px 20px;
+}
+
+.scrollmenu ul li {
+    display: inline-block;
+}
+
+.selection {
+    margin-top: 20px;
+}
+
+.selection .selection-item ul {
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.selection .selection-item ul li {
+    list-style: none;
+    background-color: #e8faff;
+    padding: 5px 10px;
+    text-align: center;
+    margin: 5px;
+}
+
+.selection-item button {
+    outline: none;
+    border: none;
+    background-color: initial;
+    width: initial;
+}
+.selection-item button i {
+    color: #999;
+}
+.scroll {
+    margin-top: 1rem;
+    width: 100%;
+    height: 450px;
+    overflow: scroll;
+}
+.menutree {
+   margin-left: 3rem;
+}
+
+.menutree-dropdown::before {
+    content: '\271A';
+    margin-left: -3rem;
+    margin-right: 1.9rem;
+}
+.menutree ol {
+    padding: 0;
+}
+.menutree li {
+    list-style: none;
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.menutree input {
+    float: left;
+    margin-top: 0.25rem;
+    margin-right: 0.5rem;
+}
+
+.menutree li .menu_label {
+    cursor: pointer;
+}
+
+.menutree li .menu_label+input[type=checkbox]+ol>li {
+    display: none;
+}
+
+.menutree li .menu_label+input[type=checkbox]:checked+ol>li {
+    display:inline-block;
+    margin: 0.2rem;
+    background-color: #ddd;
+    padding:0.5rem 0.5rem 0 0.5rem;
+}
+
+.menutree-dropdown ol {
+    margin-left: -0.3rem;
+}
+
+/* CKEditor ç·¨è¼¯å€å¡Š */
+.ck-editor__editable_inline {
+	/* è¨­å®šæœ€ä½Žé«˜åº¦ */
+    min-height: 400px;
+}
+.modal {
+    color: #666;
+}
+.modal h5 {
+    font-weight: bold;
+}
+.modal .input-group {
+    display: flex;
+    margin-bottom: 1rem;
+}
+.modal .input-group label {
+    margin-right: 1rem;
+}
+.modal button {
+    width: initial;
+}
+.data-table {width: 100%;}
+
+.data-table thead th {
+    background-color: #333;
+    color: #fff;
+    border-bottom: none;
+}
+
+.data-table tbody td {
+    padding: 0.75rem;
+}
+
+.data-table tbody th {
+    background-color: #ffce2d;
+}
+.data-table tbody th a,.data-table tbody th input {
+    color: #333;
+    margin: 0 0.5rem;
+}
+.data-table tbody th a:hover {
+    color: rgb(46, 107, 156);
+}
+.data-table button {width:initial;}
+.unopened {
+    display: block;
+    background-color: #999;
+    color: #fff;
+    text-align: center;
+
+}
+.opened {
+    display: block;
+    background-color: #00be7f;
+    color: #fff;
+    text-align: center;
+}
+.menu-tag {
+    display: block;
+    background-color: #00be7f;
+    color: #fff;
+    text-align: center;
+    width: 80px;
+}
+
+.scrtabs-tab-scroll-arrow {
+    border:none;
+    text-align: center;
+}
+.scrtabs-tab-scroll-arrow:hover {
+    background-color: initial;
+}
+.nav .nav-link {
+    border:none;
+}
+.nav .nav-link.active {
+    border-bottom: 3px solid #007bff;
+}
+.tab .nav-link.active {
+    border-bottom: 3px solid #007bff;
+    color: #495057;
+}
+.collapsed {
+    cursor: pointer;
+}
+
+.collapsed>i::before {
+    content: "\f105";
+}
+.collapse .show .axx {
+    padding-right: 1rem !important;
+    background-color: lawngreen !important;
+}
+.table .accordion-item {
+    text-indent: 1rem;
+}
+.table .accordion-item-second{
+    text-indent: 3rem;
+}
+.hover tr:hover {
+    background-color: #e8faff;
+}
+.hover tr td tr:hover {
+    background-color: #ffffe8;
+}
+
+.picture-item {
+    border: #999 1px solid;
+    padding: 0.3rem;
+    border-radius: 3px;
+    margin: 0.5rem 0;
+}
+.picture-item img {
+    width: 100%;
+    height: 100%;
+}
+
+.transfer {
+    border: #ddd 1px solid;
+    border-radius: 5px;
+}
+.transfer h5 {
+    background-color: #ffce2d;
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 5px 5px 0 0;
+}
+.choose-item {
+    color: #999;
+    padding-top: 1rem;
+}
+
+.online {
+    background-color: #fff;
+    color: #666;
+    padding: 0.3rem 1rem;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+.online i {
+    position: relative;
+    margin-right: 0.5rem;
+}
+.dot {
+    position: absolute;
+    bottom:-2px;
+    left: 10px;
+    width: 11px;
+    height: 11px;
+    background-color: #04db70;
+    border-radius: 50%;
+}
+
+.plus {
+    padding: 0 0 0 0.8rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+.modal-body img {
+    width: 100%;
+    height: auto;
+}
+.photo-info p {
+    margin: 0.5rem 0;
+}
+.photo-info span {
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    text-align: justify;
+    text-justify: distribute-all-lines;
+    text-align-last: justify;
+    color: #333;
+}
+.check-item label {
+    margin: 0.5rem;
+}
+.upload label {
+    position: relative;
+    padding: 0;
+    margin: 5px;
+    cursor: pointer;
+    width:10%;
+}
+
+@media (max-width:1024px) {
+    .upload label {
+        width:18%;
+    }
+}
+@media (max-width:414px) {
+    .upload label {
+        width:28%;
+    }
+}
+.upload input[type=checkbox] {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+.upload input[type=checkbox]+span {
+    display: inline-block;
+    padding:5px;
+    color: #666;
+    background-color: #ddd;
+    user-select: none;
+}
+
+.upload input[type=checkbox]:checked+span {
+    color: #666;
+    background-color: #ffce2d;
+}
+.upload img {
+    width: 100%;
+    height: auto;
+}
+/*dropzone*/
+
+.dropzone {
+    border: dashed 2px #999;
+    background-color: #f3f3f3;
+}
+.upload-area {
+    color: #666;
+}
+.upload-area i {
+    font-size: 8rem;
+    color: #ddd;
+}
+.upload-area span {
+    display: block;
+    margin-bottom: 1rem;
+    color: #999;
+}
+.media {
+    width: 100%;
+    height: 450px;
+    overflow-y: scroll;
+}
+.media-item {
+    border: none;
+    width: 25%;
+    padding: 10px;
+}
+@media (max-width:1024px) {
+    .media-item {
+        width: 33%;
+    }
+}
+@media (max-width:414px) {
+    .media-item {
+        width: 50%;
+    }
+}
+.media-item label {
+    position: relative;
+    padding: 0;
+    cursor: pointer;
+}
+
+.media-item input[type=checkbox] {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+.media-item input[type=checkbox]+span {
+    display: inline-block;
+    padding:5px;
+    color: #666;
+    background-color: #ddd;
+    user-select: none;
+}
+
+.media-item input[type=checkbox]:checked+span {
+    color: #666;
+    background-color: #ffce2d;
+}
+.info p {
+    padding: 0;
+    margin: 0;
+}
+.youtube {
+    width: 60%;
+    margin: 0 auto;
+}
+@media (max-width:768px) {
+    .youtube {
+        width: 100%;
+    }
+}
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px;
+    height: 0;
+    overflow: hidden;
+  }
+  
+  .video-container iframe, .video-container object, .video-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .sidebar nav ul li a.nav-link.active {
+      border-bottom: none;
+  }

@@ -1,0 +1,109 @@
+@charset "utf-8";
+*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
+/* 登入頁 */
+.nnlogo {
+    margin-bottom: 2rem;
+}
+.nnlogo a img {
+    width: 170px;
+    height: auto;
+}
+/* //登入頁 */
+.logo-pt{
+    position: relative;
+    left: -30px;
+}
+.log-info {
+    position: relative;
+    right: -15px;
+}
+.logout-op {
+    opacity: 0.8;
+}
+.header-logo {margin-left: -15px}
+.form-material .form-group.form-static-label .form-control~.float-label {
+    top: -17px;
+    font-size: 14px;
+    line-height: 0.95
+}
+.deptData {
+    /* background-color: #F0F0F0; */
+    /* box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.75); */
+}
+.btn {font-size: 1.1rem;}
+.logout {font-size: 0.75rem;padding: 5px 10px; margin-top: -4px;}
+.nav-link i,.nav-link span {font-size: 15px;}
+
+.noData {
+    /* opacity: 0; */
+}
+.noDataFadeIn {
+    -webkit-transition: all 1.5s;
+    -moz-transition: all 1.5s;
+    -ms-transition: all 1.5s;
+    -o-transition: all 1.5s;
+    transition: all 1.5s;
+    opacity: 1;
+}
+
+@media (max-width: 575px) {
+    /* 登入頁 */
+	.nnlogo a img {
+        width: 150px;
+        height: auto;
+    }
+    /* //登入頁 */
+    .logo-pt{
+        position: relative;
+        left: -30px;
+    }
+    .log-info {
+        position: relative;
+        right: -30px;
+    }
+    .loguser {display: none;}
+    .srch-btn {
+        height: 35px;
+        line-height: 35px;
+        margin-top: 8px;
+        padding: 0!important;
+    }
+    .xs-w-auto {width: auto!important;}
+    .xs-w-25 {width: 25%!important;}
+    .xs-w-70 {width: 70%!important;}
+    .xs-w-0 {width: 0!important;}
+    .xs-mr-0 {margin-right: 0!important;}
+}
+@media (min-width: 576px) and (max-width: 767px) {
+    .logo-pt{
+        left: 150px;
+    }
+    .log-info {
+        position: relative;
+        right: -15px;
+    }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+	.logo-pt{
+        left: 270px;
+    }
+    .log-info {
+        position: relative;
+        right: -15px;
+    }
+}
+@media (min-width: 768px) {
+	.srch-btn {
+        margin-top: 2px;
+    }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+	.logo-pt{
+        left: 41%;
+    }
+}
+@media (min-width: 1200px) {
+	.logo-pt{
+        left: 43%;
+    }
+}
