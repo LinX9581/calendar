@@ -36,8 +36,9 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#"> <%= userName %>
-                        <i class="fas fa-user-circle"></i>
+                    <a class="nav-link" href="#">
+                        <%= userName %>
+                            <i class="fas fa-user-circle"></i>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -145,7 +146,8 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋帳號</button>
@@ -158,59 +160,8 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover" style="width: 100%;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th width="90px" style="text-align: center;"></th>
-                                                                <th>使用者名稱</th>
-                                                                <th>帳號</th>
-                                                                <th>電子郵件</th>
-                                                                <th>角色</th>
-                                                                <th>委刊數</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a><a
-                                                                        href="#"><i class="far fa-trash-alt"></i></a>
-                                                                </th>
-                                                                <td>張永仁</td>
-                                                                <td>Brian</td>
-                                                                <td>brian@nownews.com</td>
-                                                                <td>Admin</td>
-                                                                <td>0</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a><a
-                                                                        href="#"><i class="far fa-trash-alt"></i></a>
-                                                                </th>
-                                                                <td>業助A</td>
-                                                                <td>業助A</td>
-                                                                <td>assistantA@nownews.com</td>
-                                                                <td>SuperUser</td>
-                                                                <td>0</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a><a
-                                                                        href="#"><i class="far fa-trash-alt"></i></a>
-                                                                </th>
-                                                                <td>業助B</td>
-                                                                <td>業助B</td>
-                                                                <td>assistantB@nownews.com</td>
-                                                                <td>SuperUser</td>
-                                                                <td>0</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a><a
-                                                                        href="#"><i class="far fa-trash-alt"></i></a>
-                                                                </th>
-                                                                <td>曾誠</td>
-                                                                <td>曾誠</td>
-                                                                <td>sale@nownews.com</td>
-                                                                <td>user</td>
-                                                                <td>77</td>
-                                                            </tr>
-                                                        </tbody>
+                                                    <table class="table nowrap hover order-table" style="width: 100%;">
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -239,10 +190,57 @@
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
     <script>
-        $(function () {
-            $(".datepicker").datepicker();
-        });
+        getAccount()
+        async function getAccount() {
+            let innerHTML = ''
+            await fetch('/getPrivilege', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            }).then(res => res.json()).then(res => {
+                innerHTML +=
+                    `<thead>
+                        <tr class="tr-main">
+                            <th width="90px" style="text-align: center;"></th>
+                            <th scope="col">使用者名稱</th>
+                            <th scope="col">帳號</th>
+                            <th scope="col">電子郵件</th>
+                            <th scope="col">角色</th>
+                            <th scope="col">委刊數</th>
+                        </tr>
+                    </thead>
+                    <tbody class="deptDataBody">
+                    </tbody>
+                    `;
+                for (let item = 0; item < res.allAccount.length; item++) {
+                    innerHTML +=
+                        ` 
+                        <tr>
+                            <th>
+                                <a href="#"><i class="far fa-edit"></i></a>
+                                <a href="#"><i class="far fa-trash-alt"></i></a>
+                            </th>
+                            <td scope="row" data-th="使用者名稱">
+                                ${res.allAccount[item].name} 
+                            </td>
+                            <td data-th="帳號">
+                                ${res.allAccount[item].account} 
+                            </td>
+                            <td data-th="電子郵件">
+                                ${res.allAccount[item].email} 
+                            </td>
+                            <td data-th="角色">
+                                ${res.allAccount[item].type} 
+                            </td>
+                        </tr>
+                    `;
+
+                }
+                $('.table').html(innerHTML)
+            })
+        }
+
     </script>
+    <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
     <script src="js/index/bootstrap.bundle.min.js"></script>
     <script src="js/index/jquery.scrolling-tabs.min.js"></script>

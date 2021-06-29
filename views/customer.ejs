@@ -36,8 +36,9 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#"> <%= userName %>
-                        <i class="fas fa-user-circle"></i>
+                    <a class="nav-link" href="#">
+                        <%= userName %>
+                            <i class="fas fa-user-circle"></i>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -145,7 +146,8 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋客戶</button>
@@ -158,51 +160,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover" style="width: 100%;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th width="40px" style="text-align: center;"></th>
-                                                                <th>客戶代號</th>
-                                                                <th>客戶全名</th>
-                                                                <th>連絡人</th>
-                                                                <th>連絡電話</th>
-                                                                <th>備註</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>A123456</td>
-                                                                <td>橘子數網股份有限公司</td>
-                                                                <td>窗口一</td>
-                                                                <td>0800000123</td>
-                                                                <td>備註</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>A123457</td>
-                                                                <td>柳丁數網股份有限公司</td>
-                                                                <td>窗口一</td>
-                                                                <td>0800000123</td>
-                                                                <td>備註</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>A123458</td>
-                                                                <td>蘋果數網股份有限公司</td>
-                                                                <td>窗口一</td>
-                                                                <td>0800000123</td>
-                                                                <td>備註</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>A123459</td>
-                                                                <td>香蕉數網股份有限公司</td>
-                                                                <td>窗口一</td>
-                                                                <td>0800000123</td>
-                                                                <td>備註</td>
-                                                            </tr>
-                                                        </tbody>
+                                                    <table class="table nowrap hover order-table" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -234,8 +192,60 @@
         $(function () {
             $(".datepicker").datepicker();
         });
+        getCustomer()
+        async function getCustomer() {
+            let innerHTML = ''
+            await fetch('/getCustomer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            }).then(res => res.json()).then(res => {
+                console.log(res.allCustomer);
+                innerHTML +=
+                    `<thead>
+                        <tr class="tr-main">
+                            <th width="40px" style="text-align: center;"></th>
+                            <th scope="col">客戶代號</th>
+                            <th scope="col">客戶全名</th>
+                            <th scope="col">連絡人</th>
+                            <th scope="col">連絡電話</th>
+                            <th scope="col">備註</th>
+                        </tr>
+                    </thead>
+                    <tbody class="deptDataBody">
+                    </tbody>
+                    `;
+                for (let item = 0; item < res.allCustomer.length; item++) {
+                    innerHTML +=
+                        ` 
+                        <tr>
+                            <th>
+                                <a href="#"><i class="far fa-edit"></i></a>
+                                <a href="#"><i class="far fa-trash-alt"></i></a>
+                            </th>
+                            <td scope="row" data-th="客戶代號">
+                                ${res.allCustomer[item].code} 
+                            </td>
+                            <td data-th="客戶全名">
+                                ${res.allCustomer[item].name} 
+                            </td>
+                            <td data-th="連絡人">
+                                ${res.allCustomer[item].contacts} 
+                            </td>
+                            <td data-th="連絡電話">
+                                ${res.allCustomer[item].phone} 
+                            </td>
+                            <td data-th="備註">
+                                ${res.allCustomer[item].memo} 
+                            </td>
+                        </tr>
+                    `;
 
+                }
+                $('.table').html(innerHTML)
+            })
+        }
     </script>
+    <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
     <script src="js/index/bootstrap.bundle.min.js"></script>
     <script src="js/index/jquery.scrolling-tabs.min.js"></script>

@@ -82,7 +82,10 @@ router.get('/position', function (req, res) {
             userName
         });
     } else {
-        res.render('404', {});
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
     }
 });
 
@@ -97,7 +100,10 @@ router.get('/order', function (req, res) {
             userName
         });
     } else {
-        res.render('404', {});
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
     }
 });
 
@@ -112,7 +118,60 @@ router.get('/customer', function (req, res) {
             userName
         });
     } else {
-        res.render('404', {});
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+router.get('/customer-add', function (req, res) {
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let userName = req.session.user.name
+        res.render('customer-add', {
+            today,
+            title,
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+router.post('/getCustomer', async function (req, res) {
+    if (req.session.user != undefined) {
+        let getCustomerSql = 'SELECT code,name,contacts,phone,memo FROM sale_booking.customer'
+        let allCustomer = await query(getCustomerSql)
+        res.send(JSON.stringify({
+            'allCustomer': allCustomer,
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/create_customer', async function (req, res) {
+    if (req.session.user != undefined) {
+        let code = req.body.code, name = req.body.name, contacts = req.body.contacts, phone = req.body.phone, email = req.body.email, sale_name = req.body.sale_name, tax_id = req.body.tax_id, postal_code = req.body.postal_code, address = req.body.address, payment_terms = req.body.payment_terms, memo = req.body.memo
+        let userName = req.session.user.name
+        let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let createCustomerSql = 'INSERT INTO sale_booking.`customer` (`code`, `name`, `contacts`, `phone`, `email`, `sale_name`,`tax_id`,`postal_code`,`address`,`payment_terms`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        let createCustomerData = [code, name, contacts, phone, email, sale_name, tax_id, postal_code, address, payment_terms, memo, createTime, userName, createTime, userName]
+        await query(createCustomerSql, createCustomerData)
+        res.render('customer', {
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
     }
 });
 
@@ -127,23 +186,43 @@ router.get('/channel', function (req, res) {
             userName
         });
     } else {
-        res.render('404', {});
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
     }
 });
 
 router.get('/privilege', function (req, res) {
-    if (req.session.user != undefined) {
+    // if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = req.session.user.name
+        let userName = 'req.session.user.name'
         res.render('privilege', {
             today,
             title,
             userName
         });
-    } else {
-        res.render('404', {});
-    }
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
+});
+router.post('/getPrivilege', async function (req, res) {
+    // if (req.session.user != undefined) {
+        let getAccountSql = 'SELECT name,account,email,type FROM sale_booking.user'
+        let allAccount = await query(getAccountSql)
+        res.send(JSON.stringify({
+            'allAccount': allAccount,
+        }));
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
 });
 
 router.get('/privilege-add', function (req, res) {
@@ -157,7 +236,10 @@ router.get('/privilege-add', function (req, res) {
             userName
         });
     } else {
-        res.render('404', {});
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
     }
 });
 
@@ -173,7 +255,10 @@ router.post('/create_account', async function (req, res) {
             userName
         });
     } else {
-        res.render('404', {});
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
     }
 });
 
