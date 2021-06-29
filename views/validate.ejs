@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .form-control {
+            color: #333;
+        }
+
+        .help-block {
+            color: red;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+</head>
+
+<body>
+    <!-- <form class="form-horizontal" role="form" action="/create_account" method="post" onsubmit="" id="main"> -->
+    <div class="container">
+        <div class="row">
+            <div class="span12">
+                <!-- <form class="form-horizontal" role="form" id="form" method="post" action="post.php"> -->
+                <form class="form-horizontal" role="form" action="/create_account" method="post" onsubmit="" id="form">
+
+                    <div class="form-group">
+                        <label for="">登入帳號</label>
+                        <span></span>
+                        <input type="text" class="form-control account" id="account" name="account" type="account"
+                            placeholder="請輸入登入帳號">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="">登入密碼</label>
+                        <span></span>
+                        <input type="text" class="form-control password" id="password" name="password" type="password"
+                            placeholder="請輸入登入密碼">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="">確認登入密碼</label>
+                        <span></span>
+                        <input type="text" class="form-control password_check" name="equality" type="equality"
+                            placeholder="請輸入登入密碼">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="">帳號角色</label>
+                        <select class="form-control type" name="type" type="type">
+                            <option value="">Admin</option>
+                            <option value="">SuperUser</option>
+                            <option value="">User</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">帳號名稱</label>
+                        <span></span>
+                        <input type="text" class="form-control name" placeholder="請輸入帳號名稱" name="使用者名稱" type="name">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="">電子郵件</label>
+                        <span></span>
+                        <input type="text" class="form-control email" placeholder="請輸入電子郵件" name="email" type="email">
+                        <div class="messages"></div>
+                    </div>
+                    <div class="form-group memo">
+                        <label for="">備註</label>
+                        <span></span>
+                        <input type="text" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-6">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">送出</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+    <script src="js/index/validate.js"></script>
+    <script>
+            $(function () {
+
+                // jQuery Validation Plugin 的Twitter BootStrap 3 支援
+                $.validator.setDefaults({
+                    highlight: function (element) {
+                        $(element).closest('.form-group').addClass('has-error');
+                    },
+                    unhighlight: function (element) {
+                        $(element).closest('.form-group').removeClass('has-error');
+                    },
+                    errorElement: 'span',
+                    errorClass: 'help-block',
+                    errorPlacement: function (error, element) {
+                        if (element.parent('.controls').length) {
+                            error.insertAfter(element.parent());
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    }
+                });
+                // jQuery Validation Plugin的套用
+                $('#form').validate({
+                    rules: {
+                        account: "required",
+
+                        password: {
+                            required: true,
+                            minlength: 5
+                        },
+
+                        equality: {
+                            equalTo: password,
+                            required: true,
+                        }
+                    },
+                    messages: {
+                        account: "請輸入姓名。",
+
+                        password: {
+                            required: "請輸入內容。",
+                            minlength: jQuery.format("至少大於 {0} 字。")
+                        },
+                        equality: "與密碼不符"
+                    }
+                });
+            });
+
+    </script>
+</body>
+
+</html>

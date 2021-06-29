@@ -2,3 +2,5 @@
 
 INSERT INTO calendar_list(id,name,color,bgcolor,dragbgcolor,bordercolor)
 VALUES('1','test','#ffffff','black','black','black');
+
+https://www.itread01.com/content/1547092477.html

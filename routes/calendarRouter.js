@@ -3,35 +3,33 @@ import express from 'express';
 import moment from 'moment';
 
 let router = express.Router();
-router.get('/', function (req, res) {
-    let title = 'NOW Booking '
-    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    res.render('login', {
-        today,
-        title
-    });
-    console.log("sit connect")
-});
-
 router.get('/www', async function (req, res) {
-    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    let channel = 'www'
-    req.session.channel = channel;
-    res.render('booking', {
-        today,
-        channel
-    });
-    console.log("booking connect")
+    if (req.session.user != undefined) {
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let channel = 'www'
+        req.session.channel = channel;
+        res.render('booking', {
+            today,
+            channel
+        });
+    } else {
+        res.render('404', {});
+    }
 });
 
 router.get('/petsmao', async function (req, res) {
-    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    let channel = 'petsmao'
-    res.render('petsmao', {
-        today,
-        channel
-    });
-    console.log("booking connect")
+    if (req.session.user != undefined) {
+
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let channel = 'petsmao'
+        res.render('petsmao', {
+            today,
+            channel
+        });
+    } else {
+        res.render('404', {});
+    }
+
 });
 
 router.post('/renderSchedule', async function (req, res) {
