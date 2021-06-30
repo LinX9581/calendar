@@ -195,14 +195,14 @@ router.get('/channel', function (req, res) {
 
 router.get('/privilege', function (req, res) {
     // if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
-        res.render('privilege', {
-            today,
-            title,
-            userName
-        });
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+    res.render('privilege', {
+        today,
+        title,
+        userName
+    });
     // } else {
     //     let title = 'NOW Booking '
     //     res.render('login', {
@@ -210,13 +210,30 @@ router.get('/privilege', function (req, res) {
     //     })
     // }
 });
+router.get('/edit', function (req, res) {
+    console.log('get');
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+});
+router.post('/edit', function (req, res) {
+    console.log(req.body);
+    console.log(req.body[0]);
+
+    // console.log(res.body?.first);
+    // console.log(res.body?.action);
+    console.log('get post');
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+});
 router.post('/getPrivilege', async function (req, res) {
     // if (req.session.user != undefined) {
-        let getAccountSql = 'SELECT name,account,email,type FROM sale_booking.user'
-        let allAccount = await query(getAccountSql)
-        res.send(JSON.stringify({
-            'allAccount': allAccount,
-        }));
+    let getAccountSql = 'SELECT name,account,email,type FROM sale_booking.user'
+    let allAccount = await query(getAccountSql)
+    res.send(JSON.stringify({
+        'allAccount': allAccount,
+    }));
     // } else {
     //     let title = 'NOW Booking '
     //     res.render('login', {
@@ -243,6 +260,22 @@ router.get('/privilege-add', function (req, res) {
     }
 });
 
+router.post('/delete_account', async function (req, res) {
+    if (req.session.user != undefined) {
+        let delId = req.body.delId;
+        let deleteAccountSql = 'DELETE FROM sale_booking.`user` WHERE account = ?'
+        let deleteAccountData = [delId]
+        await query(deleteAccountSql, deleteAccountData)
+        res.send(JSON.stringify({
+            'delete Account': "成功",
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
 router.post('/create_account', async function (req, res) {
     if (req.session.user != undefined) {
         let account = req.body.account, password = req.body.password, type = req.body.type, name = req.body.name, email = req.body.email, memo = req.body.memo

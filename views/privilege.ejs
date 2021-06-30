@@ -189,6 +189,8 @@
     <!-- jQuery -->
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/jquery.tabledit.js"></script>
     <script>
         getAccount()
         async function getAccount() {
@@ -200,7 +202,8 @@
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th width="90px" style="text-align: center;"></th>
+                            <th style="display: none;">#</th>
+                            <th width="20px" style="text-align: center;"></th>
                             <th scope="col">使用者名稱</th>
                             <th scope="col">帳號</th>
                             <th scope="col">電子郵件</th>
@@ -215,29 +218,60 @@
                     innerHTML +=
                         ` 
                         <tr>
+                            <th scope="row" style="display: none;"></th>
                             <th>
-                                <a href="#"><i class="far fa-edit"></i></a>
-                                <a href="#"><i class="far fa-trash-alt"></i></a>
+                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allAccount[item].account}"></i></a>
                             </th>
-                            <td scope="row" data-th="使用者名稱">
-                                ${res.allAccount[item].name} 
+                            <td scope="row" data-th="使用者名稱" class="tabledit-view-mode" style="cursor: pointer;">
+                                <span class="tabledit-span">${res.allAccount[item].name} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
                             </td>
-                            <td data-th="帳號">
-                                ${res.allAccount[item].account} 
+                            <td data-th="帳號" class="tabledit-view-mode" style="cursor: pointer;">
+                                <span class="tabledit-span">${res.allAccount[item].account} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
                             </td>
-                            <td data-th="電子郵件">
-                                ${res.allAccount[item].email} 
+                            <td data-th="電子郵件" class="tabledit-view-mode" style="cursor: pointer;">
+                                <span class="tabledit-span">${res.allAccount[item].email} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
                             </td>
-                            <td data-th="角色">
-                                ${res.allAccount[item].type} 
+                            <td data-th="角色" class="tabledit-view-mode" style="cursor: pointer;">
+                                <span class="tabledit-span">${res.allAccount[item].type} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
                             </td>
                         </tr>
                     `;
 
                 }
                 $('.table').html(innerHTML)
+                $('.table').Tabledit({
+                    url: '/edit',
+                    editButton: false,
+                    deleteButton: false,
+                    hideIdentifier: true,
+                    columns: {
+                        identifier: [0, 'id'],
+                        editable: [
+                            [2, 'first'],
+                            [3, 'last'],
+                            [3, 'nickname']
+                        ]
+                    }
+                });
+                $('.delBtn').click(async function () {
+                    let delId = $('.delBtn').attr('delId')
+                    $(this).parent().parent().parent().remove()
+                    await fetch('/delete_account', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "delId": delId,
+                        })
+                    }).then(res => res.json()).then(res => {
+                        console.log(res);
+                    })
+
+                    console.log(delId);
+                    console.log(a);
+                })
             })
         }
+
 
     </script>
     <script src="js/index/tableSearch.js"></script>
