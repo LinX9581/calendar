@@ -255,19 +255,19 @@
                 });
                 $('.delBtn').click(async function () {
                     let delId = $('.delBtn').attr('delId')
-                    $(this).parent().parent().parent().remove()
-                    await fetch('/delete_account', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            "delId": delId,
+                    let isDel = confirm('確定刪除 ' + delId + ' ?')
+                    if (isDel) {
+                        $(this).parent().parent().parent().remove()
+                        await fetch('/delete_account', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                "delId": delId,
+                            })
+                        }).then(res => res.json()).then(res => {
+                            console.log(res);
                         })
-                    }).then(res => res.json()).then(res => {
-                        console.log(res);
-                    })
-
-                    console.log(delId);
-                    console.log(a);
+                    }
                 })
             })
         }
