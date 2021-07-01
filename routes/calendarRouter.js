@@ -34,7 +34,7 @@ router.get('/petsmao', async function (req, res) {
 
 router.post('/renderSchedule', async function (req, res) {
     let channel = req.body.channel;
-    let beforeCreateScheduleSql = "select * from booking.schedule_event where channel = ?"
+    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channel = ?"
     let beforeCreateScheduleData = [channel]
     let allSchedule = await query(beforeCreateScheduleSql, beforeCreateScheduleData)
     res.send(JSON.stringify({
@@ -44,7 +44,7 @@ router.post('/renderSchedule', async function (req, res) {
 })
 router.post('/renderCalendar', async function (req, res) {
     let channel = req.body.channel;
-    let beforeCreateCalendarSql = "select * from booking.calendar_list where channel = ? order by orderKey"
+    let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channel = ? order by orderKey"
     let beforeCreateCalendarData = [channel]
     let allCalendar = await query(beforeCreateCalendarSql, beforeCreateCalendarData)
     res.send(JSON.stringify({
@@ -55,9 +55,9 @@ router.post('/renderCalendar', async function (req, res) {
 router.post('/deleteCalendar', async function (req, res) {
     let delIdArray = []
     let delCalId = req.body.delCalId;
-    let delCalSql = 'DELETE FROM booking.calendar_list WHERE id = ?'
-    let delCalScheduleSql = 'DELETE FROM booking.schedule_event WHERE calendarId = ?'
-    let delCalScheduleIdSql = 'SELECT id FROM booking.schedule_event WHERE calendarId = ?'
+    let delCalSql = 'DELETE FROM sale_booking.calendar_list WHERE id = ?'
+    let delCalScheduleSql = 'DELETE FROM sale_booking.schedule_event WHERE calendarId = ?'
+    let delCalScheduleIdSql = 'SELECT id FROM sale_booking.schedule_event WHERE calendarId = ?'
     let delCalSqlData = [delCalId]
     let delScheduleId = await query(delCalScheduleIdSql, delCalSqlData)
 
@@ -72,6 +72,8 @@ router.post('/deleteCalendar', async function (req, res) {
     }));
 })
 router.post('/createCalendarList', async function (req, res) {
+    let userName = req.session.user.name
+    let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
     let calendarId = req.body.calendarId;
     let calendarName = req.body.calendarName;
     let calendarColor = req.body.calendarColor;
@@ -79,9 +81,11 @@ router.post('/createCalendarList', async function (req, res) {
     let calendarDragBgColor = req.body.calendarDragBgColor;
     let calendarBorderColor = req.body.calendarBorderColor;
     let channel = req.body.channel;
-    let calendarListSql = 'insert into booking.calendar_list (id,name,color,bgcolor,dragbgcolor,bordercolor,channel) values (?,?,?,?,?,?,?)'
-    let calendarListData = [calendarId, calendarName, calendarColor, calendarBgColor, calendarDragBgColor, calendarBorderColor, channel]
-    await query(calendarListSql, calendarListData)
+    let calendarListSql = 'insert into sale_booking.calendar_list (id,name,color,bgcolor,dragbgcolor,bordercolor,channel,create_date,create_by,update_date,update_by) values (?,?,?,?,?,?,?,?,?,?,?)'
+    let calendarListData = [calendarId, calendarName, calendarColor, calendarBgColor, calendarDragBgColor, calendarBorderColor, channel, createTime, userName, createTime, userName]
+    let createCalendarResult = await query(calendarListSql, calendarListData)
+    console.log(createCalendarResult);
+
 
     res.send(JSON.stringify({
         'add Calendar': 'succeed',
@@ -104,7 +108,7 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     // let beforeCreateScheduleSql = "INSERT INTO booking.event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`color`,`bgColor`,`dragBgColor`,`borderColor`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
     // let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, color, bgColor, dragBgColor, borderColor]
 
-    let beforeCreateScheduleSql = "INSERT INTO booking.schedule_event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`)VALUES(?,?,?,?,?,?,?,?,?);"
+    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`)VALUES(?,?,?,?,?,?,?,?,?);"
     let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, channel]
     await query(beforeCreateScheduleSql, newScheduleData)
     res.send(JSON.stringify({
@@ -113,7 +117,7 @@ router.post('/beforeCreateSchedule', async function (req, res) {
 })
 router.post('/beforeDeleteSchedule', async function (req, res) {
     let deleteId = req.body.deleteId
-    let beforeDeleteScheduleSql = "delete from booking.schedule_event where id = ?"
+    let beforeDeleteScheduleSql = "delete from sale_booking.schedule_event where id = ?"
     let deleteScheduleData = [deleteId]
     await query(beforeDeleteScheduleSql, deleteScheduleData)
     res.send(JSON.stringify({
@@ -135,7 +139,7 @@ router.post('/beforeUpdateSchedule', async function (req, res) {
     // let updateScheduleData = [updateId, updateTitle, updateLocation, updateBgColor, updateBorderColor, updateColor, updateDragBgColor, updateStart, updateEnd, scheduleId]
 
     let updateScheduleData = [updateId, updateTitle, updateLocation, updateStart, updateEnd, scheduleId]
-    let beforeUpdateScheduleSql = "UPDATE booking.schedule_event SET calendarId = ?, title = ?, location = ?, start = ?, end = ? WHERE id = ?"
+    let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ?, location = ?, start = ?, end = ? WHERE id = ?"
     await query(beforeUpdateScheduleSql, updateScheduleData)
 
     res.send(JSON.stringify({
