@@ -146,20 +146,16 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋版位</button>
                                                 </div>
-                                                <div class="col-md-4 col-xl-2 form-group">
-                                                    <a href="position-add">
-                                                        <button class="btn btn-primary" type="button">新增版位</button>
-                                                    </a>
-                                                </div>
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover" style="width: 100%;">
+                                                    <table class="table nowrap hover order-table" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -245,6 +241,7 @@
         });
 
     </script>
+    <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
     <script src="js/index/bootstrap.bundle.min.js"></script>
     <script src="js/index/jquery.scrolling-tabs.min.js"></script>
