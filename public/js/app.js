@@ -8,9 +8,10 @@ var socket = io();
 
 (async function (window, Calendar) {
     var cal, resizeThrottled;
-    var useCreationPopup = true;
-    var useDetailPopup = true;
+    var useCreationPopup = false;
+    var useDetailPopup = false;
     var datePicker, selectedCalendar;
+    let scheduleEvent = '';
 
     cal = new Calendar('#calendar', {
         defaultView: 'month',
@@ -37,13 +38,17 @@ var socket = io();
         },
         'clickSchedule': function (e) {
             console.log('clickSchedule', e);
+            // $('#exampleModal').modal('show');
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
         },
         'beforeCreateSchedule': function (e) {       //建立新的scedule
             console.log('beforeCreateSchedule', e);
-            saveNewSchedule(e);
+            $('#create_schedule_dropdown').modal('show');
+            scheduleEvent = e;
+            e.guide.clearGuideElement();
+            // saveNewSchedule(e);
         },
         'beforeUpdateSchedule': async function (e) {       //任何更新都會觸發
             var schedule = e.schedule;
@@ -128,6 +133,43 @@ var socket = io();
             return true;
         }
     });
+
+    $('#create_scedule').click(function () {
+        let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
+        let activity = $('#activity').val();
+        let advertisers = $('#advertisers').val();
+        let customer_company = $('#customer_company').val();
+        let salesperson = $('#salesperson').val();
+        let ad_type = $('#ad_type').val();
+        let memo = $('#memo').val();
+        customerSaveNewSchedule(scheduleEvent, calId, activity, advertisers, customer_company, salesperson, ad_type, memo)
+    })
+    async function customerSaveNewSchedule(e, calId, activity, advertisers, customer_company, salesperson, ad_type, memo) {
+        var schedule = {
+            id: +new Date(),
+            calendarId: String(calId),
+            title: activity,
+            body: {
+                activity: activity,
+                advertisers: advertisers,
+                customer_company: customer_company,
+                salesperson: salesperson,
+                ad_type: ad_type,
+                memo: memo,
+            },
+            isAllDay: true,
+            start: e.start,
+            end: e.end,
+            category: 'allday'
+        };
+        cal.createSchedules([schedule]);
+        $('#activity').val('');
+        $('#advertisers').val('');
+        $('#customer_company').val('');
+        $('#salesperson').val('');
+        $('#ad_type').val('');
+        $('#memo').val('');
+    }
 
     /**
      * Get time template for time and all-day

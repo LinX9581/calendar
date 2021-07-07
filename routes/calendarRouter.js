@@ -4,7 +4,7 @@ import moment from 'moment';
 
 let router = express.Router();
 router.get('/www', async function (req, res) {
-    if (req.session.user != undefined) {
+    // if (req.session.user != undefined) {
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let channel = 'www'
         req.session.channel = channel;
@@ -12,9 +12,9 @@ router.get('/www', async function (req, res) {
             today,
             channel
         });
-    } else {
-        res.render('404', {});
-    }
+    // } else {
+    //     res.render('404', {});
+    // }
 });
 
 router.get('/petsmao', async function (req, res) {

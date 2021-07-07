@@ -43,6 +43,10 @@ async function serverRenderInit() {
     await renderSchedule()
     await sleep(1000)
     await afterAllEventRender()
+    $('.tui-full-calendar-weekday-grid-line').attr({
+        "data-toggle": "modal",
+        "data-target": "#exampleModal"
+    })
 }
 
 async function afterAllEventRender() {
@@ -60,6 +64,48 @@ async function renderCalendar() {
             "channel": channel,
         })
     }).then(res => res.json()).then((jsonData) => {
+        $.each(jsonData.calendar, function (index, val) {
+            console.log(val.bgcolor);
+            $('.dropdown_ul').append(
+                `
+                    <li getChooseCalId=${val.id}> <span class="test2" style="background-color:${val.bgcolor}; color:${val.bgcolor};">12 </span> &nbsp; ${val.name}
+                `
+            );
+        })
+        // <li><span class="test2" style="background-color:red; color:red;">  11   </span><a> &nbsp; Create Page</a></li>
+        $('.dropdown_getCalendarList_button').text($('.dropdown_ul>li').first().text())
+        $('.dropdown_getCalendarList_button').attr('thisCalId',$('.dropdown_ul>li').first().attr('getChooseCalId'))
+        $(".dropdown_getCalendarList_button").click(function () {
+            var val = $(this).attr('id');
+            if (val == 1) {
+                $("ul").hide();
+                $(this).attr('id', '0');
+            } else {
+                $("ul").show();
+                $(this).attr('id', '1');
+            }
+
+        });
+        $('.dropdown_ul>li').click(function () {
+            $('.dropdown_getCalendarList_button').text($(this).text())
+            $('.dropdown_getCalendarList_button').attr('thisCalId',$(this).attr('getChooseCalId'))
+            $("ul").hide();
+            $(".dropdown_getCalendarList_button").attr('id', '0');
+
+        })
+        //Mouse click on setting button and ul list
+        $("ul, .dropdown_getCalendarList_button").mouseup(function () {
+            return false;
+        });
+
+        //Document Click
+        $(document).mouseup(function () {
+            $("ul").hide();
+            $(".dropdown_getCalendarList_button").attr('id', '0');
+        });
+
+
+        // Render Calendar List
         for (let i = 0; i < jsonData.calendar.length; i++) {
             calendar = new CalendarInfo();
             calendar.id = jsonData.calendar[i].id;
