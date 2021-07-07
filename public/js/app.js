@@ -9,7 +9,7 @@ var socket = io();
 (async function (window, Calendar) {
     var cal, resizeThrottled;
     var useCreationPopup = false;
-    var useDetailPopup = false;
+    var useDetailPopup = true;
     var datePicker, selectedCalendar;
     let scheduleEvent = '';
 
@@ -59,12 +59,15 @@ var socket = io();
                 changes.category = 'time';
             }
 
-            let updateId = changes?.calendarId ?? schedule.id
+            let updateId = changes?.calendarId ?? schedule.calendarId
             let updateTitle = changes?.title ?? schedule.title
             let updateLocation = changes?.location ?? schedule.location
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
+            console.log(updateId);
+            console.log('變更ID');
 
+            
             await fetch('/beforeUpdateSchedule', {
                 method: 'POST',
                 headers: {

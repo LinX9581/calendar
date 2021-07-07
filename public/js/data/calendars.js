@@ -69,7 +69,7 @@ async function renderCalendar() {
             );
         })
         $('.dropdown_getCalendarList_button').text($('.dropdown_ul>li').first().text())
-        $('.dropdown_getCalendarList_button').attr('thisCalId',$('.dropdown_ul>li').first().attr('getChooseCalId'))
+        $('.dropdown_getCalendarList_button').attr('thisCalId', $('.dropdown_ul>li').first().attr('getChooseCalId'))
         $(".dropdown_getCalendarList_button").click(function () {
             var val = $(this).attr('id');
             if (val == 1) {
@@ -83,7 +83,7 @@ async function renderCalendar() {
         });
         $('.dropdown_ul>li').click(function () {
             $('.dropdown_getCalendarList_button').text($(this).text())
-            $('.dropdown_getCalendarList_button').attr('thisCalId',$(this).attr('getChooseCalId'))
+            $('.dropdown_getCalendarList_button').attr('thisCalId', $(this).attr('getChooseCalId'))
             $(".dropdown_ul").hide();
             $(".dropdown_getCalendarList_button").attr('id', '0');
 
@@ -148,7 +148,7 @@ async function calendarDel() {
         if (isDel) {
             $(this).parent().remove()
             socket.emit('delete calendar', delCalId, channel);
-
+            $('li[getChooseCalId=' + delCalId + ']').remove()
             await fetch('/deleteCalendar', {
                 method: 'POST',
                 headers: {
@@ -217,6 +217,11 @@ async function calendarInfo(calendarName, calendarColor, channel) {
             "channel": channel
         })
     }).then(res => res.json()).then((createCalendarListRes) => {
+        $('.dropdown_ul').append(
+            `
+                <li getChooseCalId=${createCalendarListRes.calendarId}> <span class="test2" style="background-color:${createCalendarListRes.calendarColor}; color:${createCalendarListRes.calendarColor};">12 </span> &nbsp; ${calendarName}
+            `
+        );
         console.log(createCalendarListRes);
     })
 }

@@ -72,7 +72,7 @@ router.post('/deleteCalendar', async function (req, res) {
     }));
 })
 router.post('/createCalendarList', async function (req, res) {
-    let userName = req.session.user.name
+    let userName = 'req.session.user.name'
     let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
     let calendarId = req.body.calendarId;
     let calendarName = req.body.calendarName;
@@ -86,8 +86,10 @@ router.post('/createCalendarList', async function (req, res) {
     let createCalendarResult = await query(calendarListSql, calendarListData)
     console.log(createCalendarResult);
 
-
     res.send(JSON.stringify({
+        'calendarId' : calendarId,
+        'calendarColor' : calendarBgColor,
+        'calendarName' : calendarName,
         'add Calendar': 'succeed',
     }));
 })
