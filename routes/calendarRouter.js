@@ -5,13 +5,13 @@ import moment from 'moment';
 let router = express.Router();
 router.get('/www', async function (req, res) {
     // if (req.session.user != undefined) {
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let channel = 'www'
-        req.session.channel = channel;
-        res.render('booking', {
-            today,
-            channel
-        });
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let channel = 'www'
+    req.session.channel = channel;
+    res.render('booking', {
+        today,
+        channel
+    });
     // } else {
     //     res.render('404', {});
     // }
@@ -101,15 +101,14 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     let category = req.body.category
     let state = req.body.state
     let channel = req.body.channel;
-    // let color = req.body.color
-    // let bgColor = req.body.bgColor
-    // let dragBgColor = req.body.dragBgColor
-    // let borderColor = req.body.borderColor
-    // let beforeCreateScheduleSql = "INSERT INTO booking.event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`color`,`bgColor`,`dragBgColor`,`borderColor`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
-    // let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, color, bgColor, dragBgColor, borderColor]
+    let advertisers = req.body.advertisers;
+    let customer_company = req.body.customer_company;
+    let salesperson = req.body.salesperson;
+    let ad_type = req.body.ad_type;
+    let memo = req.body.memo;
 
-    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`)VALUES(?,?,?,?,?,?,?,?,?);"
-    let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, channel]
+    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`calendarId`,`title`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`,`advertisers`,`customer_company`,`salesperson`,`ad_type`,`memo`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+    let newScheduleData = [id, calendarId, title, isAllDay, start, end, category, state, channel, advertisers, customer_company, salesperson, ad_type, memo]
     await query(beforeCreateScheduleSql, newScheduleData)
     res.send(JSON.stringify({
         'beforeCreateSchedule': 'succeed',

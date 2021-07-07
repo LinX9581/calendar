@@ -64,10 +64,6 @@ var socket = io();
             let updateLocation = changes?.location ?? schedule.location
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
-            // let updateBorderColor = changes?.borderColor ?? schedule.borderColor
-            // let updateBgColor = changes?.updatebgColor ?? schedule.bgColor
-            // let updateColor = changes?.color ?? schedule.color
-            // let updatedragBgColor = changes?.dragBgColor ?? schedule.dragBgColor
 
             await fetch('/beforeUpdateSchedule', {
                 method: 'POST',
@@ -146,7 +142,7 @@ var socket = io();
     })
     async function customerSaveNewSchedule(e, calId, activity, advertisers, customer_company, salesperson, ad_type, memo) {
         var schedule = {
-            id: +new Date(),
+            id: String(chance.guid()),
             calendarId: String(calId),
             title: activity,
             body: {
@@ -163,6 +159,32 @@ var socket = io();
             category: 'allday'
         };
         cal.createSchedules([schedule]);
+
+        await fetch('/beforeCreateSchedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "id": schedule.id,
+                "calendarId": schedule.calendarId,
+                "title": activity,
+                "isAllDay": e.isAllDay,
+                "start": schedule.start,
+                "end": schedule.end,
+                "category": schedule.category,
+                "dueDateClass": e.dueDateClass,
+                "state": e.state,
+                "channel": channel,
+                "advertisers": advertisers,
+                "customer_company": customer_company,
+                "salesperson": salesperson,
+                "ad_type": ad_type,
+                "memo": memo,
+            })
+        }).then(res => res.json()).then((beforeCreateScheduleRes) => {
+            console.log(beforeCreateScheduleRes);
+        })
         $('#activity').val('');
         $('#advertisers').val('');
         $('#customer_company').val('');

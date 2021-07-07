@@ -78,10 +78,10 @@ async function renderCalendar() {
         $(".dropdown_getCalendarList_button").click(function () {
             var val = $(this).attr('id');
             if (val == 1) {
-                $("ul").hide();
+                $(".dropdown_ul").hide();
                 $(this).attr('id', '0');
             } else {
-                $("ul").show();
+                $(".dropdown_ul").show();
                 $(this).attr('id', '1');
             }
 
