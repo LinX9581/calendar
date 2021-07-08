@@ -87,9 +87,9 @@ router.post('/createCalendarList', async function (req, res) {
     console.log(createCalendarResult);
 
     res.send(JSON.stringify({
-        'calendarId' : calendarId,
-        'calendarColor' : calendarBgColor,
-        'calendarName' : calendarName,
+        'calendarId': calendarId,
+        'calendarColor': calendarBgColor,
+        'calendarName': calendarName,
         'add Calendar': 'succeed',
     }));
 })
@@ -126,22 +126,23 @@ router.post('/beforeDeleteSchedule', async function (req, res) {
     }));
 })
 router.post('/beforeUpdateSchedule', async function (req, res) {
-    let scheduleId = req.body.scheduleId
-    let updateId = req.body.updateId
-    let updateTitle = req.body.updateTitle
-    let updateLocation = req.body.updateLocation
-    let updateStart = req.body.updateStart
-    let updateEnd = req.body.updateEnd
-    // let updateBgColor = req.body.updateBgColor
-    // let updateBorderColor = req.body.updateBorderColor
-    // let updateColor = req.body.updateColor
-    // let updateDragBgColor = req.body.updateDragBgColor
-    // let beforeUpdateScheduleSql = "UPDATE booking.event SET id = ?, title = ?, location = ?, bgColor = ?, borderColor = ?, color = ?, dragBgColor = ?, start = ?, end = ? WHERE id = ?"
-    // let updateScheduleData = [updateId, updateTitle, updateLocation, updateBgColor, updateBorderColor, updateColor, updateDragBgColor, updateStart, updateEnd, scheduleId]
+    // update 會莫名觸發兩次 但不影響運作 推測是在套件監聽事件裡面 再次觸發update導致兩次 相關code 在 app.js  'clickSchedule' & $('.schedule_edit_btn').click() 這兩個分別會觸發一次
+    if (req.body.changes != undefined) {
+        let scheduleId = req.body.scheduleId
+        let updateCalendarId = req.body.changes.calendarId
+        let updateTitle = req.body.changes.title
+        let updateAdvertisers = req.body.changes.body.advertisers
+        let updateCustomer_company = req.body.changes.body.customer_company
+        let updateSalesperson = req.body.changes.body.salesperson
+        let updateAd_type = req.body.changes.body.ad_type
+        let updateMemo = req.body.changes.body.memo
+        // let updateStart = req.body.updateStart
+        // let updateEnd = req.body.updateEnd
 
-    let updateScheduleData = [updateId, updateTitle, updateLocation, updateStart, updateEnd, scheduleId]
-    let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ?, location = ?, start = ?, end = ? WHERE id = ?"
-    await query(beforeUpdateScheduleSql, updateScheduleData)
+        let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ?, advertisers = ?, customer_company = ?, salesperson = ?, ad_type = ?, memo = ? WHERE id = ?"
+        let updateScheduleData = [updateCalendarId, updateTitle, updateAdvertisers, updateCustomer_company, updateSalesperson, updateAd_type, updateMemo, scheduleId]
+        await query(beforeUpdateScheduleSql, updateScheduleData)
+    }
 
     res.send(JSON.stringify({
         'beforeUpdateSchedule': 'succeed',

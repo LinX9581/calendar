@@ -12,6 +12,8 @@ var socket = io();
     var useDetailPopup = true;
     var datePicker, selectedCalendar;
     let scheduleEvent = '';
+    let editScheduleId = '';
+    let editCalendarId = '';
 
     cal = new Calendar('#calendar', {
         defaultView: 'month',
@@ -36,12 +38,11 @@ var socket = io();
         'clickMore': function (e) {
             console.log('clickMore', e);
         },
-        'clickSchedule': function (e) {
+        'clickSchedule': async function (e) {
             console.log('clickSchedule', e);
-            $('.tui-full-calendar-popup-edit').click(function () {
-
-                console.log('clickSchedule', e);
-                console.log('按下schedule');
+            $('.tui-full-calendar-popup-edit').click(async function () {
+                let thisScheduleCalendarName = $('#detailEditCalendarList>li[getChooseCalId=' + e.schedule.calendarId + ']').text();
+                $('.dropdown_getCalendarList_button').text(thisScheduleCalendarName);
                 $('#click_schedule_dropdown').modal('show');
                 $('#edit_title').val(e.schedule.title)
                 $('#edit_time').text(moment(e.schedule.start._date).format('YYYY.MM.DD h:mm:ss') + '  ~  ' + moment(e.schedule.end._date).format('YYYY.MM.DD h:mm:ss'))
@@ -50,20 +51,9 @@ var socket = io();
                 $('#edit_salesperson').val(e.schedule.body.salesperson)
                 $('#edit_ad_type').val(e.schedule.body.ad_type)
                 $('#edit_memo').val(e.schedule.body.memo)
-                $('.schedule_edit_btn').click(function () {
 
-                    console.log('按下儲存');
-                    console.log(e.schedule.id);
-                    console.log(e.schedule.calendarId);
-                    console.log($('.dropdown_getCalendarList_button').attr('thiscalid'));
-                    let changes = {
-                        title: $('#edit_title').val(),
-                        calendarId: $('.dropdown_getCalendarList_button').attr('thiscalid'),
-                        state: "Busy"
-                    }
-                    socket.emit('update schedule', e.schedule.id, e.schedule.calendarId, changes, channel);
-                    cal.updateSchedule(e.schedule.id, e.schedule.calendarId, changes);
-                })
+                editScheduleId = e.schedule.id
+                editCalendarId = e.schedule.calendarId
             })
         },
         'clickDayname': function (date) {
@@ -85,11 +75,13 @@ var socket = io();
                 changes.category = 'time';
             }
 
-            let updateId = changes?.calendarId ?? schedule.calendarId
+            let updateCalendarId = changes?.calendarId ?? schedule.calendarId
             let updateTitle = changes?.title ?? schedule.title
             let updateLocation = changes?.location ?? schedule.location
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
+            socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
+            cal.updateSchedule(schedule.id, schedule.calendarId, changes);
 
             await fetch('/beforeUpdateSchedule', {
                 method: 'POST',
@@ -99,7 +91,7 @@ var socket = io();
                 body: JSON.stringify({
                     "change": changes,
                     "scheduleId": schedule.id,
-                    "updateId": updateId,
+                    "updateCalendarId": updateCalendarId,
                     "updateTitle": updateTitle,
                     "updateLocation": updateLocation,
                     "updateStart": updateStart,
@@ -112,8 +104,6 @@ var socket = io();
             }).then(res => res.json()).then((jsonData) => {
                 return 0;
             })
-            socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
-            cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             refreshScheduleVisibility();
         },
         'beforeDeleteSchedule': async function (e) {
@@ -155,6 +145,36 @@ var socket = io();
             return true;
         }
     });
+
+    $('.schedule_edit_btn').click(async function () {
+        let changes = {
+            title: $('#edit_title').val(),
+            calendarId: editCalendarId,
+            body: {
+                advertisers: $('#edit_advertisers').val(),
+                customer_company: $('#edit_customer_company').val(),
+                salesperson: $('#edit_salesperson').val(),
+                ad_type: $('#edit_ad_type').val(),
+                memo: $('#edit_memo').val(),
+            },
+            state: "Busy"
+        }
+        socket.emit('update schedule', editScheduleId, editCalendarId, changes, channel);
+        cal.updateSchedule(editScheduleId, editCalendarId, changes);
+        await fetch('/beforeUpdateSchedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "changes": changes,
+                "scheduleId": editScheduleId,
+            })
+        }).then(res => res.json()).then((jsonData) => {
+            return 0;
+        })
+
+    })
 
     $('#create_scedule').click(function () {
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
