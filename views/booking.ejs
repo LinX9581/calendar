@@ -71,6 +71,7 @@
             right: 6px;
             top: 18px;
         }
+
         .test2 {
             width: 10px;
             height: 10px;
@@ -222,7 +223,7 @@
                         <form>
                             <div class="form-group">
                                 <div class="dropdown_create_schedule">
-                                    <div class="dropdown_getCalendarList_button">  </div>
+                                    <div class="dropdown_getCalendarList_button"> </div>
                                     <ul class="dropdown_ul"></ul>
                                 </div>
                             </div>
@@ -272,6 +273,72 @@
                 </div>
             </div>
         </div>
+
+        <!-- 委託單內容 -->
+        <div class="modal" tabindex="-1" role="dialog" id="click_schedule_dropdown">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 委託單內容
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <div class="dropdown_create_schedule">
+                                    <div class="dropdown_getCalendarList_button"> </div>
+                                    <ul class="dropdown_ul"></ul>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="modal-title">活動名稱</h5>
+                                <input type="text" class="form-control" id="edit_title" placeholder="活動名稱"
+                                    aria-label="Username" aria-describedby="basic-addon1">
+                            </div>
+                            <div class="form-group">
+                                <div id="edit_time">Time</div>
+                            </div>
+                            <div class="form-group">
+                                <h5 class="modal-title">廣告主</h5>
+                                <input type="text" class="form-control" id="edit_advertisers" placeholder="廣告主"
+                                    aria-label="Username" aria-describedby="basic-addon1">
+                            </div>
+                            <div class="form-group">
+                                <h5 class="modal-title">委刊公司</h5>
+                                <input type="text" class="form-control" id="edit_customer_company" placeholder="委刊公司"
+                                    aria-label="Username" aria-describedby="basic-addon1">
+                            </div>
+                            <div class="form-group">
+                                <h5 class="modal-title">聯絡人</h5>
+                                <input type="text" class="form-control" id="edit_salesperson" placeholder="聯絡人"
+                                    aria-label="Username" aria-describedby="basic-addon1">
+                            </div>
+                            <div class="form-group">
+                                <h5 class="modal-title">類型</h5>
+                                <input type="text" class="form-control" id="edit_ad_type" placeholder="類型"
+                                    aria-label="Username" aria-describedby="basic-addon1">
+                            </div>
+                            <div class="form-group">
+                                <h5 class="modal-title">MEMO</h5>
+                                <input type="text" class="form-control" id="edit_memo" placeholder="MEMO"
+                                    aria-label="Username" aria-describedby="basic-addon1">
+                            </div>
+                        </form>
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary schedule_edit_btn">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>

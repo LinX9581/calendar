@@ -38,7 +38,33 @@ var socket = io();
         },
         'clickSchedule': function (e) {
             console.log('clickSchedule', e);
-            // $('#exampleModal').modal('show');
+            $('.tui-full-calendar-popup-edit').click(function () {
+
+                console.log('clickSchedule', e);
+                console.log('按下schedule');
+                $('#click_schedule_dropdown').modal('show');
+                $('#edit_title').val(e.schedule.title)
+                $('#edit_time').text(moment(e.schedule.start._date).format('YYYY.MM.DD h:mm:ss') + '  ~  ' + moment(e.schedule.end._date).format('YYYY.MM.DD h:mm:ss'))
+                $('#edit_advertisers').val(e.schedule.body.advertisers)
+                $('#edit_customer_company').val(e.schedule.body.customer_company)
+                $('#edit_salesperson').val(e.schedule.body.salesperson)
+                $('#edit_ad_type').val(e.schedule.body.ad_type)
+                $('#edit_memo').val(e.schedule.body.memo)
+                $('.schedule_edit_btn').click(function () {
+
+                    console.log('按下儲存');
+                    console.log(e.schedule.id);
+                    console.log(e.schedule.calendarId);
+                    console.log($('.dropdown_getCalendarList_button').attr('thiscalid'));
+                    let changes = {
+                        title: $('#edit_title').val(),
+                        calendarId: $('.dropdown_getCalendarList_button').attr('thiscalid'),
+                        state: "Busy"
+                    }
+                    socket.emit('update schedule', e.schedule.id, e.schedule.calendarId, changes, channel);
+                    cal.updateSchedule(e.schedule.id, e.schedule.calendarId, changes);
+                })
+            })
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
@@ -64,10 +90,7 @@ var socket = io();
             let updateLocation = changes?.location ?? schedule.location
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
-            console.log(updateId);
-            console.log('變更ID');
 
-            
             await fetch('/beforeUpdateSchedule', {
                 method: 'POST',
                 headers: {
@@ -161,6 +184,7 @@ var socket = io();
             end: e.end,
             category: 'allday'
         };
+        socket.emit('create schedule', [schedule], channel);
         cal.createSchedules([schedule]);
 
         await fetch('/beforeCreateSchedule', {
