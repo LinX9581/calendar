@@ -105,30 +105,31 @@ router.post('/getPosition', async function (req, res) {
 });
 
 router.get('/order', function (req, res) {
-    if (req.session.user != undefined) {
+    // if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = req.session.user.name
+        let userName = 'req.session.user.name'
         res.render('order', {
             today,
             title,
             userName
         });
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
 });
 
 router.post('/getOrder', async function (req, res) {
     // if (req.session.user != undefined) {
-        let getOrderSql = 'SELECT name,channel,rotation,memo FROM sale_booking.schedule_event'
-        let allOrder = await query(getOrderSql)
-        res.send(JSON.stringify({
-            'allOrder': allOrder,
-        }));
+    let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.schedule_event'
+    let allOrder = await query(getOrderSql)
+    console.log(allOrder);
+    res.send(JSON.stringify({
+        'allOrder': allOrder,
+    }));
     // } else {
     //     let title = 'NOW Booking '
     //     res.render('login', {

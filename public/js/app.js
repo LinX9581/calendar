@@ -188,16 +188,16 @@ var socket = io();
     })
     async function customerSaveNewSchedule(e, calId, activity, advertisers, customer_company, salesperson, ad_type, memo) {
         var schedule = {
-            id: String(chance.guid()),
+            id: String(Date.now()),
             calendarId: String(calId),
             title: activity,
             body: {
-                activity: activity,
-                advertisers: advertisers,
-                customer_company: customer_company,
-                salesperson: salesperson,
-                ad_type: ad_type,
-                memo: memo,
+                'activity': activity,
+                'advertisers': advertisers,
+                'customer_company': customer_company,
+                'salesperson': salesperson,
+                'ad_type': ad_type,
+                'memo': memo,
             },
             isAllDay: true,
             start: e.start,
@@ -223,6 +223,7 @@ var socket = io();
                 "dueDateClass": e.dueDateClass,
                 "state": e.state,
                 "channel": channel,
+                "scheduleBody": schedule.body,
                 "advertisers": advertisers,
                 "customer_company": customer_company,
                 "salesperson": salesperson,
