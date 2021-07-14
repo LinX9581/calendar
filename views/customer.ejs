@@ -203,7 +203,7 @@
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th width="40px" style="text-align: center;"></th>
+                            <th width="25px" style="text-align: center;"></th>
                             <th scope="col">客戶代號</th>
                             <th scope="col">客戶全名</th>
                             <th scope="col">連絡人</th>
@@ -219,8 +219,7 @@
                         ` 
                         <tr>
                             <th>
-                                <a href="#"><i class="far fa-edit"></i></a>
-                                <a href="#"><i class="far fa-trash-alt"></i></a>
+                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allCustomer[item].code}"></i></a>
                             </th>
                             <td scope="row" data-th="客戶代號">
                                 ${res.allCustomer[item].code} 
@@ -242,6 +241,23 @@
 
                 }
                 $('.table').html(innerHTML)
+                $('.delBtn').click(async function () {
+                    let delId = $(this).attr('delId')
+                    let isDel = confirm('確定刪除 ' + delId + ' ?')
+                    if (isDel) {
+                        $(this).parent().parent().parent().remove()
+                        await fetch('/delete_customer', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                "delId": delId,
+                            })
+                        }).then(res => res.json()).then(res => {
+                            console.log(res);
+                        })
+                    }
+                })
+
             })
         }
     </script>
