@@ -17,15 +17,21 @@ app.use(session({
     cookie: { maxAge: 3600 * 1000 }
 }));
 
-app.set("views", "views/");
+app.set("views", ["views/","views/channel"]);
 app.set("view engine", "ejs");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.static('public'));
-app.use('/', calendarRouter);
+app.use('/ch', express.static('public'));
+app.use('/ch', calendarRouter);
 app.use('/', bookingRouter);
-
+// app.get('/ch', async function (req, res) {
+//     let today = '123'
+//     res.render('test', {
+//         today
+//     });
+// });
 io.on('connection', function (socket) {
     socket.on('create schedule', function (schedule, channel) {
         socket.broadcast.emit(channel + 'create schedule', schedule);

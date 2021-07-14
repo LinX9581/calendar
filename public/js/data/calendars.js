@@ -51,7 +51,7 @@ async function afterAllEventRender() {
     await calendarDel()
 }
 async function renderCalendar() {
-    await fetch('/renderCalendar', {
+    await fetch('/ch/renderCalendar', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -125,7 +125,7 @@ async function renderCalendar() {
 }
 
 async function renderSchedule() {
-    await fetch('/renderSchedule', {
+    await fetch('/ch/renderSchedule', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -149,7 +149,7 @@ async function calendarDel() {
             $(this).parent().remove()
             socket.emit('delete calendar', delCalId, channel);
             $('li[getChooseCalId=' + delCalId + ']').remove()
-            await fetch('/deleteCalendar', {
+            await fetch('/ch/deleteCalendar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -201,7 +201,7 @@ async function calendarInfo(calendarName, calendarColor, channel) {
         '<span>' + calendar.name + '</span> ' +
         '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>')
 
-    await fetch('/createCalendarList', {
+    await fetch('/ch/createCalendarList', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

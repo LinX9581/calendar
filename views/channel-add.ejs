@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>委刊單</title>
+    <title>廣告版面</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Font Awesome -->
@@ -79,7 +79,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="www" class="nav-link">
+                                    <a href="booking" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>預約排程</p>
                                     </a>
@@ -99,13 +99,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="channel" class="nav-link">
+                            <a href="channel" class="nav-link active">
                                 <i class="nav-icon fas fa-photo-video"></i>
                                 <p>頻道管理</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link active">
+                            <a href="privilege" class="nav-link">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p>帳號管理</p>
                             </a>
@@ -125,7 +125,9 @@
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index"><i class="fa fa-home"></i> 帳號管理</a>
+                                <li class="breadcrumb-item"><a href="channel.html"><i class="fa fa-home"></i> 頻道管理</a>
+                                </li>
+                                <li class="breadcrumb-item">新增頻道 <%= channelIsExist %>
                                 </li>
                             </ol>
                         </div><!-- /.col -->
@@ -140,31 +142,49 @@
                     <!-- Main row -->
                     <div class="row">
                         <div class="col-12">
-                            <div class="card card-warning card-outline">
-                                <form>
+                            <div class="card">
+                                <div class="card-header card-warning card-outline">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-edit"></i>
+                                        新增頻道
+                                    </h3>
+                                </div>
+                                <form class="form-horizontal" role="form" action="/create_channel" method="post"
+                                    onsubmit="" id="form">
                                     <div class="card-body">
                                         <div class="tab-content">
-                                            <div class="row">
-                                                <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter"
-                                                        data-table="order-table" type="text" placeholder="搜尋">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="">名稱</label>
+                                                    <span></span>
+                                                    <input type="text" class="form-control" placeholder="請輸入名稱"
+                                                        name="name" id="name">
                                                 </div>
-                                                <div class="col-md-4 col-xl-2 form-group">
-                                                    <button class="btn btn-primary" type="button">搜尋帳號</button>
+                                                <div class="form-group">
+                                                    <label for="">網域</label>
+                                                    <span></span>
+                                                    <input type="text" class="form-control" placeholder="請輸入網域"
+                                                        name="domain" id="domain">
                                                 </div>
-                                                <div class="col-md-4 col-xl-2 form-group">
-                                                    <a href="privilege-add">
-                                                        <button class="btn btn-primary" type="button">新增帳號</button>
-                                                    </a>
+                                                <div class="form-group">
+                                                    <label for="">備註</label>
+                                                    <span></span>
+                                                    <input type="text" class="form-control" name="memo" id="memo">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="">狀態</label>
+                                                    <select class="form-control" name="status" id="status">
+                                                        <option value="1">正常</option>
+                                                        <option value="0">停用</option>
+                                                    </select>
                                                 </div>
                                             </div>
-                                            <div class="tab-pane fade show active" id="tab1">
-                                                <div class="data-table">
-                                                    <table class="table nowrap hover order-table" style="width: 100%;">
-
-                                                    </table>
-                                                </div>
-                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-3 col-sm-6 text-center">
+                                            <button type="submit"
+                                                class="btn btn-primary btn-lg btn-block addBtn">送出</button>
                                         </div>
                                     </div>
                                 </form>
@@ -189,93 +209,42 @@
     <!-- jQuery -->
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
-    <script type="text/javascript"
-        src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/jquery.tabledit.js"></script>
+    <script src="js/index/validate.js"></script>
     <script>
-        getAccount()
-        async function getAccount() {
-            let innerHTML = ''
-            await fetch('/getPrivilege', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            }).then(res => res.json()).then(res => {
-                innerHTML +=
-                    `<thead>
-                        <tr class="tr-main">
-                            <th style="display: none;">#</th>
-                            <th width="20px" style="text-align: center;"></th>
-                            <th scope="col">使用者名稱</th>
-                            <th scope="col">帳號</th>
-                            <th scope="col">電子郵件</th>
-                            <th scope="col">角色</th>
-                            <th scope="col">委刊數</th>
-                        </tr>
-                    </thead>
-                    <tbody class="deptDataBody">
-                    </tbody>
-                    `;
-                for (let item = 0; item < res.allAccount.length; item++) {
-                    innerHTML +=
-                        ` 
-                        <tr>
-                            <th scope="row" style="display: none;"></th>
-                            <th>
-                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allAccount[item].account}"></i></a>
-                            </th>
-                            <td scope="row" data-th="使用者名稱" class="tabledit-view-mode" style="cursor: pointer;">
-                                <span class="tabledit-span">${res.allAccount[item].name} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
-                            </td>
-                            <td data-th="帳號" class="tabledit-view-mode" style="cursor: pointer;">
-                                <span class="tabledit-span">${res.allAccount[item].account} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
-                            </td>
-                            <td data-th="電子郵件" class="tabledit-view-mode" style="cursor: pointer;">
-                                <span class="tabledit-span">${res.allAccount[item].email} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
-                            </td>
-                            <td data-th="角色" class="tabledit-view-mode" style="cursor: pointer;">
-                                <span class="tabledit-span">${res.allAccount[item].type} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
-                            </td>
-                        </tr>
-                    `;
-
+        // jQuery Validation Plugin 的Twitter BootStrap 3 支援
+        $.validator.setDefaults({
+            highlight: function (element) {
+                $(element).closest('.form-group').addClass('has-error');
+            },
+            unhighlight: function (element) {
+                $(element).closest('.form-group').removeClass('has-error');
+            },
+            errorElement: 'span',
+            errorClass: 'help-block',
+            errorPlacement: function (error, element) {
+                if (element.parent('.controls').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
                 }
-                $('.table').html(innerHTML)
-                $('.table').Tabledit({
-                    url: '/edit',
-                    editButton: false,
-                    deleteButton: false,
-                    hideIdentifier: true,
-                    columns: {
-                        identifier: [0, 'id'],
-                        editable: [
-                            [2, 'first'],
-                            [3, 'last'],
-                            [3, 'nickname']
-                        ]
-                    }
-                });
-                $('.delBtn').click(async function () {
-                    let delId = $(this).attr('delId')
-                    console.log(delId);
-                    let isDel = confirm('確定刪除 ' + delId + ' ?')
-                    if (isDel) {
-                        $(this).parent().parent().parent().remove()
-                        await fetch('/delete_account', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                "delId": delId,
-                            })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
-                        })
-                    }
-                })
-            })
-        }
+            }
+        });
+        // jQuery Validation Plugin的套用
+        $('#form').validate({
+            rules: {
+                name: "required",
+                domain: "required",
+            },
+            messages: {
+                name: "請輸入頻道名稱",
+                domain: "請輸入網域",
+            }
+        });
 
-
+        $(function () {
+            $(".datepicker").datepicker();
+        });
     </script>
-    <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
     <script src="js/index/bootstrap.bundle.min.js"></script>
     <script src="js/index/jquery.scrolling-tabs.min.js"></script>
@@ -290,7 +259,6 @@
     <script src="js/index/script.js"></script>
     <!-- fontawesom -->
     <script src="js/fontawesome/fontawesome.js"></script>
-
 </body>
 
 </html>

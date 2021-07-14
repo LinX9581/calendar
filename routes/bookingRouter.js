@@ -4,6 +4,7 @@ import express from 'express';
 import moment from 'moment';
 import fs from 'fs';
 import md5 from 'md5';
+import { exec } from 'child_process';
 
 let router = express.Router();
 router.get('/validate', function (req, res) {
@@ -106,14 +107,14 @@ router.post('/getPosition', async function (req, res) {
 
 router.get('/order', function (req, res) {
     // if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
-        res.render('order', {
-            today,
-            title,
-            userName
-        });
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+    res.render('order', {
+        today,
+        title,
+        userName
+    });
     // } else {
     //     let title = 'NOW Booking '
     //     res.render('login', {
@@ -126,7 +127,6 @@ router.post('/getOrder', async function (req, res) {
     // if (req.session.user != undefined) {
     let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.schedule_event'
     let allOrder = await query(getOrderSql)
-    console.log(allOrder);
     res.send(JSON.stringify({
         'allOrder': allOrder,
     }));
@@ -209,21 +209,122 @@ router.post('/create_customer', async function (req, res) {
 });
 
 router.get('/channel', function (req, res) {
+    // if (req.session.user != undefined) {
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+    res.render('channel', {
+        today,
+        title,
+        userName
+    });
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
+});
+router.get('/channel-add', function (req, res) {
+    // if (req.session.user != undefined) {
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+    let channelIsExist = ''
+    res.render('channel-add', {
+        today,
+        title,
+        userName,
+        channelIsExist
+    });
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
+});
+
+router.post('/getChannel', async function (req, res) {
+    // if (req.session.user != undefined) {
+        let getAdNumbersSql = 'SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE channel = ?'
+        let getAdNumbersData = ['www']
+        let allAdNumbers = await query(getAdNumbersSql, getAdNumbersData)
+        let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel'
+        let allChannel = await query(getChannelSql)
+        res.send(JSON.stringify({
+            'allChannel': allChannel,
+            'allAdNumbers': allAdNumbers[0].adNumbers,
+        }));
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
+});
+
+router.post('/create_channel', async function (req, res) {
     if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
-        res.render('channel', {
-            today,
-            title,
-            userName
-        });
+        let domain = req.body.domain;
+        let channel = domain;
+        let isChannelExistSql = 'SELECT 1 from sale_booking.channel where domain = ?'
+        let isChannelExistData = [channel]
+        let isChannelExistRes = await query(isChannelExistSql, isChannelExistData)
+        if (isChannelExistRes == '') {
+            let channelIsExist = ''
+            let name = req.body.name, memo = req.body.memo, status = req.body.status;
+            req.session.channel = channel;
+            let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
+            let createChannelSql = 'INSERT INTO sale_booking.`channel` (`name`,`domain`,`memo`,`status`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?)'
+            let createChannelData = [name, domain, memo, status, createTime, userName, createTime, userName]
+            await query(createChannelSql, createChannelData)
+            fs.copyFile("/var/www/calendar/views/channel/www.ejs", "/var/www/calendar/views/channel/" + channel + ".ejs", (err) => {
+                if (err) {
+                    console.log("Error Found:", err);
+                }
+            });
+            res.render('channel', {
+                userName,
+                channelIsExist
+            });
+        } else {
+            let channelIsExist = '頻道已存在'
+            res.render('channel-add', {
+                userName,
+                channelIsExist
+            });
+        }
     } else {
         let title = 'NOW Booking '
         res.render('login', {
             title
         })
     }
+});
+
+router.post('/delete_channel', async function (req, res) {
+    // if (req.session.user != undefined) {
+    let delId = req.body.delId;
+    let deleteChannelSql = 'DELETE FROM sale_booking.`channel` WHERE domain = ?'
+    let deleteChannelData = [delId]
+    let delResult = await query(deleteChannelSql, deleteChannelData)
+    console.log('req.session.user' + ' delete channel ID : ' + delId);
+    exec(`rm -rf /var/www/calendar/views/channel/` + delId + `.ejs`, (err, stdout, stderr) => {
+        if (err) {
+            return;
+        }
+    });
+    res.send(JSON.stringify({
+        'delete channel': "成功",
+    }));
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
 });
 
 router.get('/privilege', function (req, res) {
@@ -293,7 +394,8 @@ router.post('/delete_account', async function (req, res) {
         let delId = req.body.delId;
         let deleteAccountSql = 'DELETE FROM sale_booking.`user` WHERE account = ?'
         let deleteAccountData = [delId]
-        await query(deleteAccountSql, deleteAccountData)
+        let delResult = await query(deleteAccountSql, deleteAccountData)
+        console.log(req.session.user + ' delete ' + delId);
         res.send(JSON.stringify({
             'delete Account': "成功",
         }));

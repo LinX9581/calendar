@@ -83,7 +83,7 @@ var socket = io();
             socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
 
-            await fetch('/beforeUpdateSchedule', {
+            await fetch('/ch/beforeUpdateSchedule', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -108,7 +108,7 @@ var socket = io();
         },
         'beforeDeleteSchedule': async function (e) {
             console.log('beforeDeleteSchedule', e);
-            await fetch('/beforeDeleteSchedule', {
+            await fetch('/ch/beforeDeleteSchedule', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -161,7 +161,7 @@ var socket = io();
         }
         socket.emit('update schedule', editScheduleId, editCalendarId, changes, channel);
         cal.updateSchedule(editScheduleId, editCalendarId, changes);
-        await fetch('/beforeUpdateSchedule', {
+        await fetch('/ch/beforeUpdateSchedule', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -207,7 +207,7 @@ var socket = io();
         socket.emit('create schedule', [schedule], channel);
         cal.createSchedules([schedule]);
 
-        await fetch('/beforeCreateSchedule', {
+        await fetch('/ch/beforeCreateSchedule', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -445,7 +445,7 @@ var socket = io();
             schedule.borderColor = calendar.borderColor;
         }
         console.log(channel + ' begin');
-        await fetch('/beforeCreateSchedule', {
+        await fetch('/ch/beforeCreateSchedule', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

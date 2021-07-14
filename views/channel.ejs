@@ -36,12 +36,13 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#"> <%= userName %>
-                        <i class="fas fa-user-circle"></i>
+                    <a class="nav-link" href="#">
+                        <%= userName %>
+                            <i class="fas fa-user-circle"></i>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/login">
                         <i class="fas fa-sign-out-alt"></i> 登出
                     </a>
                 </li>
@@ -145,10 +146,11 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
-                                                    <button class="btn btn-primary" type="button">搜尋頻道</button>
+                                                    <button class="btn btn-primary" type="button">搜尋客戶</button>
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <a href="channel-add">
@@ -158,46 +160,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover" style="width: 100%;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th width="40px" style="text-align: center;"></th>
-                                                                <th>名稱</th>
-                                                                <th>網域</th>
-                                                                <th>備註</th>
-                                                                <th>廣告版位數</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>首頁-全頻道</td>
-                                                                <td>主網</td>
-                                                                <td></td>
-                                                                <td>0</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>首頁-全頻道</td>
-                                                                <td>寵毛</td>
-                                                                <td></td>
-                                                                <td>0</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>首頁-全頻道</td>
-                                                                <td>保庇</td>
-                                                                <td></td>
-                                                                <td>0</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th><a href="#"><i class="far fa-edit"></i></a></th>
-                                                                <td>焦點、即時頻道</td>
-                                                                <td>主網</td>
-                                                                <td>原政治</td>
-                                                                <td>0</td>
-                                                            </tr>
-                                                        </tbody>
+                                                    <table class="table nowrap hover order-table" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -223,15 +186,78 @@
     <!-- ./wrapper -->
 
     <!-- jQuery -->
-    <script src="js/jquery-3.5.1.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
     <script>
         $(function () {
             $(".datepicker").datepicker();
         });
+        getChannel()
+        async function getChannel() {
+            let innerHTML = ''
+            await fetch('/getChannel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            }).then(res => res.json()).then(res => {
+                console.log(res.allChannel);
+                innerHTML +=
+                    `<thead>
+                        <tr class="tr-main">
+                            <th width="25px" style="text-align: center;"></th>
+                            <th scope="col">名稱</th>
+                            <th scope="col">網域</th>
+                            <th scope="col">備註</th>
+                            <th scope="col">廣告版位數</th>
+                        </tr>
+                    </thead>
+                    <tbody class="deptDataBody">
+                    </tbody>
+                    `;
+                for (let item = 0; item < res.allChannel.length; item++) {
+                    innerHTML +=
+                        ` 
+                        <tr>
+                            <th>
+                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allChannel[item].domain}"></i></a>
+                            </th>
+                            <td scope="row" data-th="名稱">
+                                ${res.allChannel[item].name} 
+                            </td>
+                            <td data-th="網域">
+                                <a href="/ch/${res.allChannel[item].domain}" target=_blank>${res.allChannel[item].domain}</a>
+                            </td>
+                            <td data-th="備註">
+                                ${res.allChannel[item].memo} 
+                            </td>
+                            <td data-th="廣告版位數">
+                                ${res.allAdNumbers} 
+                            </td>
+                        </tr>
+                    `;
 
+                }
+                $('.table').html(innerHTML)
+            })
+            $('.delBtn').click(async function () {
+                let delId = $(this).attr('delId')
+                let isDel = confirm('確定刪除 ' + delId + ' ?')
+                if (isDel) {
+                    $(this).parent().parent().parent().remove()
+                    await fetch('/delete_channel', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "delId": delId,
+                        })
+                    }).then(res => res.json()).then(res => {
+                        console.log(res);
+                    })
+                }
+            })
+        }
 
     </script>
+    <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
     <script src="js/index/bootstrap.bundle.min.js"></script>
     <script src="js/index/jquery.scrolling-tabs.min.js"></script>

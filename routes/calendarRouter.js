@@ -3,12 +3,34 @@ import express from 'express';
 import moment from 'moment';
 
 let router = express.Router();
+router.get('/:channel', async function (req, res) {
+    // if (req.session.user != undefined) {
+        let channel = req.params.channel
+        console.log(channel);
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    req.session.channel = channel;
+    res.render(channel, {
+        today,
+        channel
+    });
+    // } else {
+    //     res.render('404', {});
+    // }
+});
+
+router.get('/', async function (req, res) {
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    res.render('test', {
+        today
+    });
+});
+
 router.get('/www', async function (req, res) {
     // if (req.session.user != undefined) {
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     let channel = 'www'
     req.session.channel = channel;
-    res.render('booking', {
+    res.render('www', {
         today,
         channel
     });
@@ -18,7 +40,7 @@ router.get('/www', async function (req, res) {
 });
 
 router.get('/petsmao', async function (req, res) {
-    if (req.session.user != undefined) {
+    // if (req.session.user != undefined) {
 
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let channel = 'petsmao'
@@ -26,9 +48,9 @@ router.get('/petsmao', async function (req, res) {
             today,
             channel
         });
-    } else {
-        res.render('404', {});
-    }
+    // } else {
+    //     res.render('404', {});
+    // }
 
 });
 
@@ -84,7 +106,6 @@ router.post('/createCalendarList', async function (req, res) {
     let calendarListSql = 'insert into sale_booking.calendar_list (id,name,color,bgcolor,dragbgcolor,bordercolor,channel,create_date,create_by,update_date,update_by) values (?,?,?,?,?,?,?,?,?,?,?)'
     let calendarListData = [calendarId, calendarName, calendarColor, calendarBgColor, calendarDragBgColor, calendarBorderColor, channel, createTime, userName, createTime, userName]
     let createCalendarResult = await query(calendarListSql, calendarListData)
-    console.log(createCalendarResult);
 
     res.send(JSON.stringify({
         'calendarId': calendarId,
@@ -109,12 +130,10 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     let ad_type = req.body.ad_type;
     let memo = req.body.memo;
     let scheduleBody = req.body.scheduleBody;
-    console.log(scheduleBody);
 
     let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`,`advertisers`,`customer_company`,`salesperson`,`ad_type`,`memo`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     let newScheduleData = [id, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, channel, advertisers, customer_company, salesperson, ad_type, memo]
-    let ress = await query(beforeCreateScheduleSql, newScheduleData)
-    console.log(ress);
+    await query(beforeCreateScheduleSql, newScheduleData)
     res.send(JSON.stringify({
         'beforeCreateSchedule': 'succeed',
     }));
