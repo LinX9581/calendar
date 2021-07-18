@@ -76,7 +76,7 @@ router.get('/position', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
+        let userName = req.session.user.name
         res.render('position', {
             today,
             title,
@@ -92,7 +92,7 @@ router.get('/position', function (req, res) {
 
 router.post('/getPosition', async function (req, res) {
     if (req.session.user != undefined) {
-        let getPositionSql = 'SELECT name,channel,rotation,memo FROM sale_booking.calendar_list'
+        let getPositionSql = 'SELECT name,channel,rotation,memo FROM sale_booking.calendar_list ORDER BY channel'
         let allPosition = await query(getPositionSql)
         res.send(JSON.stringify({
             'allPosition': allPosition,
@@ -109,7 +109,7 @@ router.get('/order', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
+        let userName = req.session.user.name
         res.render('order', {
             today,
             title,
@@ -125,7 +125,7 @@ router.get('/order', function (req, res) {
 
 router.post('/getOrder', async function (req, res) {
     if (req.session.user != undefined) {
-        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.schedule_event'
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.schedule_event ORDER BY advertisers'
         let allOrder = await query(getOrderSql)
         res.send(JSON.stringify({
             'allOrder': allOrder,
@@ -182,7 +182,7 @@ router.get('/customer', function (req, res) {
 
 router.post('/getCustomer', async function (req, res) {
     if (req.session.user != undefined) {
-        let getCustomerSql = 'SELECT code,name,contacts,phone,memo FROM sale_booking.customer'
+        let getCustomerSql = 'SELECT code,name,contacts,phone,memo FROM sale_booking.customer ORDER BY name'
         let allCustomer = await query(getCustomerSql)
         res.send(JSON.stringify({
             'allCustomer': allCustomer,
@@ -267,7 +267,7 @@ router.get('/channel', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
+        let userName = req.session.user.name
         res.render('channel', {
             today,
             title,
@@ -284,7 +284,7 @@ router.get('/channel-add', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
+        let userName = req.session.user.name
         let channelIsExist = ''
         res.render('channel-add', {
             today,
@@ -305,7 +305,7 @@ router.post('/getChannel', async function (req, res) {
         let getAdNumbersSql = 'SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE channel = ?'
         let getAdNumbersData = ['www']
         let allAdNumbers = await query(getAdNumbersSql, getAdNumbersData)
-        let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel'
+        let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel ORDER BY domain'
         let allChannel = await query(getChannelSql)
         res.send(JSON.stringify({
             'allChannel': allChannel,
@@ -375,6 +375,14 @@ router.post('/delete_channel', async function (req, res) {
         let deleteChannelData = [delId]
         await query(deleteChannelSql, deleteChannelData)
 
+        let deletecalendarListFromThisChannelSql = 'DELETE FROM sale_booking.`calendar_list` WHERE channel = ?'
+        let deletecalendarListFromThisChannelData = [delId]
+        await query(deletecalendarListFromThisChannelSql, deletecalendarListFromThisChannelData)
+
+        let deleteScheduleListFromThisChannelSql = 'DELETE FROM sale_booking.`schedule_event` WHERE channel = ?'
+        let deleteScheduleListFromThisChannelData = [delId]
+        await query(deleteScheduleListFromThisChannelSql, deleteScheduleListFromThisChannelData)
+        
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId, function (error) {
             if (error) console.log(error)
         })
@@ -400,7 +408,7 @@ router.get('/privilege', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
+        let userName = req.session.user.name
         res.render('privilege', {
             today,
             title,
@@ -416,7 +424,7 @@ router.get('/privilege', function (req, res) {
 
 router.post('/getPrivilege', async function (req, res) {
     if (req.session.user != undefined) {
-        let getAccountSql = 'SELECT name,account,email,type FROM sale_booking.user'
+        let getAccountSql = 'SELECT name,account,email,type FROM sale_booking.user ORDER BY name'
         let allAccount = await query(getAccountSql)
         res.send(JSON.stringify({
             'allAccount': allAccount,

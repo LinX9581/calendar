@@ -43,12 +43,12 @@ async function serverRenderInit() {
     await renderSchedule()
     await sleep(1000)
     await afterAllEventRender()
+    await calendarDel()
 }
 
 async function afterAllEventRender() {
     console.log("afterAllEventReadyRerender");
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
-    await calendarDel()
 }
 async function renderCalendar() {
     await fetch('/ch/renderCalendar', {
@@ -61,10 +61,9 @@ async function renderCalendar() {
         })
     }).then(res => res.json()).then((jsonData) => {
         $.each(jsonData.calendar, function (index, val) {
-            console.log(val.bgcolor);
             $('.dropdown_ul').append(
                 `
-                    <li getChooseCalId=${val.id}> <span class="test2" style="background-color:${val.bgcolor}; color:${val.bgcolor};">12 </span> &nbsp; ${val.name}
+                    <li getChooseCalId=${val.id}> <span class="calListStyle" style="background-color:${val.bgcolor}; color:${val.bgcolor};"></span> &nbsp; ${val.name}
                 `
             );
         })
@@ -81,13 +80,15 @@ async function renderCalendar() {
             }
 
         });
-        $('.dropdown_ul>li').click(function () {
+        $(".dropdown_ul").delegate("li", "click", function () {
             $('.dropdown_getCalendarList_button').text($(this).text())
             $('.dropdown_getCalendarList_button').attr('thisCalId', $(this).attr('getChooseCalId'))
             $(".dropdown_ul").hide();
             $(".dropdown_getCalendarList_button").attr('id', '0');
+        });
+        // $('.dropdown_ul>li').click(function () {
 
-        })
+        // })
         //Mouse click on setting button and ul list
         $(".dropdown_ul, .dropdown_getCalendarList_button").mouseup(function () {
             return false;
@@ -138,34 +139,7 @@ async function renderSchedule() {
     })
 }
 
-async function calendarDel() {
-    $('.delBtn').on('click', async function () {
-        let delCalId = $(this).attr('delId')
-        console.log(delCalId + 'deleteid');
-        let delCalName = $(this).attr('delName')
-        let isDel = confirm('確定刪除 ' + delCalName + ' ?')
-
-        if (isDel) {
-            $(this).parent().remove()
-            socket.emit('delete calendar', delCalId, channel);
-            $('li[getChooseCalId=' + delCalId + ']').remove()
-            await fetch('/ch/deleteCalendar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }, body: JSON.stringify({
-                    "delCalId": delCalId
-                })
-            }).then(res => res.json()).then((delScheduleIdRes) => {
-                socket.emit('delete calendar relate to the schedule', delScheduleIdRes, delCalId, channel);
-                for (const delScheduleIdIndex of delScheduleIdRes.delIdArray) {
-                    cal.deleteSchedule(delScheduleIdIndex.id, delCalId);
-                }
-            })
-        }
-    })
-}
-
+//新增的 calendar list , 讓 del btn 可以偵測新增的calendar list
 $('#addListBtn').click(async function () {
     await addCalendarInfo()
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
@@ -194,7 +168,6 @@ async function calendarInfo(calendarName, calendarColor, channel) {
     calendar.borderColor = calendarColor;
     addCalendar(calendar);
     socket.emit('create calendar', calendar.id, calendarName, calendarColor, channel);
-
     $('#calendarList').append('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
         '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
         '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
@@ -219,10 +192,36 @@ async function calendarInfo(calendarName, calendarColor, channel) {
     }).then(res => res.json()).then((createCalendarListRes) => {
         $('.dropdown_ul').append(
             `
-                <li getChooseCalId=${createCalendarListRes.calendarId}> <span class="test2" style="background-color:${createCalendarListRes.calendarColor}; color:${createCalendarListRes.calendarColor};">12 </span> &nbsp; ${calendarName}
+                <li getChooseCalId=${createCalendarListRes.calendarId}> <span class="calListStyle" style="background-color:${createCalendarListRes.calendarColor}; color:${createCalendarListRes.calendarColor};"></span> &nbsp; ${calendarName}
             `
         );
-        console.log(createCalendarListRes);
     })
 }
 
+async function calendarDel() {
+    $('.delBtn').on('click', async function () {
+        let delCalId = $(this).attr('delId')
+        console.log(delCalId + 'deleteid');
+        let delCalName = $(this).attr('delName')
+        let isDel = confirm('確定刪除 ' + delCalName + ' ?')
+
+        if (isDel) {
+            $(this).parent().remove()
+            socket.emit('delete calendar', delCalId, channel);
+            $('li[getChooseCalId=' + delCalId + ']').remove()
+            await fetch('/ch/deleteCalendar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }, body: JSON.stringify({
+                    "delCalId": delCalId
+                })
+            }).then(res => res.json()).then((delScheduleIdRes) => {
+                socket.emit('delete calendar relate to the schedule', delScheduleIdRes, delCalId, channel);
+                for (const delScheduleIdIndex of delScheduleIdRes.delIdArray) {
+                    cal.deleteSchedule(delScheduleIdIndex.id, delCalId);
+                }
+            })
+        }
+    })
+}

@@ -40,17 +40,29 @@ var socket = io();
         },
         'clickSchedule': async function (e) {
             console.log('clickSchedule', e);
+            //body 會跑版 暫時清空
+            $('div > div.tui-full-calendar-popup-container > div.tui-full-calendar-section-detail > div.tui-full-calendar-popup-detail-item.tui-full-calendar-popup-detail-item-separate > span').text('')
+            console.log(e.schedule.body);
+            let body1 = e.schedule.body
+            console.log(body1.activity);
             $('.tui-full-calendar-popup-edit').click(async function () {
                 let thisScheduleCalendarName = $('#detailEditCalendarList>li[getChooseCalId=' + e.schedule.calendarId + ']').text();
                 $('.dropdown_getCalendarList_button').text(thisScheduleCalendarName);
                 $('#click_schedule_dropdown').modal('show');
                 $('#edit_title').val(e.schedule.title)
                 $('#edit_time').text(moment(e.schedule.start._date).format('YYYY.MM.DD h:mm:ss') + '  ~  ' + moment(e.schedule.end._date).format('YYYY.MM.DD h:mm:ss'))
-                $('#edit_advertisers').val(e.schedule.body.advertisers)
-                $('#edit_customer_company').val(e.schedule.body.customer_company)
-                $('#edit_salesperson').val(e.schedule.body.salesperson)
-                $('#edit_ad_type').val(e.schedule.body.ad_type)
-                $('#edit_memo').val(e.schedule.body.memo)
+                let scheduleBody = JSON.stringify(e.schedule.body.replace('^"', '').replace('"$', ''))
+                
+                $('#edit_advertisers').val(scheduleBody.advertisers)
+                $('#edit_customer_company').val(scheduleBody.customer_company)
+                $('#edit_salesperson').val(scheduleBody.salesperson)
+                $('#edit_ad_type').val(scheduleBody.ad_type)
+                $('#edit_memo').val(scheduleBody.memo)
+                console.log(e.schedule.body);
+                console.log(scheduleBody);
+                console.log(scheduleBody.activity);
+                console.log(scheduleBody.ad_type);
+                console.log(scheduleBody.customer_company);
 
                 editScheduleId = e.schedule.id
                 editCalendarId = e.schedule.calendarId
