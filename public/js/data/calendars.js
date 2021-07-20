@@ -41,6 +41,7 @@ async function serverRenderInit() {
     console.log('serverRenderInit');
     await renderCalendar()
     await renderSchedule()
+    await renderOrderList()
     await sleep(1000)
     await afterAllEventRender()
     await calendarDel()
@@ -50,6 +51,7 @@ async function afterAllEventRender() {
     console.log("afterAllEventReadyRerender");
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
 }
+
 async function renderCalendar() {
     await fetch('/ch/renderCalendar', {
         method: 'POST',
@@ -61,43 +63,41 @@ async function renderCalendar() {
         })
     }).then(res => res.json()).then((jsonData) => {
         $.each(jsonData.calendar, function (index, val) {
-            $('.dropdown_ul').append(
+            $('#dropdown_getCalUl').append(
                 `
                     <li getChooseCalId=${val.id}> <span class="calListStyle" style="background-color:${val.bgcolor}; color:${val.bgcolor};"></span> &nbsp; ${val.name}
                 `
             );
         })
-        $('.dropdown_getCalendarList_button').text($('.dropdown_ul>li').first().text())
-        $('.dropdown_getCalendarList_button').attr('thisCalId', $('.dropdown_ul>li').first().attr('getChooseCalId'))
-        $(".dropdown_getCalendarList_button").click(function () {
+        $('.dropdown_getCalBtn').text($('#dropdown_getCalUl>li').first().text())
+        $('.dropdown_getCalBtn').attr('thisCalId', $('#dropdown_getCalUl>li').first().attr('getChooseCalId'))
+        $(".dropdown_getCalBtn").click(function () {
+            console.log('dropdown_getCalendarList_button click');
             var val = $(this).attr('id');
             if (val == 1) {
-                $(".dropdown_ul").hide();
+                $("#dropdown_getCalUl").hide();
                 $(this).attr('id', '0');
             } else {
-                $(".dropdown_ul").show();
+                $("#dropdown_getCalUl").show();
                 $(this).attr('id', '1');
             }
 
         });
-        $(".dropdown_ul").delegate("li", "click", function () {
-            $('.dropdown_getCalendarList_button').text($(this).text())
-            $('.dropdown_getCalendarList_button').attr('thisCalId', $(this).attr('getChooseCalId'))
-            $(".dropdown_ul").hide();
-            $(".dropdown_getCalendarList_button").attr('id', '0');
+        $("#dropdown_getCalUl").delegate("li", "click", function () {
+            console.log('dropdown calendar li click');
+            $('.dropdown_getCalBtn').text($(this).text())
+            $('.dropdown_getCalBtn').attr('thisCalId', $(this).attr('getChooseCalId'))
+            $("#dropdown_getCalUl").hide();
+            $(".dropdown_getCalBtn").attr('id', '0');
         });
-        // $('.dropdown_ul>li').click(function () {
 
-        // })
-        //Mouse click on setting button and ul list
-        $(".dropdown_ul, .dropdown_getCalendarList_button").mouseup(function () {
+        $("#dropdown_getCalUl, .dropdown_getCalBtn").mouseup(function () {
             return false;
         });
 
-        //Document Click
         $(document).mouseup(function () {
-            $(".dropdown_ul").hide();
-            $(".dropdown_getCalendarList_button").attr('id', '0');
+            $("#dropdown_getCalUl").hide();
+            $(".dropdown_getCalBtn").attr('id', '0');
         });
 
 
@@ -124,6 +124,63 @@ async function renderCalendar() {
         calendarList.innerHTML = html.join('\n');
     })
 }
+
+async function renderOrderList() {
+    console.log('renderOrderList');
+    await fetch('/getOrder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "channel": channel,
+        })
+    }).then(res => res.json()).then((jsonData) => {
+        $.each(jsonData.allOrder, function (index, val) {
+            $('#dropdown_getOrderUl').append(
+                `
+                    <li getChooseOrderId=${val.id}>${val.title}
+                `
+            );
+        })
+        $('.dropdown_getOrderBtn').text($('#dropdown_getOrderUl>li').first().text())
+        $('.dropdown_getOrderBtn').attr('thisCalId', $('#dropdown_getOrderUl>li').first().attr('getChooseCalId'))
+        $('.dropdown_getOrderBtn').attr('thisOrderId', $('#dropdown_getOrderUl>li').first().attr('getChooseOrderId'))
+        $('.dropdown_getOrderBtn').attr('thisOrderTitle', $('#dropdown_getOrderUl>li').first().text())
+        $(".dropdown_getOrderBtn").click(function () {
+            console.log('dropdown_getCalendarList_button click');
+            var val = $(this).attr('id');
+            if (val == 1) {
+                $("#dropdown_getOrderUl").hide();
+                $(this).attr('id', '0');
+            } else {
+                $("#dropdown_getOrderUl").show();
+                $(this).attr('id', '1');
+            }
+
+        });
+        $("#dropdown_getOrderUl").delegate("li", "click", function () {
+            console.log('dropdown calendar li click');
+            console.log($(this).text());
+            $('.dropdown_getOrderBtn').text($(this).text())
+            $('.dropdown_getOrderBtn').attr('thisCalId', $(this).attr('getChooseCalId'))
+            $('.dropdown_getOrderBtn').attr('thisOrderId', $(this).attr('getChooseOrderId'))
+            $('.dropdown_getOrderBtn').attr('thisOrderTitle', $(this).text())
+            $("#dropdown_getOrderUl").hide();
+            $(".dropdown_getOrderBtn").attr('id', '0');
+        });
+
+        $("#dropdown_getOrderUl, .dropdown_getOrderBtn").mouseup(function () {
+            return false;
+        });
+
+        $(document).mouseup(function () {
+            $("#dropdown_getOrderUl").hide();
+            $(".dropdown_getOrderBtn").attr('id', '0');
+        });
+    })
+}
+
 
 async function renderSchedule() {
     await fetch('/ch/renderSchedule', {
@@ -190,7 +247,7 @@ async function calendarInfo(calendarName, calendarColor, channel) {
             "channel": channel
         })
     }).then(res => res.json()).then((createCalendarListRes) => {
-        $('.dropdown_ul').append(
+        $('#dropdown_getCalUl').append(
             `
                 <li getChooseCalId=${createCalendarListRes.calendarId}> <span class="calListStyle" style="background-color:${createCalendarListRes.calendarColor}; color:${createCalendarListRes.calendarColor};"></span> &nbsp; ${calendarName}
             `

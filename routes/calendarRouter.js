@@ -124,15 +124,11 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     let category = req.body.category
     let state = req.body.state
     let channel = req.body.channel;
-    let advertisers = req.body.advertisers;
-    let customer_company = req.body.customer_company;
-    let salesperson = req.body.salesperson;
-    let ad_type = req.body.ad_type;
-    let memo = req.body.memo;
     let scheduleBody = req.body.scheduleBody;
 
-    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`,`advertisers`,`customer_company`,`salesperson`,`ad_type`,`memo`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
-    let newScheduleData = [id, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, channel, advertisers, customer_company, salesperson, ad_type, memo]
+    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`)VALUES(?,?,?,?,?,?,?,?,?,?);"
+    let newScheduleData = [id, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, channel]
+    console.log(newScheduleData);
     await query(beforeCreateScheduleSql, newScheduleData)
     res.send(JSON.stringify({
         'beforeCreateSchedule': 'succeed',

@@ -52,7 +52,7 @@ var socket = io();
                 $('#edit_title').val(e.schedule.title)
                 $('#edit_time').text(moment(e.schedule.start._date).format('YYYY.MM.DD h:mm:ss') + '  ~  ' + moment(e.schedule.end._date).format('YYYY.MM.DD h:mm:ss'))
                 let scheduleBody = JSON.stringify(e.schedule.body.replace('^"', '').replace('"$', ''))
-                
+
                 $('#edit_advertisers').val(scheduleBody.advertisers)
                 $('#edit_customer_company').val(scheduleBody.customer_company)
                 $('#edit_salesperson').val(scheduleBody.salesperson)
@@ -190,27 +190,19 @@ var socket = io();
 
     $('#create_scedule').click(function () {
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
-        let activity = $('#activity').val();
-        let advertisers = $('#advertisers').val();
-        let customer_company = $('#customer_company').val();
-        let salesperson = $('#salesperson').val();
-        let ad_type = $('#ad_type').val();
-        let memo = $('#memo').val();
-        customerSaveNewSchedule(scheduleEvent, calId, activity, advertisers, customer_company, salesperson, ad_type, memo)
+        let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
+        let orderTitle = $('.dropdown_getOrderBtn').attr('thisOrderTitle')
+        console.log(calId);
+        console.log(orderId + ' order id');
+        console.log(orderTitle + ' titleee');
+        customerSaveNewSchedule(scheduleEvent, calId, orderId, orderTitle)
     })
-    async function customerSaveNewSchedule(e, calId, activity, advertisers, customer_company, salesperson, ad_type, memo) {
+    async function customerSaveNewSchedule(e, calId, orderId, orderTitle) {
+        console.log(orderTitle + "標題");
         var schedule = {
             id: String(Date.now()),
             calendarId: String(calId),
-            title: activity,
-            body: {
-                'activity': activity,
-                'advertisers': advertisers,
-                'customer_company': customer_company,
-                'salesperson': salesperson,
-                'ad_type': ad_type,
-                'memo': memo,
-            },
+            title: orderTitle,
             isAllDay: true,
             start: e.start,
             end: e.end,
@@ -227,7 +219,7 @@ var socket = io();
             body: JSON.stringify({
                 "id": schedule.id,
                 "calendarId": schedule.calendarId,
-                "title": activity,
+                "title": orderTitle,
                 "isAllDay": e.isAllDay,
                 "start": schedule.start,
                 "end": schedule.end,
@@ -235,22 +227,11 @@ var socket = io();
                 "dueDateClass": e.dueDateClass,
                 "state": e.state,
                 "channel": channel,
-                "scheduleBody": schedule.body,
-                "advertisers": advertisers,
-                "customer_company": customer_company,
-                "salesperson": salesperson,
-                "ad_type": ad_type,
-                "memo": memo,
+                "orderId": orderId
             })
         }).then(res => res.json()).then((beforeCreateScheduleRes) => {
             console.log(beforeCreateScheduleRes);
         })
-        $('#activity').val('');
-        $('#advertisers').val('');
-        $('#customer_company').val('');
-        $('#salesperson').val('');
-        $('#ad_type').val('');
-        $('#memo').val('');
     }
 
     /**

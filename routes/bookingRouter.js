@@ -106,37 +106,84 @@ router.post('/getPosition', async function (req, res) {
 });
 
 router.get('/order', function (req, res) {
-    if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = req.session.user.name
-        res.render('order', {
-            today,
-            title,
-            userName
-        });
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
+    // if (req.session.user != undefined) {
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+    res.render('order', {
+        today,
+        title,
+        userName
+    });
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
 });
 
 router.post('/getOrder', async function (req, res) {
-    if (req.session.user != undefined) {
-        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.schedule_event ORDER BY advertisers'
-        let allOrder = await query(getOrderSql)
-        res.send(JSON.stringify({
-            'allOrder': allOrder,
-        }));
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
+    // if (req.session.user != undefined) {
+    let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.order_list ORDER BY advertisers'
+    let allOrder = await query(getOrderSql)
+    res.send(JSON.stringify({
+        'allOrder': allOrder,
+    }));
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
 });
+
+router.get('/order-add', function (req, res) {
+    // if (req.session.user != undefined) {
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let userName = 'req.session.user.name'
+    res.render('order-add', {
+        today,
+        title,
+        userName
+    });
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
+});
+
+router.post('/create_order', async function (req, res) {
+    // if (req.session.user != undefined) {
+    let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let name = req.body.name, advertisers = req.body.advertisers, customer_company = req.body.customer_company, salesperson = req.body.salesperson, ad_type = req.body.ad_type, memo = req.body.memo
+    let schedule_time = req.body.schedule_time.split('-');
+
+    let userName = 'req.session.user.name'
+    let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
+    let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
+    let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, userName, createTime, userName]
+    console.log(createOrderData);
+    // fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code, function (error) {
+    //     if (error) console.log(error)
+    // })
+    // console.log(req.session.user.name + ' create customer ' + code);
+
+    await query(createOrderSql, createOrderData)
+    res.render('order', {
+        userName
+    });
+    // } else {
+    //     let title = 'NOW Booking '
+    //     res.render('login', {
+    //         title
+    //     })
+    // }
+});
+
 router.post('/delete_order', async function (req, res) {
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -346,7 +393,7 @@ router.post('/create_channel', async function (req, res) {
             fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name, function (error) {
                 if (error) console.log(error)
             })
-            console.log(req.session.user.name + ' create channel ' + name);    
+            console.log(req.session.user.name + ' create channel ' + name);
 
             res.render('channel', {
                 userName,
@@ -382,7 +429,7 @@ router.post('/delete_channel', async function (req, res) {
         let deleteScheduleListFromThisChannelSql = 'DELETE FROM sale_booking.`schedule_event` WHERE channel = ?'
         let deleteScheduleListFromThisChannelData = [delId]
         await query(deleteScheduleListFromThisChannelSql, deleteScheduleListFromThisChannelData)
-        
+
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId, function (error) {
             if (error) console.log(error)
         })
