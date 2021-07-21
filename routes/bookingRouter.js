@@ -188,7 +188,7 @@ router.post('/delete_order', async function (req, res) {
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let delId = req.body.delId;
-        let deleteOrderSql = 'DELETE FROM sale_booking.`schedule_event` WHERE id = ?'
+        let deleteOrderSql = 'DELETE FROM sale_booking.`order_list` WHERE id = ?'
         let deleteOrderData = [delId]
         await query(deleteOrderSql, deleteOrderData)
 

@@ -11,7 +11,8 @@ var socket = io();
     var useCreationPopup = false;
     var useDetailPopup = true;
     var datePicker, selectedCalendar;
-    let scheduleEvent = '';
+    let createScheduleEvent = '';
+    let updateScheduleEvent = '';
     let editScheduleId = '';
     let editCalendarId = '';
 
@@ -42,27 +43,14 @@ var socket = io();
             console.log('clickSchedule', e);
             //body 會跑版 暫時清空
             $('div > div.tui-full-calendar-popup-container > div.tui-full-calendar-section-detail > div.tui-full-calendar-popup-detail-item.tui-full-calendar-popup-detail-item-separate > span').text('')
-            console.log(e.schedule.body);
-            let body1 = e.schedule.body
-            console.log(body1.activity);
+            updateScheduleEvent = e.schedule;
+
             $('.tui-full-calendar-popup-edit').click(async function () {
-                let thisScheduleCalendarName = $('#detailEditCalendarList>li[getChooseCalId=' + e.schedule.calendarId + ']').text();
+                let thisScheduleCalendarName = $('.dropdown_calendar_ul>li[getChooseCalId=' + e.schedule.calendarId + ']').text();
+                console.log(thisScheduleCalendarName + ' 目前的廣告板為名稱');
                 $('.dropdown_getCalendarList_button').text(thisScheduleCalendarName);
                 $('#click_schedule_dropdown').modal('show');
-                $('#edit_title').val(e.schedule.title)
-                $('#edit_time').text(moment(e.schedule.start._date).format('YYYY.MM.DD h:mm:ss') + '  ~  ' + moment(e.schedule.end._date).format('YYYY.MM.DD h:mm:ss'))
-                let scheduleBody = JSON.stringify(e.schedule.body.replace('^"', '').replace('"$', ''))
-
-                $('#edit_advertisers').val(scheduleBody.advertisers)
-                $('#edit_customer_company').val(scheduleBody.customer_company)
-                $('#edit_salesperson').val(scheduleBody.salesperson)
-                $('#edit_ad_type').val(scheduleBody.ad_type)
-                $('#edit_memo').val(scheduleBody.memo)
-                console.log(e.schedule.body);
-                console.log(scheduleBody);
-                console.log(scheduleBody.activity);
-                console.log(scheduleBody.ad_type);
-                console.log(scheduleBody.customer_company);
+                $('.dropdown_getOrderUl').val(e.schedule.title)
 
                 editScheduleId = e.schedule.id
                 editCalendarId = e.schedule.calendarId
@@ -74,7 +62,7 @@ var socket = io();
         'beforeCreateSchedule': function (e) {       //建立新的scedule
             console.log('beforeCreateSchedule', e);
             $('#create_schedule_dropdown').modal('show');
-            scheduleEvent = e;
+            createScheduleEvent = e;
             e.guide.clearGuideElement();
             // saveNewSchedule(e);
         },
@@ -160,18 +148,14 @@ var socket = io();
 
     $('.schedule_edit_btn').click(async function () {
         let changes = {
-            title: $('#edit_title').val(),
+            title: $('.dropdown_getOrderBtn').attr('thisordertitle'),
             calendarId: editCalendarId,
             body: {
-                advertisers: $('#edit_advertisers').val(),
-                customer_company: $('#edit_customer_company').val(),
-                salesperson: $('#edit_salesperson').val(),
-                ad_type: $('#edit_ad_type').val(),
-                memo: $('#edit_memo').val(),
             },
             state: "Busy"
         }
-        socket.emit('update schedule', editScheduleId, editCalendarId, changes, channel);
+        console.log(changes.title);
+        // socket.emit('update schedule', editScheduleId, editCalendarId, changes, channel);
         cal.updateSchedule(editScheduleId, editCalendarId, changes);
         await fetch('/ch/beforeUpdateSchedule', {
             method: 'POST',
@@ -195,7 +179,7 @@ var socket = io();
         console.log(calId);
         console.log(orderId + ' order id');
         console.log(orderTitle + ' titleee');
-        customerSaveNewSchedule(scheduleEvent, calId, orderId, orderTitle)
+        customerSaveNewSchedule(createScheduleEvent, calId, orderId, orderTitle)
     })
     async function customerSaveNewSchedule(e, calId, orderId, orderTitle) {
         console.log(orderTitle + "標題");

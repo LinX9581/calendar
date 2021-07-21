@@ -149,16 +149,11 @@ router.post('/beforeUpdateSchedule', async function (req, res) {
         let scheduleId = req.body.scheduleId
         let updateCalendarId = req.body.changes.calendarId
         let updateTitle = req.body.changes.title
-        let updateAdvertisers = req.body.changes.body.advertisers
-        let updateCustomer_company = req.body.changes.body.customer_company
-        let updateSalesperson = req.body.changes.body.salesperson
-        let updateAd_type = req.body.changes.body.ad_type
-        let updateMemo = req.body.changes.body.memo
         // let updateStart = req.body.updateStart
         // let updateEnd = req.body.updateEnd
 
-        let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ?, advertisers = ?, customer_company = ?, salesperson = ?, ad_type = ?, memo = ? WHERE id = ?"
-        let updateScheduleData = [updateCalendarId, updateTitle, updateAdvertisers, updateCustomer_company, updateSalesperson, updateAd_type, updateMemo, scheduleId]
+        let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ? WHERE id = ?"
+        let updateScheduleData = [updateCalendarId, updateTitle, scheduleId]
         await query(beforeUpdateScheduleSql, updateScheduleData)
     }
 
