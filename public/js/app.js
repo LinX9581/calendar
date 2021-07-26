@@ -77,24 +77,23 @@ var socket = io();
             }
 
             let updateCalendarId = changes?.calendarId ?? schedule.calendarId
-            let updateTitle = changes?.title ?? schedule.title
-            let updateLocation = changes?.location ?? schedule.location
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
-            socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
+            // socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
-
-            await fetch('/ch/beforeUpdateSchedule', {
+            console.log(changes);
+            console.log(updateCalendarId);
+            console.log(updateStart);
+            console.log(updateEnd);
+            await fetch('/ch/beforeUpdateScheduleTime', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    "change": changes,
+                    "changes": changes,
                     "scheduleId": schedule.id,
                     "updateCalendarId": updateCalendarId,
-                    "updateTitle": updateTitle,
-                    "updateLocation": updateLocation,
                     "updateStart": updateStart,
                     "updateEnd": updateEnd,
                     // "updateBorderColor": updateBorderColor,

@@ -160,8 +160,6 @@ async function renderOrderList() {
 
         });
         $(".dropdown_getOrderUl").delegate("li", "click", function () {
-            console.log('dropdown calendar li click');
-            console.log($(this).text());
             $('.dropdown_getOrderBtn').text($(this).text())
             $('.dropdown_getOrderBtn').attr('thisCalId', $(this).attr('getChooseCalId'))
             $('.dropdown_getOrderBtn').attr('thisOrderId', $(this).attr('getChooseOrderId'))

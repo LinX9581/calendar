@@ -23,7 +23,7 @@ router.get('/', function (req, res) {
         today,
         title
     });
-    console.log("sit connect")
+    // console.log("sit connect")
 });
 router.get('/login', function (req, res) {
     req.session.destroy(function () {
@@ -37,12 +37,14 @@ router.post('/', async function (req, res) {
     let account = req.body.account
     let pwd = md5(req.body.password)
     console.log(pwd);
-    let accountCheckSql = 'SELECT name,type FROM sale_booking.user WHERE account = ? AND password = ?'
+    let accountCheckSql = 'SELECT account,name,type FROM sale_booking.user WHERE account = ? AND password = ?'
     let accountCheckData = [account, pwd]
     let isAccountExists = await query(accountCheckSql, accountCheckData)
     if (isAccountExists != '') {
+        let userAccount = isAccountExists[0].account;
         let userName = isAccountExists[0].name;
         let userType = isAccountExists[0].type;
+
         console.log(loginTime + " " + userName + " 已登入 Type: " + userType)
         let userLoginTrace = loginTime + " " + userName + "已登入 Type: " + userType + "\n"
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
@@ -57,11 +59,11 @@ router.post('/', async function (req, res) {
                 superuserInvisible = 'd-none'
                 break;
             case 'User':
-                deptArray = ['']
                 userInvisible = 'd-none'
                 break;
         }
         let user = {
+            account: userAccount,
             name: userName,
             type: userType,
         }
@@ -112,82 +114,84 @@ router.post('/getPosition', async function (req, res) {
 });
 
 router.get('/order', function (req, res) {
-    // if (req.session.user != undefined) {
-    let title = 'NOW Booking '
-    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    let userName = 'req.session.user.name'
-    res.render('order', {
-        today,
-        title,
-        userName
-    });
-    // } else {
-    //     let title = 'NOW Booking '
-    //     res.render('login', {
-    //         title
-    //     })
-    // }
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let userName = req.session.user.name
+        res.render('order', {
+            today,
+            title,
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
 });
 
 router.post('/getOrder', async function (req, res) {
-    // if (req.session.user != undefined) {
-    let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.order_list ORDER BY advertisers'
-    let allOrder = await query(getOrderSql)
-    res.send(JSON.stringify({
-        'allOrder': allOrder,
-    }));
-    // } else {
-    //     let title = 'NOW Booking '
-    //     res.render('login', {
-    //         title
-    //     })
-    // }
+    if (req.session.user != undefined) {
+        let userAccount = req.session.user.account
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.order_list WHERE create_by = ? ORDER BY advertisers'
+        let getOrderData = [userAccount]
+        let allOrder = await query(getOrderSql, getOrderData)
+        res.send(JSON.stringify({
+            'allOrder': allOrder,
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
 });
 
 router.get('/order-add', function (req, res) {
-    // if (req.session.user != undefined) {
-    let title = 'NOW Booking '
-    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    let userName = 'req.session.user.name'
-    res.render('order-add', {
-        today,
-        title,
-        userName
-    });
-    // } else {
-    //     let title = 'NOW Booking '
-    //     res.render('login', {
-    //         title
-    //     })
-    // }
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let userName = req.session.user.name
+        res.render('order-add', {
+            today,
+            title,
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
 });
 
 router.post('/create_order', async function (req, res) {
-    // if (req.session.user != undefined) {
-    let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
-    let name = req.body.name, advertisers = req.body.advertisers, customer_company = req.body.customer_company, salesperson = req.body.salesperson, ad_type = req.body.ad_type, memo = req.body.memo
-    let schedule_time = req.body.schedule_time.split('-');
+    if (req.session.user != undefined) {
+        let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let name = req.body.name, advertisers = req.body.advertisers, customer_company = req.body.customer_company, salesperson = req.body.salesperson, ad_type = req.body.ad_type, memo = req.body.memo
+        let schedule_time = req.body.schedule_time.split('-');
 
-    let userName = 'req.session.user.name'
-    let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
-    let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
-    let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, userName, createTime, userName]
-    console.log(createOrderData);
-    // fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code, function (error) {
-    //     if (error) console.log(error)
-    // })
-    // console.log(req.session.user.name + ' create customer ' + code);
+        let userName = req.session.user.name
+        let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
+        let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, userName, createTime, userName]
+        console.log(createOrderData);
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code, function (error) {
+            if (error) console.log(error)
+        })
+        console.log(req.session.user.name + ' create customer ' + code);
 
-    await query(createOrderSql, createOrderData)
-    res.render('order', {
-        userName
-    });
-    // } else {
-    //     let title = 'NOW Booking '
-    //     res.render('login', {
-    //         title
-    //     })
-    // }
+        await query(createOrderSql, createOrderData)
+        res.render('order', {
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
 });
 
 router.post('/delete_order', async function (req, res) {
@@ -364,7 +368,7 @@ router.post('/getChannel', async function (req, res) {
 
         //加總重複channel個數 ex. www:1 babou:3 petsmao:4
         let repeatNumbers = {};
-        channel.forEach(function(item) {
+        channel.forEach(function (item) {
             repeatNumbers[item] = repeatNumbers[item] ? repeatNumbers[item] + 1 : 1;
         });
 
@@ -372,7 +376,7 @@ router.post('/getChannel', async function (req, res) {
         let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel ORDER BY domain'
         let allChannel = await query(getChannelSql)
         let repeatNumbersArray = allChannel.map(e => {
-            if(repeatNumbers[e.domain] == undefined) repeatNumbers[e.domain] = 0;
+            if (repeatNumbers[e.domain] == undefined) repeatNumbers[e.domain] = 0;
             return repeatNumbers[e.domain]
         })
         res.send(JSON.stringify({
