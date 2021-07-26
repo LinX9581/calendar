@@ -44,16 +44,17 @@ var socket = io();
             //body 會跑版 暫時清空
             $('div > div.tui-full-calendar-popup-container > div.tui-full-calendar-section-detail > div.tui-full-calendar-popup-detail-item.tui-full-calendar-popup-detail-item-separate > span').text('')
             updateScheduleEvent = e.schedule;
-
-            $('.tui-full-calendar-popup-edit').click(async function () {
-                let thisScheduleCalendarName = $('.dropdown_calendar_ul>li[getChooseCalId=' + e.schedule.calendarId + ']').text();
+            $('.tui-full-calendar-section-button').delegate(".tui-full-calendar-popup-edit", "click", function () {
+                let thisScheduleCalendarName = $('.dropdown_calendar_ul>li[getChooseCalId=' + updateScheduleEvent.calendarId + ']').text();
                 console.log(thisScheduleCalendarName + ' 目前的廣告板為名稱');
-                $('.dropdown_getCalendarList_button').text(thisScheduleCalendarName);
                 $('#click_schedule_dropdown').modal('show');
-                $('.dropdown_getOrderUl').val(e.schedule.title)
-
-                editScheduleId = e.schedule.id
-                editCalendarId = e.schedule.calendarId
+                $('.dropdown_getCalendarList_button').val(thisScheduleCalendarName);
+                $('.dropdown_getOrderUl').val(updateScheduleEvent.title)
+        
+                editScheduleId = updateScheduleEvent.id
+                editCalendarId = updateScheduleEvent.calendarId
+                console.log(editScheduleId);
+                console.log(editCalendarId);
             })
         },
         'clickDayname': function (date) {
@@ -146,17 +147,21 @@ var socket = io();
         }
     });
 
+
+    
     $('.schedule_edit_btn').click(async function () {
+        console.log($('.dropdown_getCalBtn').attr('thiscalid') + ' 變更後的cal ID');
+        console.log(updateScheduleEvent.id + ' 目前的 scheduleId');
         let changes = {
             title: $('.dropdown_getOrderBtn').attr('thisordertitle'),
-            calendarId: editCalendarId,
+            calendarId: $('.dropdown_getCalBtn').attr('thiscalid'),
             body: {
             },
             state: "Busy"
         }
         console.log(changes.title);
-        // socket.emit('update schedule', editScheduleId, editCalendarId, changes, channel);
-        cal.updateSchedule(editScheduleId, editCalendarId, changes);
+        // socket.emit('update schedule', updateScheduleEvent.id, updateScheduleEvent.calendarId, changes, channel);
+        cal.updateSchedule(updateScheduleEvent.id, updateScheduleEvent.calendarId, changes);
         await fetch('/ch/beforeUpdateSchedule', {
             method: 'POST',
             headers: {
@@ -164,7 +169,7 @@ var socket = io();
             },
             body: JSON.stringify({
                 "changes": changes,
-                "scheduleId": editScheduleId,
+                "scheduleId": updateScheduleEvent.id,
             })
         }).then(res => res.json()).then((jsonData) => {
             return 0;

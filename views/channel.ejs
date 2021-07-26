@@ -79,7 +79,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="www" class="nav-link">
+                                    <a href="/channel" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>預約排程</p>
                                     </a>
@@ -214,6 +214,9 @@
                     </tbody>
                     `;
                 for (let item = 0; item < res.allChannel.length; item++) {
+                    if(res.allAdNumbers[item] == undefined){
+                        res.allAdNumbers[item] = 0
+                    }
                     innerHTML +=
                         ` 
                         <tr>
@@ -230,7 +233,7 @@
                                 ${res.allChannel[item].memo} 
                             </td>
                             <td data-th="廣告版位數">
-                                ${res.allAdNumbers} 
+                                ${res.allAdNumbers[item]} 
                             </td>
                         </tr>
                     `;

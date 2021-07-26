@@ -18,7 +18,7 @@
             left: 0;
         }
 
-        .dropdown_ul {
+        .dropdown_calendar_ul {
             list-style-type: none;
             margin: 0;
             padding: 0;
@@ -32,21 +32,21 @@
             z-index: 1;
         }
 
-        .dropdown_ul>li a {
+        .dropdown_calendar_ul>li a {
             color: #000;
             text-decoration: none;
         }
 
-        .dropdown_ul>li {
+        .dropdown_calendar_ul>li {
             padding: 8px 16px;
             border-bottom: 1px solid #e5e5e5;
         }
 
-        .dropdown_ul>li:last-child {
+        .dropdown_calendar_ul>li:last-child {
             border-bottom: none;
         }
 
-        .dropdown_ul>li:hover {
+        .dropdown_calendar_ul>li:hover {
             background-color: #e5e5e5;
             color: white;
         }
@@ -95,11 +95,6 @@
                 New schedule</button>
         </div>
         <div>
-            <div id="calendarTest">
-                <select name="" id="sel">
-                    <option>adsf
-                </select>
-            </div>
             <div class="addListArea">
                 <input type="text" class="form-control form-control-sm" id="addListInput">
             </div>
@@ -224,46 +219,17 @@
                         <form>
                             <div class="form-group">
                                 <div class="dropdown_create_schedule">
-                                    <div class="dropdown_getCalendarList_button"> </div>
-                                    <ul class="dropdown_ul"></ul>
+                                    <span>廣告版位</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"> </div>
+                                    <ul class="dropdown_calendar_ul dropdown_getCalUl" id=""></ul>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="">活動名稱</label>
-                                <span></span>
-                                <input type="text" class="form-control" placeholder="請輸入活動名稱" name="activity"
-                                    id="activity">
-                            </div>
-                            <div class="form-group">
-                                <label for="">廣告主</label>
-                                <span></span>
-                                <input type="text" class="form-control" placeholder="請輸入廣告主" name="advertisers"
-                                    id="advertisers">
-                            </div>
-                            <div class="form-group">
-                                <label for="">委刊公司</label>
-                                <span></span>
-                                <input type="text" class="form-control" placeholder="請輸入委刊公司" name="customer_company"
-                                    id="customer_company">
-                            </div>
-                            <div class="form-group">
-                                <label for="">聯絡人</label>
-                                <span></span>
-                                <input type="text" class="form-control" placeholder="請輸入聯絡人" name="salesperson"
-                                    id="salesperson">
-                            </div>
-                            <div class="form-group">
-                                <label for="">類型</label>
-                                <select class="form-control" name="ad_tyl" id="ad_type">
-                                    <option value="CPM">CPM</option>
-                                    <option value="CPC">CPC</option>
-                                    <option value="CPL">CPL</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="">備註</label>
-                                <span></span>
-                                <input type="text" class="form-control" name="memo" id="memo">
+                                <div class="dropdown_create_schedule">
+                                    <span>委刊單</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getOrderBtn"> </div>
+                                    <ul class="dropdown_calendar_ul dropdown_getOrderUl" id=""></ul>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -291,47 +257,20 @@
                         <form>
                             <div class="form-group">
                                 <div class="dropdown_create_schedule">
-                                    <div class="dropdown_getCalendarList_button"> </div>
-                                    <ul class="dropdown_ul" id="detailEditCalendarList"></ul>
+                                    <span>廣告版位</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"> </div>
+                                    <ul class="dropdown_calendar_ul dropdown_getCalUl" id=""></ul>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <h5 class="modal-title">活動名稱</h5>
-                                <input type="text" class="form-control" id="edit_title" placeholder="活動名稱"
-                                    aria-label="Username" aria-describedby="basic-addon1">
-                            </div>
-                            <div class="form-group">
-                                <div id="edit_time">Time</div>
-                            </div>
-                            <div class="form-group">
-                                <h5 class="modal-title">廣告主</h5>
-                                <input type="text" class="form-control" id="edit_advertisers" placeholder="廣告主"
-                                    aria-label="Username" aria-describedby="basic-addon1">
-                            </div>
-                            <div class="form-group">
-                                <h5 class="modal-title">委刊公司</h5>
-                                <input type="text" class="form-control" id="edit_customer_company" placeholder="委刊公司"
-                                    aria-label="Username" aria-describedby="basic-addon1">
-                            </div>
-                            <div class="form-group">
-                                <h5 class="modal-title">聯絡人</h5>
-                                <input type="text" class="form-control" id="edit_salesperson" placeholder="聯絡人"
-                                    aria-label="Username" aria-describedby="basic-addon1">
-                            </div>
-                            <div class="form-group">
-                                <h5 class="modal-title">類型</h5>
-                                <input type="text" class="form-control" id="edit_ad_type" placeholder="類型"
-                                    aria-label="Username" aria-describedby="basic-addon1">
-                            </div>
-                            <div class="form-group">
-                                <h5 class="modal-title">MEMO</h5>
-                                <input type="text" class="form-control" id="edit_memo" placeholder="MEMO"
-                                    aria-label="Username" aria-describedby="basic-addon1">
+                                <div class="dropdown_create_schedule">
+                                    <span>委刊單</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getOrderBtn"> </div>
+                                    <ul class="dropdown_calendar_ul dropdown_getOrderUl" id=""></ul>
+                                </div>
                             </div>
                         </form>
                     </div>
-
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary schedule_edit_btn" data-dismiss="modal">Save changes</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -25,6 +25,12 @@ router.get('/', function (req, res) {
     });
     console.log("sit connect")
 });
+router.get('/login', function (req, res) {
+    req.session.destroy(function () {
+        // res.redirect('/');
+        res.render('logout', {});
+    })
+});
 router.post('/', async function (req, res) {
     let title = 'NOW Booking'
     let loginTime = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -314,7 +320,7 @@ router.get('/channel', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = req.session.user.name
+        let userName = 'req.session.user.name'
         res.render('channel', {
             today,
             title,
@@ -349,14 +355,29 @@ router.get('/channel-add', function (req, res) {
 
 router.post('/getChannel', async function (req, res) {
     if (req.session.user != undefined) {
-        let getAdNumbersSql = 'SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE channel = ?'
-        let getAdNumbersData = ['www']
-        let allAdNumbers = await query(getAdNumbersSql, getAdNumbersData)
+        //取得頻道組成陣列
+        let getAdNumbersSql = 'SELECT channel FROM sale_booking.`calendar_list` ORDER BY channel'
+        let getChannel = await query(getAdNumbersSql)
+        let channel = getChannel.map(e => {
+            return e.channel
+        })
+
+        //加總重複channel個數 ex. www:1 babou:3 petsmao:4
+        let repeatNumbers = {};
+        channel.forEach(function(item) {
+            repeatNumbers[item] = repeatNumbers[item] ? repeatNumbers[item] + 1 : 1;
+        });
+
+        //取得個頻道的廣告數
         let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel ORDER BY domain'
         let allChannel = await query(getChannelSql)
+        let repeatNumbersArray = allChannel.map(e => {
+            if(repeatNumbers[e.domain] == undefined) repeatNumbers[e.domain] = 0;
+            return repeatNumbers[e.domain]
+        })
         res.send(JSON.stringify({
             'allChannel': allChannel,
-            'allAdNumbers': allAdNumbers[0].adNumbers,
+            'allAdNumbers': repeatNumbersArray,
         }));
     } else {
         let title = 'NOW Booking '
