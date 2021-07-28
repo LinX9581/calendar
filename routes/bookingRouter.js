@@ -133,10 +133,14 @@ router.get('/order', function (req, res) {
 
 router.post('/getOrder', async function (req, res) {
     if (req.session.user != undefined) {
-        let userAccount = req.session.user.account
-        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.order_list WHERE create_by = ? ORDER BY advertisers'
-        let getOrderData = [userAccount]
-        let allOrder = await query(getOrderSql, getOrderData)
+        let renderOrderCondition = ''
+        //判斷權限是user 就多一個 where條件
+        if(req.session.user.type == 'User'){
+            let user = req.session.user.account;
+            renderOrderCondition = ' WHERE create_by = "' + user + '"'
+        }
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.order_list ' + renderOrderCondition + ' ORDER BY advertisers'
+        let allOrder = await query(getOrderSql)
         res.send(JSON.stringify({
             'allOrder': allOrder,
         }));

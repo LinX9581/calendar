@@ -160,7 +160,8 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table" style="width: 100%;">
+                                                    <table class="table nowrap hover order-table" style="width: 100%;"
+                                                        id="editTable">
                                                     </table>
                                                 </div>
                                             </div>
@@ -188,10 +189,14 @@
     <!-- jQuery -->
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
+
+    <!-- bstable -->
+    <script src="js/index/bstable.js"></script>
     <script>
         $(function () {
             $(".datepicker").datepicker();
         });
+        let delId = ''
         getOrder()
         async function getOrder() {
             let innerHTML = ''
@@ -203,7 +208,6 @@
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th width="25px" style="text-align: center;"></th>
                             <th scope="col">委刊單</th>
                             <th scope="col">客戶名稱</th>
                             <th scope="col">活動名稱</th>
@@ -212,54 +216,64 @@
                             <th scope="col">備註</th>
                         </tr>
                     </thead>
-                    <tbody class="deptDataBody">
-                    </tbody>
+                    <tbody class="renderTable">
+                    
                     `;
                 for (let item = 0; item < res.allOrder.length; item++) {
                     innerHTML +=
                         ` 
-                        <tr>
-                            <th>
-                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allOrder[item].id}"></i></a>
-                            </th>
-                            <td scope="row" data-th="委刊單">
-                                ${res.allOrder[item].id} 
-                            </td>
-                            <td data-th="客戶名稱">
-                                ${res.allOrder[item].advertisers} 
-                            </td>
-                            <td data-th="活動名稱">
-                                ${res.allOrder[item].title} 
-                            </td>
-                            <td data-th="類型">
-                                ${res.allOrder[item].ad_type} 
-                            </td>
-                            <td data-th="業務">
-                                ${res.allOrder[item].salesperson} 
-                            </td>
-                            <td data-th="備註">
-                                ${res.allOrder[item].memo} 
-                            </td>
+                        <tr delId="${res.allOrder[item].id}">
+                            <td scope="row" data-th="委刊單">${res.allOrder[item].id}</td>
+                            <td data-th="客戶名稱">${res.allOrder[item].advertisers}</td>
+                            <td data-th="活動名稱">${res.allOrder[item].title}</td>
+                            <td data-th="類型">${res.allOrder[item].ad_type} </td>
+                            <td data-th="業務">${res.allOrder[item].salesperson}</td>
+                            <td data-th="備註">${res.allOrder[item].memo}</td>
                         </tr>
                     `;
 
                 }
+                innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
-                $('.delBtn').click(async function () {
-                    let delId = $(this).attr('delId')
-                    let isDel = confirm('確定刪除 ' + delId + ' ?')
-                    if (isDel) {
-                        $(this).parent().parent().parent().remove()
-                        await fetch('/delete_order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                "delId": delId,
+                var editOrderTable = new BSTable("editTable", {
+                    onEdit: function () {
+                        // $(this)
+                        console.log('按下編輯');
+                    },
+                    onDelete: async function (button) {
+                        let isDel = confirm('確定刪除 ' + delId + ' ?')
+                        if (isDel) {
+                            await fetch('/delete_order', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    "delId": delId,
+                                })
+                            }).then(res => res.json()).then(res => {
+                                console.log(res);
                             })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
-                        })
-                    }
+                        }
+                        console.log(delId);
+                    },
+                });
+                editOrderTable.init()
+                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                $('#bDel').click(async function () {
+                    console.log(delId);
+                    // let delId = $(this).attr('delId')
+                    // let isDel = confirm('確定刪除 ' + delId + ' ?')
+                    // if (isDel) {
+                    //     $(this).parent().parent().parent().remove()
+                    //     await fetch('/delete_order', {
+                    //         method: 'POST',
+                    //         headers: { 'Content-Type': 'application/json' },
+                    //         body: JSON.stringify({
+                    //             "delId": delId,
+                    //         })
+                    //     }).then(res => res.json()).then(res => {
+                    //         console.log(res);
+                    //     })
+                    // }
                 })
             })
         }

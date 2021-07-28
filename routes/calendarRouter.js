@@ -29,7 +29,7 @@ router.get('/', async function (req, res) {
 router.post('/renderSchedule', async function (req, res) {
     let renderScheduleCondition = ''
     //判斷權限是user 就多一個 where條件
-    if(req.session.user.type = 'User'){
+    if(req.session.user.type == 'User'){
         let user = req.session.user.account;
         renderScheduleCondition = ' AND create_by = "' + user + '"'
     }
