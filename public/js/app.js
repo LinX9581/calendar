@@ -53,8 +53,6 @@ var socket = io();
         
                 editScheduleId = updateScheduleEvent.id
                 editCalendarId = updateScheduleEvent.calendarId
-                console.log(editScheduleId);
-                console.log(editCalendarId);
             })
         },
         'clickDayname': function (date) {

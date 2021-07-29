@@ -204,7 +204,6 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             }).then(res => res.json()).then(res => {
-                console.log(res.allOrder);
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
@@ -223,12 +222,12 @@
                     innerHTML +=
                         ` 
                         <tr delId="${res.allOrder[item].id}">
-                            <td scope="row" data-th="委刊單">${res.allOrder[item].id}</td>
-                            <td data-th="客戶名稱">${res.allOrder[item].advertisers}</td>
-                            <td data-th="活動名稱">${res.allOrder[item].title}</td>
-                            <td data-th="類型">${res.allOrder[item].ad_type} </td>
-                            <td data-th="業務">${res.allOrder[item].salesperson}</td>
-                            <td data-th="備註">${res.allOrder[item].memo}</td>
+                            <td scope="row" data-th="委刊單" cal="orderId">${res.allOrder[item].id}</td>
+                            <td data-th="客戶名稱" cal="advertisers">${res.allOrder[item].advertisers}</td>
+                            <td data-th="活動名稱" cal="title">${res.allOrder[item].title}</td>
+                            <td data-th="類型" cal="ad_type">${res.allOrder[item].ad_type} </td>
+                            <td data-th="業務" cal="salesperson">${res.allOrder[item].salesperson}</td>
+                            <td data-th="備註" cal="memo">${res.allOrder[item].memo}</td>
                         </tr>
                     `;
 
@@ -236,10 +235,6 @@
                 innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
                 var editOrderTable = new BSTable("editTable", {
-                    onEdit: function () {
-                        // $(this)
-                        console.log('按下編輯');
-                    },
                     onDelete: async function (button) {
                         let isDel = confirm('確定刪除 ' + delId + ' ?')
                         if (isDel) {
@@ -253,27 +248,36 @@
                                 console.log(res);
                             })
                         }
-                        console.log(delId);
                     },
                 });
                 editOrderTable.init()
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
-                $('#bDel').click(async function () {
-                    console.log(delId);
-                    // let delId = $(this).attr('delId')
-                    // let isDel = confirm('確定刪除 ' + delId + ' ?')
-                    // if (isDel) {
-                    //     $(this).parent().parent().parent().remove()
-                    //     await fetch('/delete_order', {
-                    //         method: 'POST',
-                    //         headers: { 'Content-Type': 'application/json' },
-                    //         body: JSON.stringify({
-                    //             "delId": delId,
-                    //         })
-                    //     }).then(res => res.json()).then(res => {
-                    //         console.log(res);
-                    //     })
-                    // }
+
+                let orderId = '', advertisers = '', title = '', ad_type = '', salesperson = '', memo = ''
+                $('.btn-group').delegate("#bAcep", "click", async function () {
+                    let currentRow = $(this).parents('tr');
+                    currentRow.find('td').each(function () {
+                        orderId = $(this).parent().find("td[cal=orderId]").text()
+                        advertisers = $(this).parent().find("td[cal=advertisers]").text()
+                        title = $(this).parent().find("td[cal=title]").text()
+                        ad_type = $(this).parent().find("td[cal=ad_type]").text()
+                        salesperson = $(this).parent().find("td[cal=salesperson]").text()
+                        memo = $(this).parent().find("td[cal=memo]").text()
+                    })
+                    await fetch('/update_order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "orderId": orderId,
+                            "advertisers": advertisers,
+                            "title": title,
+                            "ad_type": ad_type,
+                            "salesperson": salesperson,
+                            "memo": memo,
+                        })
+                    }).then(res => res.json()).then(res => {
+                        console.log(res);
+                    })
                 })
             })
         }

@@ -153,14 +153,14 @@ class BSTable {
   _rowEdit(button) {
     // Indicate user is editing the row
     let $currentRow = $(button).parents('tr');       // access the row
-    console.log($currentRow);
+    // console.log($currentRow);
     let $cols = $currentRow.find('td');              // read rows
-    console.log($cols);
+    // console.log($cols);
     if (this.currentlyEditingRow($currentRow)) return;    // not currently editing, return
     //Pone en modo de edición
     this._modifyEachColumn(this.options.editableColumns, $cols, function ($td) {  // modify each column
       let content = $td.html();             // read content
-      console.log(content);
+      // console.log(content);
       let div = '<div style="display: none;">' + content + '</div>';  // hide content (save for later use)
       let input = '<input class="form-control input-sm"  data-original-value="' + content + '" value="' + content + '">';
       $td.html(div + input);                // set content
@@ -178,8 +178,9 @@ class BSTable {
   _rowAccept(button) {
     // Accept the changes to the row
     let $currentRow = $(button).parents('tr');    // access the row
-    console.log($currentRow);
+    // console.log($currentRow);
     let $cols = $currentRow.find('td');              // read fields
+    // console.log($cols);
     if (!this.currentlyEditingRow($currentRow)) return;   // not currently editing, return
 
     // Finish editing the row & save edits

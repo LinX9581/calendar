@@ -131,11 +131,29 @@ router.get('/order', function (req, res) {
     }
 });
 
+router.get('/order-add', function (req, res) {
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let userName = req.session.user.name
+        res.render('order-add', {
+            today,
+            title,
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
 router.post('/getOrder', async function (req, res) {
     if (req.session.user != undefined) {
         let renderOrderCondition = ''
         //判斷權限是user 就多一個 where條件
-        if(req.session.user.type == 'User'){
+        if (req.session.user.type == 'User') {
             let user = req.session.user.account;
             renderOrderCondition = ' WHERE create_by = "' + user + '"'
         }
@@ -152,16 +170,21 @@ router.post('/getOrder', async function (req, res) {
     }
 });
 
-router.get('/order-add', function (req, res) {
+router.post('/update_order', async function (req, res) {
     if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = req.session.user.name
-        res.render('order-add', {
-            today,
-            title,
-            userName
-        });
+        let renderOrderCondition = ''
+        //判斷權限是user 就多一個 where條件
+        if (req.session.user.type == 'User') {
+            let user = req.session.user.account;
+            renderOrderCondition = ' WHERE create_by = "' + user + '"'
+        }
+        let orderId = req.body.orderId, advertisers = req.body.advertisers, title = req.body.title, ad_type = req.body.ad_type, salesperson = req.body.salesperson, memo = req.body.memo
+        let updateOrderSql = 'UPDATE sale_booking.order_list SET advertisers=?, title=?, ad_type=?, salesperson=?, memo=? WHERE id=?'
+        let updateOrderData = [advertisers, title, ad_type, salesperson, memo, orderId]
+        await query(updateOrderSql, updateOrderData)
+        res.send(JSON.stringify({
+            'update_order': '成功',
+        }));
     } else {
         let title = 'NOW Booking '
         res.render('login', {
