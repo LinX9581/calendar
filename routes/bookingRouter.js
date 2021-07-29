@@ -203,11 +203,10 @@ router.post('/create_order', async function (req, res) {
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
         let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, userName, createTime, userName]
-        console.log(createOrderData);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name, function (error) {
             if (error) console.log(error)
         })
-        console.log(req.session.user.name + ' create customer ' + code);
+        console.log(req.session.user.name + ' create name ' + name);
 
         await query(createOrderSql, createOrderData)
         res.render('order', {
@@ -289,6 +288,29 @@ router.get('/customer-add', function (req, res) {
             title,
             userName
         });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/update_customer', async function (req, res) {
+    if (req.session.user != undefined) {
+        let rendercustomerCondition = ''
+        //判斷權限是user 就多一個 where條件
+        if (req.session.user.type == 'User') {
+            let user = req.session.user.account;
+            rendercustomerCondition = ' WHERE create_by = "' + user + '"'
+        }
+        let code = req.body.code, name = req.body.name, contacts = req.body.contacts, phone = req.body.phone, memo = req.body.memo
+        let updateCustomerSql = 'UPDATE sale_booking.customer SET name=?, contacts=?, phone=?, memo=? WHERE code=?'
+        let updateCustomerData = [name, contacts, phone, memo, code]
+        await query(updateCustomerSql, updateCustomerData)
+        res.send(JSON.stringify({
+            'update_customer': '成功',
+        }));
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -604,12 +626,6 @@ router.post('/create_account', async function (req, res) {
 });
 
 router.post('/edit', function (req, res) {
-    console.log(req.body);
-    console.log(req.body[0]);
-
-    // console.log(res.body?.first);
-    // console.log(res.body?.action);
-    console.log('get post');
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     let userName = 'req.session.user.name'

@@ -160,7 +160,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table" style="width: 100%;">
+                                                    <table class="table nowrap hover order-table" id="editTable" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -188,6 +188,8 @@
     <!-- jQuery -->
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
+    <!-- bstable -->
+    <script src="js/index/bstable.js"></script>
     <script>
         $(function () {
             $(".datepicker").datepicker();
@@ -199,11 +201,9 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             }).then(res => res.json()).then(res => {
-                console.log(res.allCustomer);
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th width="25px" style="text-align: center;"></th>
                             <th scope="col">客戶代號</th>
                             <th scope="col">客戶全名</th>
                             <th scope="col">連絡人</th>
@@ -211,51 +211,64 @@
                             <th scope="col">備註</th>
                         </tr>
                     </thead>
-                    <tbody class="deptDataBody">
-                    </tbody>
+                    <tbody class="renderTable">
                     `;
                 for (let item = 0; item < res.allCustomer.length; item++) {
                     innerHTML +=
                         ` 
-                        <tr>
-                            <th>
-                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allCustomer[item].code}"></i></a>
-                            </th>
-                            <td scope="row" data-th="客戶代號">
-                                ${res.allCustomer[item].code} 
-                            </td>
-                            <td data-th="客戶全名">
-                                ${res.allCustomer[item].name} 
-                            </td>
-                            <td data-th="連絡人">
-                                ${res.allCustomer[item].contacts} 
-                            </td>
-                            <td data-th="連絡電話">
-                                ${res.allCustomer[item].phone} 
-                            </td>
-                            <td data-th="備註">
-                                ${res.allCustomer[item].memo} 
-                            </td>
+                        <tr delId="${res.allCustomer[item].code}">
+                            <td scope="row" data-th="客戶代號" cal="code">${res.allCustomer[item].code}</td>
+                            <td data-th="客戶全名" cal="name">${res.allCustomer[item].name}</td>
+                            <td data-th="連絡人" cal="contacts">${res.allCustomer[item].contacts}</td>
+                            <td data-th="連絡電話" cal="phone">${res.allCustomer[item].phone}</td>
+                            <td data-th="備註" cal="memo">${res.allCustomer[item].memo}</td>
                         </tr>
                     `;
-
                 }
+                innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
-                $('.delBtn').click(async function () {
-                    let delId = $(this).attr('delId')
-                    let isDel = confirm('確定刪除 ' + delId + ' ?')
-                    if (isDel) {
-                        $(this).parent().parent().parent().remove()
-                        await fetch('/delete_customer', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                "delId": delId,
+                var editOrderTable = new BSTable("editTable", {
+                    onDelete: async function (button) {
+                        let isDel = confirm('確定刪除 ' + delId + ' ?')
+                        if (isDel) {
+                            await fetch('/delete_customer', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    "delId": delId,
+                                })
+                            }).then(res => res.json()).then(res => {
+                                console.log(res);
                             })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
+                        }
+                    },
+                });
+                editOrderTable.init()
+                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+
+                let code = '', name = '', contacts = '', phone = '', salesperson = '', memo = ''
+                $('.btn-group').delegate("#bAcep", "click", async function () {
+                    let currentRow = $(this).parents('tr');
+                    currentRow.find('td').each(function () {
+                        code = $(this).parent().find("td[cal=code]").text()
+                        name = $(this).parent().find("td[cal=name]").text()
+                        contacts = $(this).parent().find("td[cal=contacts]").text()
+                        phone = $(this).parent().find("td[cal=phone]").text()
+                        memo = $(this).parent().find("td[cal=memo]").text()
+                    })
+                    await fetch('/update_customer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "code": code,
+                            "name": name,
+                            "contacts": contacts,
+                            "phone": phone,
+                            "memo": memo,
                         })
-                    }
+                    }).then(res => res.json()).then(res => {
+                        console.log(res);
+                    })
                 })
 
             })
