@@ -155,7 +155,8 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table" style="width: 100%;">
+                                                    <table class="table nowrap hover order-table" id="editTable"
+                                                        style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -183,7 +184,11 @@
     <!-- jQuery -->
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
+    <!-- bstable -->
+    <script src="js/index/bstable.js"></script>
+
     <script>
+        let delId = ''
         getPosition()
         async function getPosition() {
             let innerHTML = ''
@@ -195,7 +200,6 @@
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th width="30px" style="text-align: center;"></th>
                             <th scope="col">名稱</th>
                             <th scope="col">頻道</th>
                             <th scope="col">輪替數</th>
@@ -203,36 +207,64 @@
                             <th scope="col">委刊數</th>
                         </tr>
                     </thead>
-                    <tbody class="deptDataBody">
-                    </tbody>
+                    <tbody class="renderTable">
                     `;
                 for (let item = 0; item < res.allPosition.length; item++) {
                     innerHTML +=
                         ` 
-                        <tr>
-                            <th>
-                                <a href="#"><i class="far fa-edit"></i></a>
-                            </th>
-                            <td scope="row" data-th="名稱">
-                                ${res.allPosition[item].name} 
-                            </td>
-                            <td data-th="頻道">
-                                ${res.allPosition[item].channel} 
-                            </td>
-                            <td data-th="輪替數">
-                                ${res.allPosition[item].rotation} 
-                            </td>
-                            <td data-th="備註">
-                                ${res.allPosition[item].memo} 
-                            </td>
-                            <td data-th="委刊數">
-                                0  
-                            </td>
+                        <tr delId="${res.allPosition[item].id}">
+                            <td scope="row" data-th="名稱" cal="name" calId="${res.allPosition[item].id}">${res.allPosition[item].name}</td>
+                            <td data-th="頻道" cal="channel">${res.allPosition[item].channel}</td>
+                            <td data-th="輪替數" cal="rotation">${res.allPosition[item].rotation}</td>
+                            <td data-th="備註" cal="memo">${res.allPosition[item].memo}</td>
+                            <td data-th="委刊數">0</td>
                         </tr>
                     `;
 
                 }
+                innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
+                var editPositionTable = new BSTable("editTable", {
+                    onDelete: async function (button) {
+                        let isDel = confirm('確定刪除 ' + delId + ' ?')
+                        if (isDel) {
+                            await fetch('/delete_position', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    "delId": delId,
+                                })
+                            }).then(res => res.json()).then(res => {
+                                console.log(res);
+                            })
+                        }
+                    },
+                });
+                editPositionTable.init()
+                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                let calId = '', name = '', advertisers = '', title = '', ad_type = '', salesperson = '', memo = ''
+                $('.btn-group').delegate("#bAcep", "click", async function () {
+                    let currentRow = $(this).parents('tr');
+                    currentRow.find('td').each(function () {
+                        calId = $(this).parent().find("td").attr('calId')
+                        name = $(this).parent().find("td[cal=name]").text()
+                        rotation = $(this).parent().find("td[cal=rotation]").text()
+                        memo = $(this).parent().find("td[cal=memo]").text()
+                    })
+                    await fetch('/update_position', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            "calId": calId,
+                            "name": name,
+                            "rotation": rotation,
+                            "memo": memo,
+                        })
+                    }).then(res => res.json()).then(res => {
+                        console.log(res);
+                    })
+                })
+
             })
         }
 

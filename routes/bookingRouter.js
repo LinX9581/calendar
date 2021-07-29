@@ -100,10 +100,57 @@ router.get('/position', function (req, res) {
 
 router.post('/getPosition', async function (req, res) {
     if (req.session.user != undefined) {
-        let getPositionSql = 'SELECT name,channel,rotation,memo FROM sale_booking.calendar_list ORDER BY channel'
+        let getPositionSql = 'SELECT id,name,channel,rotation,memo FROM sale_booking.calendar_list ORDER BY channel'
         let allPosition = await query(getPositionSql)
         res.send(JSON.stringify({
             'allPosition': allPosition,
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/update_position', async function (req, res) {
+    if (req.session.user != undefined) {
+        let renderPositionCondition = ''
+        //判斷權限是user 就多一個 where條件
+        if (req.session.user.type == 'User') {
+            let user = req.session.user.account;
+            renderPositionCondition = ' WHERE create_by = "' + user + '"'
+        }
+        let calId = req.body.calId, name = req.body.name, rotation = req.body.rotation, memo = req.body.memo
+        let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?, rotation=?, memo=? WHERE id=?'
+        let updatePositionData = [name, rotation, memo, calId]
+        await query(updatePositionSql, updatePositionData)
+        res.send(JSON.stringify({
+            'update_position': '成功',
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/delete_position', async function (req, res) {
+    if (req.session.user != undefined) {
+        let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let delId = req.body.delId;
+        let deletePostionSql = 'DELETE FROM sale_booking.`calendar_list` WHERE id = ?'
+        let deletePostionData = [delId]
+        await query(deletePostionSql, deletePostionData)
+
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId, function (error) {
+            if (error) console.log(error)
+        })
+        console.log(req.session.user.name + ' delete postion ' + delId);
+
+        res.send(JSON.stringify({
+            'Delete Postion': "成功",
         }));
     } else {
         let title = 'NOW Booking '
