@@ -40,6 +40,7 @@
                         <%= userName %>
                             <i class="fas fa-user-circle"></i>
                     </a>
+                    <span class="userType" value="<%= userType %>"></span>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/login">
@@ -188,6 +189,7 @@
     <script src="js/index/bstable.js"></script>
 
     <script>
+        let userType = $('.userType').attr('value')
         let delId = ''
         getPosition()
         async function getPosition() {
@@ -241,6 +243,9 @@
                     },
                 });
                 editPositionTable.init()
+                if(userType == 'User'){
+                    // $(".renderTable>tr").find('td:last').addClass('d-none');
+                }
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
                 let calId = '', name = '', advertisers = '', title = '', ad_type = '', salesperson = '', memo = ''
                 $('.btn-group').delegate("#bAcep", "click", async function () {

@@ -40,6 +40,7 @@
                         <%= userName %>
                             <i class="fas fa-user-circle"></i>
                     </a>
+                    <span class="userType" value="<%= userType %>"></span>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/login">
@@ -192,6 +193,13 @@
     <script type="text/javascript"
         src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/jquery.tabledit.js"></script>
     <script>
+        let userType = $('.userType').attr('value')
+        let userVisible = ''
+        if (userType == 'User' || userType == 'SuperUser') {
+            userVisible = 'd-none'
+        }
+        console.log(userType);
+        console.log(userVisible);
         getAccount()
         async function getAccount() {
             let innerHTML = ''
@@ -202,13 +210,13 @@
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th style="display: none;">#</th>
-                            <th width="20px" style="text-align: center;"></th>
                             <th scope="col">使用者名稱</th>
                             <th scope="col">帳號</th>
                             <th scope="col">電子郵件</th>
                             <th scope="col">角色</th>
                             <th scope="col">委刊數</th>
+                            <th style="display: none;" class="${userVisible}">#</th>
+                            <th width="20px" style="text-align: center;" class="${userVisible}"></th>
                         </tr>
                     </thead>
                     <tbody class="deptDataBody">
@@ -218,10 +226,6 @@
                     innerHTML +=
                         ` 
                         <tr>
-                            <th scope="row" style="display: none;"></th>
-                            <th>
-                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allAccount[item].account}"></i></a>
-                            </th>
                             <td scope="row" data-th="使用者名稱" class="tabledit-view-mode" style="cursor: pointer;">
                                 <span class="tabledit-span">${res.allAccount[item].name} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
                             </td>
@@ -234,10 +238,18 @@
                             <td data-th="角色" class="tabledit-view-mode" style="cursor: pointer;">
                                 <span class="tabledit-span">${res.allAccount[item].type} </span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
                             </td>
+                            <td data-th="委刊數" class="tabledit-view-mode" style="cursor: pointer;">
+                                <span class="tabledit-span">${res.allOrderNumbers[item]}</span><input class="tabledit-input form-control input-sm" type="text" name="First Name" style="display: none;" disabled="">
+                            </td>
+                            <th scope="row" style="display: none;" class="${userVisible}"></th>
+                            <th class="${userVisible}">
+                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allAccount[item].account}"></i></a>
+                            </th>
                         </tr>
                     `;
 
                 }
+
                 $('.table').html(innerHTML)
                 $('.table').Tabledit({
                     url: '/edit',

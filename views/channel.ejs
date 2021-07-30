@@ -203,11 +203,11 @@
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th width="25px" style="text-align: center;"></th>
                             <th scope="col">名稱</th>
                             <th scope="col">網域</th>
                             <th scope="col">備註</th>
                             <th scope="col">廣告版位數</th>
+                            <th width="25px" style="text-align: center;"></th>
                         </tr>
                     </thead>
                     <tbody class="deptDataBody">
@@ -220,9 +220,6 @@
                     innerHTML +=
                         ` 
                         <tr>
-                            <th>
-                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allChannel[item].domain}"></i></a>
-                            </th>
                             <td scope="row" data-th="名稱">
                                 ${res.allChannel[item].name} 
                             </td>
@@ -235,6 +232,9 @@
                             <td data-th="廣告版位數">
                                 ${res.allAdNumbers[item]} 
                             </td>
+                            <th>
+                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allChannel[item].domain}"></i></a>
+                            </th>
                         </tr>
                     `;
 

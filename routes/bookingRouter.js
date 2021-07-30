@@ -82,13 +82,15 @@ router.post('/', async function (req, res) {
 
 router.get('/position', function (req, res) {
     if (req.session.user != undefined) {
+        let userType = req.session.user.type
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
         res.render('position', {
             today,
             title,
-            userName
+            userName,
+            userType
         });
     } else {
         let title = 'NOW Booking '
@@ -201,8 +203,8 @@ router.post('/getOrder', async function (req, res) {
         let renderOrderCondition = ''
         //判斷權限是user 就多一個 where條件
         if (req.session.user.type == 'User') {
-            let user = req.session.user.account;
-            renderOrderCondition = ' WHERE create_by = "' + user + '"'
+            let account = req.session.user.account;
+            renderOrderCondition = ' WHERE create_by = "' + account + '"'
         }
         let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo FROM sale_booking.order_list ' + renderOrderCondition + ' ORDER BY advertisers'
         let allOrder = await query(getOrderSql)
@@ -247,9 +249,10 @@ router.post('/create_order', async function (req, res) {
         let schedule_time = req.body.schedule_time.split('-');
 
         let userName = req.session.user.name
+        let account = req.session.user.account
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
-        let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, userName, createTime, userName]
+        let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, account, createTime, account]
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name, function (error) {
             if (error) console.log(error)
         })
@@ -420,7 +423,7 @@ router.get('/channel', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let userName = 'req.session.user.name'
+        let userName = req.session.user.name
         res.render('channel', {
             today,
             title,
@@ -463,21 +466,23 @@ router.post('/getChannel', async function (req, res) {
         })
 
         //加總重複channel個數 ex. www:1 babou:3 petsmao:4
-        let repeatNumbers = {};
+        let eachChannelAdNumbers = {};
         channel.forEach(function (item) {
-            repeatNumbers[item] = repeatNumbers[item] ? repeatNumbers[item] + 1 : 1;
+            eachChannelAdNumbers[item] = eachChannelAdNumbers[item] ? eachChannelAdNumbers[item] + 1 : 1;
         });
 
         //取得個頻道的廣告數
         let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel ORDER BY domain'
         let allChannel = await query(getChannelSql)
-        let repeatNumbersArray = allChannel.map(e => {
-            if (repeatNumbers[e.domain] == undefined) repeatNumbers[e.domain] = 0;
-            return repeatNumbers[e.domain]
+        
+        //如果該頻道沒廣告怎該索引=0
+        let eachChannelAdNumbersArray = allChannel.map(e => {
+            if (eachChannelAdNumbers[e.domain] == undefined) eachChannelAdNumbers[e.domain] = 0;
+            return eachChannelAdNumbers[e.domain]
         })
         res.send(JSON.stringify({
             'allChannel': allChannel,
-            'allAdNumbers': repeatNumbersArray,
+            'allAdNumbers': eachChannelAdNumbersArray,
         }));
     } else {
         let title = 'NOW Booking '
@@ -574,13 +579,15 @@ router.post('/delete_channel', async function (req, res) {
 
 router.get('/privilege', function (req, res) {
     if (req.session.user != undefined) {
+        let userType = req.session.user.type
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
         res.render('privilege', {
             today,
             title,
-            userName
+            userName,
+            userType
         });
     } else {
         let title = 'NOW Booking '
@@ -592,10 +599,29 @@ router.get('/privilege', function (req, res) {
 
 router.post('/getPrivilege', async function (req, res) {
     if (req.session.user != undefined) {
+        //取得每個人建立的委刊數組成陣列
+        let getAdNumbersSql = 'SELECT create_by FROM sale_booking.`order_list` ORDER BY create_by'
+        let getOrderCreateBy = await query(getAdNumbersSql)
+        let order = getOrderCreateBy.map(e => {
+            return e.create_by
+        })
+
+        //加總重複channel個數 ex. userA:1 userB:3 userC:4
+        let eachUserOrderNumbers = {};
+        order.forEach(function (item) {
+            eachUserOrderNumbers[item] = eachUserOrderNumbers[item] ? eachUserOrderNumbers[item] + 1 : 1;
+        });
         let getAccountSql = 'SELECT name,account,email,type FROM sale_booking.user ORDER BY name'
         let allAccount = await query(getAccountSql)
+
+        //如果該頻道沒廣告怎該索引=0
+        let eachUserOrderNumbersArray = allAccount.map(e => {
+            if (eachUserOrderNumbers[e.account] == undefined) eachUserOrderNumbers[e.account] = 0;
+            return eachUserOrderNumbers[e.account]
+        })
         res.send(JSON.stringify({
             'allAccount': allAccount,
+            'allOrderNumbers': eachUserOrderNumbersArray
         }));
     } else {
         let title = 'NOW Booking '
