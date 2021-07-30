@@ -102,10 +102,30 @@ router.get('/position', function (req, res) {
 
 router.post('/getPosition', async function (req, res) {
     if (req.session.user != undefined) {
+        //取得頻道組成陣列
+        let getCalendarIdNumbersSql = 'SELECT calendarId FROM sale_booking.`schedule_event` ORDER BY calendarId'
+        let getCalendarId = await query(getCalendarIdNumbersSql)
+        let calendarId = getCalendarId.map(e => {
+            return e.calendarId
+        })
+
+        //加總重複calendarId個數 ex. a:1 b:3 c:4
+        let eachCalendarIdNumbers = {};
+        calendarId.forEach(function (item) {
+            eachCalendarIdNumbers[item] = eachCalendarIdNumbers[item] ? eachCalendarIdNumbers[item] + 1 : 1;
+        });
+
         let getPositionSql = 'SELECT id,name,channel,rotation,memo FROM sale_booking.calendar_list ORDER BY channel'
         let allPosition = await query(getPositionSql)
+
+        //如果該頻道沒廣告怎該索引=0
+        let eachCalendarIdNumbersArray = allPosition.map(e => {
+            if (eachCalendarIdNumbers[e.id] == undefined) eachCalendarIdNumbers[e.id] = 0;
+            return eachCalendarIdNumbers[e.id]
+        })
         res.send(JSON.stringify({
             'allPosition': allPosition,
+            'allCalendarIdNumbers': eachCalendarIdNumbersArray,
         }));
     } else {
         let title = 'NOW Booking '
@@ -474,7 +494,7 @@ router.post('/getChannel', async function (req, res) {
         //取得個頻道的廣告數
         let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel ORDER BY domain'
         let allChannel = await query(getChannelSql)
-        
+
         //如果該頻道沒廣告怎該索引=0
         let eachChannelAdNumbersArray = allChannel.map(e => {
             if (eachChannelAdNumbers[e.domain] == undefined) eachChannelAdNumbers[e.domain] = 0;
