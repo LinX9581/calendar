@@ -229,15 +229,25 @@
                 }
             }
         });
-        // jQuery Validation Plugin的套用
+        $.validator.addMethod("onlyEnglish", function (value) {
+            regEx = /[a-zA-Z]/;
+            if (!regEx.test(value))
+                return false;
+            else if (regEx.test(value))
+                return true;
+        }, 'Please enter "anto"!');
+
         $('#form').validate({
             rules: {
                 name: "required",
-                domain: "required",
+                domain: {
+                    required: true,
+                    onlyEnglish: true
+                }
             },
             messages: {
                 name: "請輸入頻道名稱",
-                domain: "請輸入網域",
+                domain: "請輸入英文網域",
             }
         });
 

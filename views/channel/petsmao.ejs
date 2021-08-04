@@ -4,95 +4,25 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>Sales Booking DEMO</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.css">
-    <link rel="stylesheet" type="text/css" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css">
-    <link rel="stylesheet" type="text/css" href="./tui-calendar.css">
-    <link rel="stylesheet" type="text/css" href="./css/default.css">
-    <link rel="stylesheet" type="text/css" href="./css/icons.css">
-    <style>
-        .dropdown_create_schedule {
-            position: relative;
-            display: inline-block;
-            left: 0;
-        }
-
-        .dropdown_calendar_ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            top: 45px;
-            width: 178px;
-            background-color: white;
-            font-weight: bold;
-            position: absolute;
-            display: none;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-
-        .dropdown_calendar_ul>li a {
-            color: #000;
-            text-decoration: none;
-        }
-
-        .dropdown_calendar_ul>li {
-            padding: 8px 16px;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .dropdown_calendar_ul>li:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown_calendar_ul>li:hover {
-            background-color: #e5e5e5;
-            color: white;
-        }
-
-        .dropdown_getCalendarList_button {
-            width: 178px;
-            height: 35px;
-            background-color: #D0D0D0;
-            padding: 12px;
-            border-radius: 5px;
-            font-weight: bold;
-            border: 1px solid #ced4da;
-        }
-
-        .dropdown_getCalendarList_button:before {
-            content: "";
-            position: absolute;
-            width: 0px;
-            height: 0px;
-            border: 5px solid;
-            border-color: white transparent transparent transparent;
-            right: 6px;
-            top: 18px;
-        }
-
-        .calListStyle {
-            width: 14px;
-            height: 14px;
-            border-radius: 50px;
-            position: relative;
-            display: inline-block;
-        }
-    </style>
+    <!-- bootstrap4 CSS -->
+    <link rel="stylesheet" type="text/css" href="css/index/bootstrap.min.css">
+    <!-- font awesome CSS -->
+    <link rel="stylesheet" type="text/css" href="css/index/fontawesome.css">
+    <!-- tui-calendar CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-time-picker.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-date-picker.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-calendar.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/default.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/icons.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/dropdown.css">
 </head>
 
 <body>
-    <div id="top" class="channel" channel=<%=channel %>>
-        <h2>
-            <%= channel %>
-        </h2>
-    </div>
     <div id="lnb">
-        <div class="lnb-new-schedule">
-            <button id="btn-new-schedule" type="button" class="btn btn-default btn-block lnb-new-schedule-btn"
-                data-toggle="modal">
-                New schedule</button>
+        <div class="channel lnb-new-schedule" channel=<%=channel %>>
+            <button id="btn-new-schedule" type="button" class="btn btn-default btn-block lnb-new-schedule-btn">
+                <%= channel %>
+            </button>
         </div>
         <div>
             <div class="addListArea">
@@ -272,44 +202,36 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary schedule_edit_btn" data-dismiss="modal">Save changes</button>
+                        <button type="button" class="btn btn-primary schedule_edit_btn" data-dismiss="modal">Save
+                            changes</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
 
-
-
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="./js/jquery-3.2.1.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
-            integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
-            crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"
-            integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF"
-            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
         <script>
             let channel = $('.channel').attr('channel')
         </script>
-        <!-- font awesome CSS -->
-        <link rel="stylesheet" type="text/css" href="css/fontawesome/fontawesome.css">
         <!-- font awesome JS -->
         <script type="text/javascript" src="./js/fontawesome/fontawesome.js"></script>
         <script src="https://uicdn.toast.com/tui.code-snippet/v1.5.2/tui-code-snippet.min.js"></script>
         <script src="https://uicdn.toast.com/tui.time-picker/v2.0.3/tui-time-picker.min.js"></script>
         <script src="https://uicdn.toast.com/tui.date-picker/v4.0.3/tui-date-picker.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.31/moment-timezone-with-data.js" integrity="sha512-ECoTMVFwwVtxjEBRjUMjviUd6hBjwDhBJI0+3W2YDs+ld5rHHUDr59T15gxwEPkGu5XLmkASUSvPgQe/Tpyodg==" crossorigin="anonymous"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.31/moment-timezone-with-data.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.0.13/chance.min.js"></script>
         <script src="./tui-calendar.js"></script>
         <script src="./js/data/calendars.js"></script>
         <script src="./js/data/schedules.js"></script>
         <script src="./js/app.js"></script>
         <script src="./js/socket.js"></script>
-        <script>
-            
-        </script>
+
 </body>
 
 </html>
