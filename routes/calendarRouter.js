@@ -4,22 +4,19 @@ import moment from 'moment';
 
 let router = express.Router();
 router.get('/:channel', async function (req, res) {
-    // console.log(req.session.user);
-    // if (req.session.user != undefined) {
-        let channel = 'www'
-        let title = 'NOW Booking '
+    console.log(req.session.user);
+    if (req.session.user != undefined) {
+        let channel = req.params.channel
+        console.log(channel);
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        // req.session.channel = channel;
+        req.session.channel = channel;
         res.render(channel, {
             today,
             channel
         });
-    // } else {
-    //     res.render('../login', {
-    //         today,
-    //         title
-    //     });
-    // }
+    } else {
+        res.render('/logout', {});
+    }
 });
 
 router.get('/', async function (req, res) {

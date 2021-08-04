@@ -3,38 +3,22 @@
 /* eslint-disable require-jsdoc, no-unused-vars */
 var socket = io();
 var CalendarList = [];
-
-function CalendarInfo() {
-    this.id = null;
-    this.name = null;
-    this.checked = true;
-    this.color = null;
-    this.bgColor = null;
-    this.borderColor = null;
-    this.dragBgColor = null;
-}
-
-function addCalendar(calendar) {
-    CalendarList.push(calendar);
-}
-
-function findCalendar(id) {
-    var found;
-
-    CalendarList.forEach(function (calendar) {
-        if (calendar.id === id) {
-            found = calendar;
-        }
-    });
-
-    return found || CalendarList[0];
-}
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 var calendar;
 var html = [];
+
+//一開始先 render Calendar Schedule OrderList 
+//之後讓套件 rerender 為了讓 Schedule 能抓到 Calendar
+//再讓calendarDel() 能夠監聽   -> 這部分改成delegate就不用重複呼叫function (待修)
+
+/**
+ * renderCalendar()         : 從資料庫傳cal到前端
+ * renderSchedule()         : 從資料庫傳schedule到前端
+ * renderOrderList()        : 從資料庫傳orderList到前端
+ * afterAllEventRender()    : 初始化套件讓 Schedule 能抓到 Calendar
+ * calendarDel()            : 讓新增的cal能夠監聽刪除事件
+ * CalendarInfo(),addCalendar : 初始化一開始新增的calendar
+ * findCalendar()           : 套件其他js用
+ */
 
 serverRenderInit()
 async function serverRenderInit() {
@@ -142,6 +126,7 @@ async function renderOrderList() {
                 `
             );
         })
+        //讓新增schedule預設選項為 已有委刊單和廣告版位的第一個    但 編輯委刊單時選的仍然是第一位 應改成當下的委刊單和廣告版位 (待改)
         $('.dropdown_getOrderBtn').text($('.dropdown_getOrderUl>li').first().text())
         $('.dropdown_getOrderBtn').attr('thisCalId', $('.dropdown_getOrderUl>li').first().attr('getChooseCalId'))
         $('.dropdown_getOrderBtn').attr('thisOrderId', $('.dropdown_getOrderUl>li').first().attr('getChooseOrderId'))
@@ -158,6 +143,8 @@ async function renderOrderList() {
             }
 
         });
+
+        //選擇委託單時 給定所選 orderId calId 再讓 app.js去抓ID給後端
         $(".dropdown_getOrderUl").delegate("li", "click", function () {
             $('.dropdown_getOrderBtn').text($(this).text())
             $('.dropdown_getOrderBtn').attr('thisCalId', $(this).attr('getChooseCalId'))
@@ -177,7 +164,6 @@ async function renderOrderList() {
         });
     })
 }
-
 
 async function renderSchedule() {
     await fetch('/ch/renderSchedule', {
@@ -251,11 +237,9 @@ async function calendarInfo(calendarName, calendarColor, channel) {
         );
     })
 }
-$(".delBtn").delegate("i", "click", function(){
-    console.log('sdf');
-})
+
 async function calendarDel() {
-    $('.delBtn > i').on('click', async function () {
+    $('.delBtn').on('click', async function () {
         let delCalId = $(this).attr('delId')
         console.log(delCalId + 'deleteid');
         let delCalName = $(this).attr('delName')
@@ -280,4 +264,34 @@ async function calendarDel() {
             })
         }
     })
+}
+
+function CalendarInfo() {
+    this.id = null;
+    this.name = null;
+    this.checked = true;
+    this.color = null;
+    this.bgColor = null;
+    this.borderColor = null;
+    this.dragBgColor = null;
+}
+
+function addCalendar(calendar) {
+    CalendarList.push(calendar);
+}
+
+function findCalendar(id) {
+    var found;
+
+    CalendarList.forEach(function (calendar) {
+        if (calendar.id === id) {
+            found = calendar;
+        }
+    });
+
+    return found || CalendarList[0];
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
