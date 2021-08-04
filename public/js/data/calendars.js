@@ -251,9 +251,11 @@ async function calendarInfo(calendarName, calendarColor, channel) {
         );
     })
 }
-
+$(".delBtn").delegate("i", "click", function(){
+    console.log('sdf');
+})
 async function calendarDel() {
-    $('.delBtn').on('click', async function () {
+    $('.delBtn > i').on('click', async function () {
         let delCalId = $(this).attr('delId')
         console.log(delCalId + 'deleteid');
         let delCalName = $(this).attr('delName')
