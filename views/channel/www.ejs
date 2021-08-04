@@ -83,16 +83,11 @@
 </head>
 
 <body>
-    <div id="top" class="channel" channel=<%=channel %>>
-        <h2>
-            <%= channel %>
-        </h2>
-    </div>
     <div id="lnb">
-        <div class="lnb-new-schedule">
-            <button id="btn-new-schedule" type="button" class="btn btn-default btn-block lnb-new-schedule-btn"
-                data-toggle="modal">
-                New schedule</button>
+        <div class="channel lnb-new-schedule" channel=<%=channel %>>
+            <button id="btn-new-schedule" type="button" class="btn btn-default btn-block lnb-new-schedule-btn">
+                <%= channel %>
+            </button>
         </div>
         <div>
             <div class="addListArea">
@@ -272,7 +267,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary schedule_edit_btn" data-dismiss="modal">Save changes</button>
+                        <button type="button" class="btn btn-primary schedule_edit_btn" data-dismiss="modal">Save
+                            changes</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -300,7 +296,9 @@
         <script src="https://uicdn.toast.com/tui.time-picker/v2.0.3/tui-time-picker.min.js"></script>
         <script src="https://uicdn.toast.com/tui.date-picker/v4.0.3/tui-date-picker.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.31/moment-timezone-with-data.js" integrity="sha512-ECoTMVFwwVtxjEBRjUMjviUd6hBjwDhBJI0+3W2YDs+ld5rHHUDr59T15gxwEPkGu5XLmkASUSvPgQe/Tpyodg==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.31/moment-timezone-with-data.js"
+            integrity="sha512-ECoTMVFwwVtxjEBRjUMjviUd6hBjwDhBJI0+3W2YDs+ld5rHHUDr59T15gxwEPkGu5XLmkASUSvPgQe/Tpyodg=="
+            crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.0.13/chance.min.js"></script>
         <script src="./tui-calendar.js"></script>
         <script src="./js/data/calendars.js"></script>
@@ -308,7 +306,7 @@
         <script src="./js/app.js"></script>
         <script src="./js/socket.js"></script>
         <script>
-            
+
         </script>
 </body>
 

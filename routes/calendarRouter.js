@@ -4,19 +4,22 @@ import moment from 'moment';
 
 let router = express.Router();
 router.get('/:channel', async function (req, res) {
-    console.log(req.session.user);
-    if (req.session.user != undefined) {
-        let channel = req.params.channel
-        console.log(channel);
+    // console.log(req.session.user);
+    // if (req.session.user != undefined) {
+        let channel = 'www'
+        let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        req.session.channel = channel;
+        // req.session.channel = channel;
         res.render(channel, {
             today,
             channel
         });
-    } else {
-        res.render('/logout', {});
-    }
+    // } else {
+    //     res.render('../login', {
+    //         today,
+    //         title
+    //     });
+    // }
 });
 
 router.get('/', async function (req, res) {
@@ -29,7 +32,7 @@ router.get('/', async function (req, res) {
 router.post('/renderSchedule', async function (req, res) {
     let renderScheduleCondition = ''
     //判斷權限是user 就多一個 where條件
-    if(req.session.user.type == 'User'){
+    if (req.session.user.type == 'User') {
         let user = req.session.user.account;
         renderScheduleCondition = ' AND create_by = "' + user + '"'
     }
@@ -128,13 +131,13 @@ router.post('/beforeUpdateScheduleTime', async function (req, res) {
     // update 會莫名觸發兩次 但不影響運作 推測是在套件監聽事件裡面 再次觸發update導致兩次 相關code 在 app.js  'clickSchedule' & $('.schedule_edit_btn').click() 這兩個分別會觸發一次
     console.log(req.body.changes);
     // if (req.body.changes != undefined) {
-        let scheduleId = req.body.scheduleId
-        let updateStart = req.body.updateStart
-        let updateEnd = req.body.updateEnd
+    let scheduleId = req.body.scheduleId
+    let updateStart = req.body.updateStart
+    let updateEnd = req.body.updateEnd
 
-        let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET start = ?, end = ? WHERE id = ?"
-        let updateScheduleData = [updateStart, updateEnd, scheduleId]
-        await query(beforeUpdateScheduleSql, updateScheduleData)
+    let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET start = ?, end = ? WHERE id = ?"
+    let updateScheduleData = [updateStart, updateEnd, scheduleId]
+    await query(beforeUpdateScheduleSql, updateScheduleData)
     // }
 
     res.send(JSON.stringify({

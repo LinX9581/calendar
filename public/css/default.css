@@ -36,6 +36,10 @@ body {
   background-color: #fff;
 }
 
+.dropdown-toggle::after {
+  display: none;
+}
+
 .dropdown-menu {
   top: 25px;
   padding: 3px 0;
@@ -46,6 +50,16 @@ body {
 .dropdown-menu > li > a {
   padding: 9px 12px;
   cursor: pointer;
+}
+
+.dropdown-menu>li>a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
 }
 
 .dropdown-menu > li > a:hover {
@@ -65,7 +79,7 @@ body {
 }
 
 #top {
-  height: 49px;
+  /* height: 49px; */
   border-bottom: 1px solid #bbb;
   padding: 16px;
   font-size: 10px;
@@ -74,7 +88,7 @@ body {
 #lnb {
   position: absolute;
   width: 200px;
-  top: 49px;
+  top: 0px;
   bottom: 0;
   border-right: 1px solid #d5d5d5;
   padding: 12px 10px;
@@ -84,7 +98,7 @@ body {
 #right {
   position: absolute;
   left: 200px;
-  top: 49px;
+  top: 0px;
   right: 0;
   bottom: 0;
 }

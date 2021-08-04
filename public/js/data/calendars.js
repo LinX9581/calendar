@@ -118,7 +118,7 @@ async function renderCalendar() {
                 '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
                 '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
                 '<span>' + calendar.name + '</span> ' +
-                '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>'
+                '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fa fa-trash"></i></div></div>'
             );
         });
         calendarList.innerHTML = html.join('\n');
@@ -252,9 +252,11 @@ async function calendarInfo(calendarName, calendarColor, channel) {
         );
     })
 }
-
+$(".delBtn").delegate("i", "click", function(){
+    console.log('sdf');
+})
 async function calendarDel() {
-    $('.delBtn').on('click', async function () {
+    $('.delBtn > i').on('click', async function () {
         let delCalId = $(this).attr('delId')
         console.log(delCalId + 'deleteid');
         let delCalName = $(this).attr('delName')
