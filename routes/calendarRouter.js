@@ -5,17 +5,21 @@ import moment from 'moment';
 let router = express.Router();
 router.get('/:channel', async function (req, res) {
     console.log(req.session.user);
+    let title = 'NOW Booking '
+    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     if (req.session.user != undefined) {
         let channel = req.params.channel
         console.log(channel);
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         req.session.channel = channel;
         res.render(channel, {
             today,
             channel
         });
     } else {
-        res.render('/logout', {});
+        res.render('login', {
+            today,
+            title
+        });
     }
 });
 

@@ -79,10 +79,7 @@ var socket = io();
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
             // socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
-            console.log(changes);
-            console.log(updateCalendarId);
-            console.log(updateStart);
-            console.log(updateEnd);
+
             await fetch('/ch/beforeUpdateScheduleTime', {
                 method: 'POST',
                 headers: {
