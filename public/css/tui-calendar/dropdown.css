@@ -8,7 +8,6 @@
     list-style-type: none;
     margin: 0;
     padding: 0;
-    top: 45px;
     width: 178px;
     background-color: white;
     font-weight: bold;
@@ -38,9 +37,8 @@
 }
 
 .dropdown_getCalendarList_button {
-    width: 178px;
+    width: 180px;
     height: 35px;
-    background-color: #D0D0D0;
     padding: 12px;
     border-radius: 5px;
     font-weight: bold;
@@ -48,14 +46,10 @@
 }
 
 .dropdown_getCalendarList_button:before {
-    content: "";
-    position: absolute;
-    width: 0px;
-    height: 0px;
-    border: 5px solid;
-    border-color: white transparent transparent transparent;
-    right: 6px;
-    top: 18px;
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .calListStyle {
@@ -64,4 +58,9 @@
     border-radius: 50px;
     position: relative;
     display: inline-block;
+}
+
+.dropDownName{
+    display: inline-block;
+    text-align: left;
 }

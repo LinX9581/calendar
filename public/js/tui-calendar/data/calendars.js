@@ -11,7 +11,7 @@ var html = [];
 //再讓calendarDel() 能夠監聽   -> 這部分改成delegate就不用重複呼叫function (待修)
 
 /**
- * renderCalendar()         : 從資料庫傳cal到前端
+ * renderCalendar()         : 從資料庫傳cal到前端的 編輯委刊單、新增委刊單、calendarList
  * renderSchedule()         : 從資料庫傳schedule到前端
  * renderOrderList()        : 從資料庫傳orderList到前端
  * afterAllEventRender()    : 初始化套件讓 Schedule 能抓到 Calendar
@@ -46,16 +46,15 @@ async function renderCalendar() {
             "channel": channel,
         })
     }).then(res => res.json()).then((jsonData) => {
+        //讓編輯委刊單和新增委刊單的table顯示calendar
         $.each(jsonData.calendar, function (index, val) {
             $('.dropdown_getCalUl').append(
                 `
-                    <li getChooseCalId=${val.id}> <span class="calListStyle" style="background-color:${val.bgcolor}; color:${val.bgcolor};"></span> &nbsp; ${val.name}
+                    <li getChooseCalId=${val.id} value=${val.name}> <span class="calListStyle" style="background-color:${val.bgcolor}; color:${val.bgcolor};"></span> &nbsp; ${val.name}
                 `
             );
         })
-        $('.dropdown_getCalBtn').html(`<span class="calListStyle"></span>  ` + $('.dropdown_getCalUl>li').first().text() + ``)
-        $('.dropdown_getCalBtn > span').attr('style',$('.dropdown_getCalUl>li').first().children().attr('style'))
-        $('.dropdown_getCalBtn').attr('thisCalId', $('.dropdown_getCalUl>li').first().attr('getChooseCalId'))
+        //委刊單下拉選單
         $(".dropdown_getCalBtn").click(function () {
             console.log('dropdown_getCalendarList_button click');
             var val = $(this).attr('id');
@@ -70,7 +69,9 @@ async function renderCalendar() {
         });
         $(".dropdown_getCalUl").delegate("li", "click", function () {
             console.log('dropdown calendar li click');
-            $('.dropdown_getCalBtn').text($(this).text())
+            //將原來的cal改成選擇的 cal.text() & cal.style
+            $('.dropdown_getCalBtn').html(`<span class="calListStyle"></span>  ` + $(this).text() + `<i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>`)
+            $('.dropdown_getCalBtn > span').attr('style', $(this).children().attr('style'))
             $('.dropdown_getCalBtn').attr('thisCalId', $(this).attr('getChooseCalId'))
             $(".dropdown_getCalUl").hide();
             $(".dropdown_getCalBtn").attr('id', '0');
@@ -84,7 +85,6 @@ async function renderCalendar() {
             $(".dropdown_getCalUl").hide();
             $(".dropdown_getCalBtn").attr('id', '0');
         });
-
 
         // Render Calendar List
         for (let i = 0; i < jsonData.calendar.length; i++) {
@@ -123,15 +123,11 @@ async function renderOrderList() {
         $.each(jsonData.allOrder, function (index, val) {
             $('.dropdown_getOrderUl').append(
                 `
-                    <li getChooseOrderId=${val.id}>${val.title}
+                    <li getChooseOrderId=${val.id} value=${val.title} >${val.title}
                 `
             );
         })
-        //讓新增schedule預設選項為 已有委刊單和廣告版位的第一個    但 編輯委刊單時選的仍然是第一位 應改成當下的委刊單和廣告版位 (待改)
-        $('.dropdown_getOrderBtn').text($('.dropdown_getOrderUl>li').first().text())
-        $('.dropdown_getOrderBtn').attr('thisCalId', $('.dropdown_getOrderUl>li').first().attr('getChooseCalId'))
-        $('.dropdown_getOrderBtn').attr('thisOrderId', $('.dropdown_getOrderUl>li').first().attr('getChooseOrderId'))
-        $('.dropdown_getOrderBtn').attr('thisOrderTitle', $('.dropdown_getOrderUl>li').first().text())
+
         $(".dropdown_getOrderBtn").click(function () {
             console.log('dropdown_getCalendarList_button click');
             var val = $(this).attr('id');
@@ -147,8 +143,8 @@ async function renderOrderList() {
 
         //選擇委託單時 給定所選 orderId calId 再讓 app.js去抓ID給後端
         $(".dropdown_getOrderUl").delegate("li", "click", function () {
-            $('.dropdown_getOrderBtn').text($(this).text())
-            $('.dropdown_getOrderBtn').attr('thisCalId', $(this).attr('getChooseCalId'))
+            //將原來的order改成選擇的 order.text() & order.style
+            $('.dropdown_getOrderBtn').html($(this).text() + '<i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>')
             $('.dropdown_getOrderBtn').attr('thisOrderId', $(this).attr('getChooseOrderId'))
             $('.dropdown_getOrderBtn').attr('thisOrderTitle', $(this).text())
             $(".dropdown_getOrderUl").hide();

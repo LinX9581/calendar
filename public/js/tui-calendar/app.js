@@ -46,18 +46,21 @@ var socket = io();
             $('div > div.tui-full-calendar-popup-container > div.tui-full-calendar-section-detail > div.tui-full-calendar-popup-detail-item.tui-full-calendar-popup-detail-item-separate > span').text('')
             updateScheduleEvent = e.schedule;
             $('.tui-full-calendar-section-button').delegate(".tui-full-calendar-popup-edit", "click", function () {
-                let thisScheduleCalendarName = $('.dropdown_calendar_ul>li[getChooseCalId=' + updateScheduleEvent.calendarId + ']').text();
-                console.log(thisScheduleCalendarName + ' 目前的廣告板為名稱');
                 $('#click_schedule_dropdown').modal('show');
-                $('.dropdown_getCalendarList_button').val(thisScheduleCalendarName);
-                $('.dropdown_getOrderUl').val(updateScheduleEvent.title)
-        
+
+                //讓編輯委刊單的cal預設選項和stlye為原來選擇的calendar
+                let thisScheduleCalendarName = $('.dropdown_calendar_ul>li[getChooseCalId=' + updateScheduleEvent.calendarId + ']').attr('value');
+                $('.dropdown_getCalBtn').html(`<span class="calListStyle"></span>  <div class="dropDownName">` + thisScheduleCalendarName + `</div><i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>`)
+                $('.dropdown_getCalBtn > span').attr('style', $('.dropdown_calendar_ul>li[getChooseCalId=' + updateScheduleEvent.calendarId + ']').children().attr('style'))
+                $('.dropdown_getCalBtn').attr('thisCalId', updateScheduleEvent.calendarId)
+                //讓編輯委刊單的order預設選項和stlye為原來選擇的order
+                $('.dropdown_getOrderBtn').html('<span class="dropDownName">' + updateScheduleEvent.title + '</span><i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>')
+                $('.dropdown_getOrderBtn').attr('thisCalId',$('.dropdown_getOrderUl>li[value=' + updateScheduleEvent.title + ']').attr('getChooseOrderId'))
+                $('.dropdown_getOrderBtn').attr('thisOrderTitle', updateScheduleEvent.title)
+
                 editScheduleId = updateScheduleEvent.id
                 editCalendarId = updateScheduleEvent.calendarId
             })
-        },
-        'clickDayname': function (date) {
-            console.log('clickDayname', date);
         },
         'beforeCreateSchedule': function (e) {       //建立新的scedule
             console.log('beforeCreateSchedule', e);
@@ -66,7 +69,8 @@ var socket = io();
             e.guide.clearGuideElement();
             // saveNewSchedule(e);
         },
-        'beforeUpdateSchedule': async function (e) {       //任何更新都會觸發
+        //目前只有更新時間會觸發，及時同步會卡套件時區BUG
+        'beforeUpdateSchedule': async function (e) {
             var schedule = e.schedule;
             var changes = e.changes;
             updateChangeTime = e.changes;
@@ -80,7 +84,7 @@ var socket = io();
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
 
-            socket.emit('update schedule', schedule.id, schedule.calendarId, updateChangeTime, channel);
+            // socket.emit('update schedule', schedule.id, schedule.calendarId, updateChangeTime, channel);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
 
             await fetch('/ch/beforeUpdateScheduleTime', {
@@ -94,10 +98,6 @@ var socket = io();
                     "updateCalendarId": updateCalendarId,
                     "updateStart": updateStart,
                     "updateEnd": updateEnd,
-                    // "updateBorderColor": updateBorderColor,
-                    // "updateBgColor": updateBgColor,
-                    // "updateColor": updateColor,
-                    // "updatedragBgColor": updatedragBgColor,
                 })
             }).then(res => res.json()).then((jsonData) => {
                 return 0;
@@ -120,11 +120,6 @@ var socket = io();
             socket.emit('delete schedule', e.schedule.id, e.schedule.calendarId, channel);
             cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
         },
-        'afterRenderSchedule': function (e) {
-            var schedule = e.schedule;
-            // var element = cal.getElement(schedule.id, schedule.calendarId);
-            // console.log('afterRenderSchedule', element);
-        },
         'clickTimezonesCollapseBtn': function (timezonesCollapsed) {
             if (timezonesCollapsed) {
                 cal.setTheme({
@@ -142,7 +137,9 @@ var socket = io();
         }
     });
 
+    //editScheduleEvent
     $('.schedule_edit_btn').click(async function () {
+        console.log('click schedule edit btn');
         let changes = {
             title: $('.dropdown_getOrderBtn').attr('thisordertitle'),
             calendarId: $('.dropdown_getCalBtn').attr('thiscalid'),
@@ -167,6 +164,7 @@ var socket = io();
 
     })
 
+    //createScheduleEvent
     $('#create_scedule').click(function () {
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
         let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
@@ -208,6 +206,8 @@ var socket = io();
             console.log(beforeCreateScheduleRes);
         })
     }
+
+    //底下都是原套件 devault function
 
     /**
      * Get time template for time and all-day
@@ -384,62 +384,6 @@ var socket = io();
                 end: end
             });
         }
-    }
-    async function saveNewSchedule(scheduleData) {
-        var calendar = scheduleData.calendar || findCalendar(scheduleData.calendarId);
-        var schedule = {
-            id: String(chance.guid()),
-            title: scheduleData.title,
-            isAllDay: scheduleData.isAllDay,
-            start: scheduleData.start,
-            end: scheduleData.end,
-            category: scheduleData.isAllDay ? 'allday' : 'time',
-            dueDateClass: '',
-            color: calendar.color,
-            bgColor: calendar.bgColor,
-            dragBgColor: calendar.bgColor,
-            borderColor: calendar.borderColor,
-            location: scheduleData.location,
-            raw: {
-                class: scheduleData.raw['class']
-            },
-            state: scheduleData.state
-        };
-
-        if (calendar) {
-            schedule.calendarId = calendar.id;
-            schedule.color = calendar.color;
-            schedule.bgColor = calendar.bgColor;
-            schedule.borderColor = calendar.borderColor;
-        }
-        console.log(channel + ' begin');
-        await fetch('/ch/beforeCreateSchedule', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "id": schedule.id,
-                "calendarId": schedule.calendarId,
-                "title": schedule.title,
-                "isAllDay": schedule.isAllDay,
-                "start": schedule.start,
-                "end": schedule.end,
-                "category": schedule.category,
-                "dueDateClass": schedule.dueDateClass,
-                "state": schedule.state,
-                "color": schedule.color,
-                "bgColor": schedule.bgColor,
-                "dragBgColor": schedule.dragBgColor,
-                "borderColor": schedule.borderColor,
-                "channel": channel,
-            })
-        }).then(res => res.json()).then((beforeCreateScheduleRes) => {
-            console.log(beforeCreateScheduleRes);
-        })
-        socket.emit('create schedule', [schedule], channel);
-        cal.createSchedules([schedule]);
-        refreshScheduleVisibility();
     }
 
     function onChangeCalendars(e) {

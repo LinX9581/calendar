@@ -46,7 +46,7 @@ io.on('connection', function (socket) {
         // console.log(changes.start._date);
         // console.log(changes);
         console.log('server update');
-        // socket.broadcast.emit(channel + 'update schedule', scheduleId, calId, changes);
+        socket.broadcast.emit(channel + 'update schedule', scheduleId, calId, changes);
     });
     socket.on('delete schedule', function (scheduleId, calId, channel) {
         socket.broadcast.emit(channel + 'delete schedule', scheduleId, calId);
