@@ -60,7 +60,11 @@
     display: inline-block;
 }
 
-.dropDownName{
+.dropDownName {
     display: inline-block;
     text-align: left;
+}
+
+.lnb-new-schedule-btn {
+    text-align-last: center;
 }

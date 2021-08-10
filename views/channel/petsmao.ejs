@@ -5,9 +5,9 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>Sales Booking DEMO</title>
     <!-- bootstrap4 CSS -->
-    <link rel="stylesheet" type="text/css" href="css/index/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/common/bootstrap4.min.css">
     <!-- font awesome CSS -->
-    <link rel="stylesheet" type="text/css" href="css/index/fontawesome.css">
+    <link rel="stylesheet" type="text/css" href="css/common/fontawesome.css">
     <!-- tui-calendar CSS -->
     <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-time-picker.css">
     <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-date-picker.css">
@@ -20,30 +20,34 @@
 <body>
     <div id="lnb">
         <div class="channel lnb-new-schedule" channel=<%=channel %>>
-            <button id="btn-new-schedule" type="button" class="btn btn-default btn-block lnb-new-schedule-btn">
-                <%= channel %>
-            </button>
-        </div>
-        <div>
-            <div class="addListArea">
-                <input type="text" class="form-control form-control-sm" id="addListInput">
+            <div class="dropdown">
+                <button id="btn-new-schedule" class="btn btn-default btn-block lnb-new-schedule-btn dropdown-toggle" data-toggle="dropdown">
+                    <%= channel %> <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
+                </button>
+                <div class="dropdown-menu"></div>
             </div>
         </div>
-        <div class="row">
-            <select class="form-control form-control-sm col" id="addListColorInput">
-                <option></option>
-                <option>purple</option>
-                <option>blue</option>
-                <option>green</option>
-                <option>gray</option>
-                <option>orange</option>
-                <option>red</option>
-                <option>yellow</option>
-                <option>black</option>
-            </select>
-            <button class="btn btn-primary col btn-sm" id="addListBtn">Add List</button>
+        <div class="container">
+            <div class="row">
+                <div class="addListArea">
+                    <input type="text" class="form-control form-control-sm" id="addListInput">
+                </div>
+            </div>
+            <div class="row">
+                <select class="form-control form-control-sm " id="addListColorInput">
+                    <option></option>
+                    <option>purple</option>
+                    <option>blue</option>
+                    <option>green</option>
+                    <option>gray</option>
+                    <option>orange</option>
+                    <option>red</option>
+                    <option>yellow</option>
+                    <option>black</option>
+                </select>
+                <button class="btn btn-primary col btn-sm" id="addListBtn">Add List</button>
+            </div>
         </div>
-
         <div id="lnb-calendars" class="lnb-calendars">
             <div>
                 <div class="lnb-calendars-item">
@@ -68,56 +72,54 @@
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     <i id="calendarTypeIcon" class="calendar-icon ic_view_month" style="margin-right: 4px;"></i>
                     <span id="calendarTypeName">Dropdown</span>&nbsp;
-                    <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
-                </button>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu-calendarType">
-                    <li role="presentation">
-                        <a class="dropdown-menu-title" role="menuitem" data-action="toggle-daily">
-                            <i class="calendar-icon ic_view_day"></i>Daily
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weekly">
-                            <i class="calendar-icon ic_view_week"></i>Weekly
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a class="dropdown-menu-title" role="menuitem" data-action="toggle-monthly">
-                            <i class="calendar-icon ic_view_month"></i>Month
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks2">
-                            <i class="calendar-icon ic_view_week"></i>2 weeks
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks3">
-                            <i class="calendar-icon ic_view_week"></i>3 weeks
-                        </a>
-                    </li>
-                    <li role="presentation" class="dropdown-divider"></li>
-                    <li role="presentation">
-                        <a role="menuitem" data-action="toggle-workweek">
-                            <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-workweek"
-                                checked>
-                            <span class="checkbox-title"></span>Show weekends
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a role="menuitem" data-action="toggle-start-day-1">
-                            <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-start-day-1">
-                            <span class="checkbox-title"></span>Start Week on Monday
-                        </a>
-                    </li>
-                    <li role="presentation">
-                        <a role="menuitem" data-action="toggle-narrow-weekend">
-                            <input type="checkbox" class="tui-full-calendar-checkbox-square"
-                                value="toggle-narrow-weekend">
-                            <span class="checkbox-title"></span>Narrower than weekdays
-                        </a>
-                    </li>
-                </ul>
+            <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu-calendarType">
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-daily">
+                        <i class="calendar-icon ic_view_day"></i>Daily
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weekly">
+                        <i class="calendar-icon ic_view_week"></i>Weekly
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-monthly">
+                        <i class="calendar-icon ic_view_month"></i>Month
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks2">
+                        <i class="calendar-icon ic_view_week"></i>2 weeks
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks3">
+                        <i class="calendar-icon ic_view_week"></i>3 weeks
+                    </a>
+                </li>
+                <li role="presentation" class="dropdown-divider"></li>
+                <li role="presentation">
+                    <a role="menuitem" data-action="toggle-workweek">
+                        <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-workweek" checked>
+                        <span class="checkbox-title"></span>Show weekends
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" data-action="toggle-start-day-1">
+                        <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-start-day-1">
+                        <span class="checkbox-title"></span>Start Week on Monday
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" data-action="toggle-narrow-weekend">
+                        <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-narrow-weekend">
+                        <span class="checkbox-title"></span>Narrower than weekdays
+                    </a>
+                </li>
+            </ul>
             </span>
             <span id="menu-navi">
                 <button type="button" class="btn btn-default btn-sm move-today" data-action="move-today">Today</button>
@@ -133,8 +135,7 @@
         <div id="calendar"></div>
 
         <!-- 新增委託單 -->
-        <div class="modal fade" id="create_schedule_dropdown" tabindex="-1" role="dialog"
-            aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="create_schedule_dropdown" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -150,7 +151,7 @@
                             <div class="form-group">
                                 <div class="dropdown_create_schedule">
                                     <span>廣告版位</span>
-                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"> </div>
+                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"></div>
                                     <ul class="dropdown_calendar_ul dropdown_getCalUl" id=""></ul>
                                 </div>
                             </div>
@@ -164,8 +165,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="create_scedule"
-                            data-dismiss="modal">Create</button>
+                        <button type="button" class="btn btn-secondary" id="create_scedule" data-dismiss="modal">Create</button>
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@
                             <div class="form-group">
                                 <div class="dropdown_create_schedule">
                                     <span>廣告版位</span>
-                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"> </div>
+                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"></div>
                                     <ul class="dropdown_calendar_ul dropdown_getCalUl" id=""></ul>
                                 </div>
                             </div>
@@ -210,27 +210,28 @@
             </div>
         </div>
 
-        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-        <script src="./js/jquery-3.2.1.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+        <!-- common -->
+        <script src="./js/common/jquery-3.2.1.min.js"></script>
+        <script src="./js/common/popper.min.js"></script>
+        <script src="./js/common/bootstrap4.min.js"></script>
+        <script src="./js/common/fontawesome.js"></script>
         <script>
             let channel = $('.channel').attr('channel')
         </script>
-        <!-- font awesome JS -->
-        <script type="text/javascript" src="./js/fontawesome/fontawesome.js"></script>
-        <script src="https://uicdn.toast.com/tui.code-snippet/v1.5.2/tui-code-snippet.min.js"></script>
-        <script src="https://uicdn.toast.com/tui.time-picker/v2.0.3/tui-time-picker.min.js"></script>
-        <script src="https://uicdn.toast.com/tui.date-picker/v4.0.3/tui-date-picker.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.31/moment-timezone-with-data.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.0.13/chance.min.js"></script>
-        <script src="./tui-calendar.js"></script>
-        <script src="./js/data/calendars.js"></script>
-        <script src="./js/data/schedules.js"></script>
-        <script src="./js/app.js"></script>
-        <script src="./js/socket.js"></script>
+        <!-- socket -->
+        <script src="./js/socket/socket.io.js"></script>
+        <script src="./js/socket/socket.js"></script>
+        <!-- tui-calendar -->
+        <script src="./js/tui-calendar/tui-code-snippet.min.js"></script>
+        <script src="./js/tui-calendar/tui-time-picker.min.js"></script>
+        <script src="./js/tui-calendar/tui-date-picker.min.js"></script>
+        <script src="./js/tui-calendar/moment.min.js"></script>
+        <script src="./js/tui-calendar/moment-timezone-with-data.js"></script>
+        <script src="./js/tui-calendar/chance.min.js"></script>
+        <script src="./js/tui-calendar/tui-calendar.js"></script>
+        <script src="./js/tui-calendar/data/calendars.js"></script>
+        <script src="./js/tui-calendar/data/schedules.js"></script>
+        <script src="./js/tui-calendar/app.js"></script>
 
 </body>
 
