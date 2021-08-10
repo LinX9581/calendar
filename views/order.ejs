@@ -62,8 +62,7 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <li class="nav-item  menu-open">
                             <a href="#" class="nav-link active">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -128,9 +127,12 @@
                                 <li class="breadcrumb-item"><a href="order"><i class="fa fa-home"></i> 委刊單</a>
                                 </li>
                             </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
 
@@ -146,8 +148,7 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter"
-                                                        data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋委刊單</button>
@@ -160,8 +161,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table" style="width: 100%;"
-                                                        id="editTable">
+                                                    <table class="table nowrap hover order-table" style="width: 100%;" id="editTable">
                                                     </table>
                                                 </div>
                                             </div>
@@ -172,7 +172,8 @@
                         </div>
                     </div>
                     <!-- /.row (main row) -->
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
         </div>
@@ -208,16 +209,20 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        $(function () {
+        $(function() {
             $(".datepicker").datepicker();
         });
         let delId = ''
+        let isDel = ''
+
         getOrder()
         async function getOrder() {
             let innerHTML = ''
             await fetch('/getOrder', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
             }).then(res => res.json()).then(res => {
                 innerHTML +=
                     `<thead>
@@ -249,28 +254,38 @@
                 innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
                 var editOrderTable = new BSTable("editTable", {
-                    onDelete: async function (button) {
-                        let isDel = confirm('確定刪除 ' + delId + ' ?')
-                        if (isDel) {
-                            await fetch('/delete_order', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    "delId": delId,
-                                })
-                            }).then(res => res.json()).then(res => {
-                                console.log(res);
+                    onDelete: async function(button) {
+                        console.log('testset');
+                        await fetch('/delete_order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "delId": delId,
                             })
-                        }
+                        }).then(res => res.json()).then(res => {
+                            console.log(res);
+                        })
+
                     },
                 });
                 editOrderTable.init()
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
 
-                let orderId = '', advertisers = '', title = '', ad_type = '', salesperson = '', memo = ''
-                $('.btn-group').delegate("#bAcep", "click", async function () {
+                console.log(isDel);
+                console.log(delId);
+
+                let orderId = '',
+                    advertisers = '',
+                    title = '',
+                    ad_type = '',
+                    salesperson = '',
+                    memo = '';
+
+                $('.btn-group').delegate("#bAcep", "click", async function() {
                     let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function () {
+                    currentRow.find('td').each(function() {
                         orderId = $(this).parent().find("td[cal=orderId]").text()
                         advertisers = $(this).parent().find("td[cal=advertisers]").text()
                         title = $(this).parent().find("td[cal=title]").text()
@@ -280,7 +295,9 @@
                     })
                     await fetch('/update_order', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({
                             "orderId": orderId,
                             "advertisers": advertisers,
@@ -295,8 +312,7 @@
                 })
             })
         }
-
-
     </script>
 </body>
+
 </html>

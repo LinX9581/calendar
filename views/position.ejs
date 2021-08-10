@@ -63,8 +63,7 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -129,9 +128,12 @@
                                 <li class="breadcrumb-item"><a href="position"><i class="fa fa-home"></i> 廣告版面</a>
                                 </li>
                             </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
 
@@ -147,8 +149,7 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter"
-                                                        data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋版位</button>
@@ -156,8 +157,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table" id="editTable"
-                                                        style="width: 100%;">
+                                                    <table class="table nowrap hover order-table" id="editTable" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -168,7 +168,8 @@
                         </div>
                     </div>
                     <!-- /.row (main row) -->
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
         </div>
@@ -206,12 +207,16 @@
     <script>
         let userType = $('.userType').attr('value')
         let delId = ''
+        let isDel = ''
+
         getPosition()
         async function getPosition() {
             let innerHTML = ''
             await fetch('/getPosition', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
             }).then(res => res.json()).then(res => {
                 console.log(res);
                 innerHTML +=
@@ -242,30 +247,36 @@
                 innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
                 var editPositionTable = new BSTable("editTable", {
-                    onDelete: async function (button) {
-                        let isDel = confirm('確定刪除 ' + delId + ' ?')
-                        if (isDel) {
-                            await fetch('/delete_position', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    "delId": delId,
-                                })
-                            }).then(res => res.json()).then(res => {
-                                console.log(res);
+                    onDelete: async function(button) {
+                        await fetch('/delete_position', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "delId": delId,
                             })
-                        }
+                        }).then(res => res.json()).then(res => {
+                            console.log(res);
+                        })
                     },
                 });
                 editPositionTable.init()
-                if(userType == 'User'){
-                    // $(".renderTable>tr").find('td:last').addClass('d-none');
-                }
+
+                //動態新增完後讓功能欄上色
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
-                let calId = '', name = '', advertisers = '', title = '', ad_type = '', salesperson = '', memo = ''
-                $('.btn-group').delegate("#bAcep", "click", async function () {
+                let calId = '',
+                    name = '',
+                    advertisers = '',
+                    title = '',
+                    ad_type = '',
+                    salesperson = '',
+                    memo = '';
+
+                //動態監聽按下acep新增欄位
+                $('.btn-group').delegate("#bAcep", "click", async function() {
                     let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function () {
+                    currentRow.find('td').each(function() {
                         calId = $(this).parent().find("td").attr('calId')
                         name = $(this).parent().find("td[cal=name]").text()
                         rotation = $(this).parent().find("td[cal=rotation]").text()
@@ -273,7 +284,9 @@
                     })
                     await fetch('/update_position', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({
                             "calId": calId,
                             "name": name,
@@ -288,10 +301,10 @@
             })
         }
 
-        $(function () {
+        $(function() {
             $(".datepicker").datepicker();
         });
-
     </script>
 </body>
+
 </html>
