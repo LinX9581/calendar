@@ -1,4 +1,5 @@
 var socket = io();
+let updateChangeTime = ''
 socket.on(channel + 'create schedule', function (schedule) {
     cal.createSchedules([
         {
@@ -15,6 +16,7 @@ socket.on(channel + 'create schedule', function (schedule) {
 });
 socket.on(channel + 'update schedule', function (scheduleId, calId, changes) {
     console.log('get server update schedule socket');
+    console.log(changes);
     cal.updateSchedule(scheduleId, calId, changes);
 });
 socket.on(channel + 'delete schedule', function (scheduleId, calId) {

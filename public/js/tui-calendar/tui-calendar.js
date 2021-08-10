@@ -6218,19 +6218,23 @@ function createDateWithMultipleArgs(args) {
 function createDateWithUTCTime(arg) {
     var time;
 
-    if (arg instanceof TZDate) {
-        time = arg.getUTCTime();
-    } else if (typeof arg === 'number') {
+    if (arg instanceof Date || arg instanceof TZDate) {
+        time = arg.getTime();
+    } else if ((typeof arg) === 'string') {
+        time = Date.parse(arg);
+    } else if ((typeof arg) === 'number') {
         time = arg;
     } else if (arg === null) {
         time = 0;
     } else {
-        throw new Error('Invalid Type');
+        throw new Error('Invalid Type: ' + arg);
     }
 
-    return new Date(time);
+    return new Date(time - getCustomTimezoneOffset(time) + getTimezoneOffset(time));
 }
-
+function getLocalTimezoneOffset(timestamp) {
+    return new Date(timestamp).getTimezoneOffset();
+}
 /**
  * Convert time to local time. Those times are only from API and not from inner source code.
  * @param {Date|string} arg - date

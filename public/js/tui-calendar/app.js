@@ -13,6 +13,7 @@ var socket = io();
     var datePicker, selectedCalendar;
     let createScheduleEvent = '';
     let updateScheduleEvent = '';
+    let updateChangeTime = '';
     let editScheduleId = '';
     let editCalendarId = '';
 
@@ -68,6 +69,7 @@ var socket = io();
         'beforeUpdateSchedule': async function (e) {       //任何更新都會觸發
             var schedule = e.schedule;
             var changes = e.changes;
+            updateChangeTime = e.changes;
             console.log('beforeUpdateSchedule', e);
 
             if (changes && !changes.isAllDay && schedule.category === 'allday') {
@@ -77,7 +79,8 @@ var socket = io();
             let updateCalendarId = changes?.calendarId ?? schedule.calendarId
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
-            // socket.emit('update schedule', schedule.id, schedule.calendarId, changes, channel);
+
+            socket.emit('update schedule', schedule.id, schedule.calendarId, updateChangeTime, channel);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
 
             await fetch('/ch/beforeUpdateScheduleTime', {
@@ -123,8 +126,6 @@ var socket = io();
             // console.log('afterRenderSchedule', element);
         },
         'clickTimezonesCollapseBtn': function (timezonesCollapsed) {
-            console.log('timezonesCollapsed', timezonesCollapsed);
-
             if (timezonesCollapsed) {
                 cal.setTheme({
                     'week.daygridLeft.width': '77px',
@@ -141,11 +142,7 @@ var socket = io();
         }
     });
 
-
-    
     $('.schedule_edit_btn').click(async function () {
-        console.log($('.dropdown_getCalBtn').attr('thiscalid') + ' 變更後的cal ID');
-        console.log(updateScheduleEvent.id + ' 目前的 scheduleId');
         let changes = {
             title: $('.dropdown_getOrderBtn').attr('thisordertitle'),
             calendarId: $('.dropdown_getCalBtn').attr('thiscalid'),
@@ -153,8 +150,7 @@ var socket = io();
             },
             state: "Busy"
         }
-        console.log(changes.title);
-        // socket.emit('update schedule', updateScheduleEvent.id, updateScheduleEvent.calendarId, changes, channel);
+        socket.emit('update schedule', updateScheduleEvent.id, updateScheduleEvent.calendarId, changes, channel);
         cal.updateSchedule(updateScheduleEvent.id, updateScheduleEvent.calendarId, changes);
         await fetch('/ch/beforeUpdateSchedule', {
             method: 'POST',
@@ -175,13 +171,9 @@ var socket = io();
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
         let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
         let orderTitle = $('.dropdown_getOrderBtn').attr('thisOrderTitle')
-        console.log(calId);
-        console.log(orderId + ' order id');
-        console.log(orderTitle + ' titleee');
         customerSaveNewSchedule(createScheduleEvent, calId, orderId, orderTitle)
     })
     async function customerSaveNewSchedule(e, calId, orderId, orderTitle) {
-        console.log(orderTitle + "標題");
         var schedule = {
             id: String(Date.now()),
             calendarId: String(calId),

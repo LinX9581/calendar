@@ -53,7 +53,8 @@ async function renderCalendar() {
                 `
             );
         })
-        $('.dropdown_getCalBtn').text($('.dropdown_getCalUl>li').first().text())
+        $('.dropdown_getCalBtn').html(`<span class="calListStyle"></span>  ` + $('.dropdown_getCalUl>li').first().text() + ``)
+        $('.dropdown_getCalBtn > span').attr('style',$('.dropdown_getCalUl>li').first().children().attr('style'))
         $('.dropdown_getCalBtn').attr('thisCalId', $('.dropdown_getCalUl>li').first().attr('getChooseCalId'))
         $(".dropdown_getCalBtn").click(function () {
             console.log('dropdown_getCalendarList_button click');

@@ -7,20 +7,25 @@ router.get('/:channel', async function (req, res) {
     console.log(req.session.user);
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    if (req.session.user != undefined) {
+    // if (req.session.user != undefined) {
         let channel = req.params.channel
-        console.log(channel);
-        req.session.channel = channel;
+        req.session.channel = 'www';
+        let user = {
+            account: 'linx',
+            name: 'linx',
+            type: 'admin',
+        }
+        req.session.user = user;
         res.render(channel, {
             today,
             channel
         });
-    } else {
-        res.render('login', {
-            today,
-            title
-        });
-    }
+    // } else {
+    //     res.render('login', {
+    //         today,
+    //         title
+    //     });
+    // }
 });
 
 router.get('/', async function (req, res) {
@@ -130,7 +135,6 @@ router.post('/beforeDeleteSchedule', async function (req, res) {
 //原套件即時同步更新時間有BUG 另外建一支API
 router.post('/beforeUpdateScheduleTime', async function (req, res) {
     // update 會莫名觸發兩次 但不影響運作 推測是在套件監聽事件裡面 再次觸發update導致兩次 相關code 在 app.js  'clickSchedule' & $('.schedule_edit_btn').click() 這兩個分別會觸發一次
-    console.log(req.body.changes);
     // if (req.body.changes != undefined) {
     let scheduleId = req.body.scheduleId
     let updateStart = req.body.updateStart
