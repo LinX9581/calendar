@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>廣告版面</title>
+    <title>委刊單</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Font Awesome -->
@@ -63,8 +63,8 @@
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
-                        <li class="nav-item">
-                            <a href="order" class="nav-link">
+                        <li class="nav-item  menu-open">
+                            <a href="#" class="nav-link active">
                                 <i class="nav-icon fas fa-copy"></i>
                                 <p> 委刊單管理
                                     <i class="fas fa-angle-left right"></i>
@@ -72,13 +72,13 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="order" class="nav-link">
+                                    <a href="#" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>委刊單</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/reserveOrder" class="nav-link">
+                                    <a href="/reserveOrder" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>預約排程</p>
                                     </a>
@@ -92,7 +92,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link active">
+                            <a href="position" class="nav-link">
                                 <i class="nav-icon far fa-eye"></i>
                                 <p>廣告版面</p>
                             </a>
@@ -124,7 +124,7 @@
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="position"><i class="fa fa-home"></i> 廣告版面</a>
+                                <li class="breadcrumb-item"><a href="order"><i class="fa fa-home"></i> 委刊單</a>
                                 </li>
                             </ol>
                         </div>
@@ -151,17 +151,12 @@
                                                     <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
-                                                    <button class="btn btn-primary" type="button">搜尋版位</button>
-                                                </div>
-                                                <div class="col-md-4 col-xl-2 form-group">
-                                                    <a href="position-add">
-                                                        <button class="btn btn-primary" type="button">新增版位</button>
-                                                    </a>
+                                                    <button class="btn btn-primary" type="button">搜尋頻道</button>
                                                 </div>
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table dataTable" id="editTable" style="width: 100%;">
+                                                    <table class="table nowrap hover order-table" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -209,102 +204,44 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        let userType = $('.userType').attr('value')
+        $(function() {
+            $(".datepicker").datepicker();
+        });
         let delId = ''
         let isDel = ''
 
-        getPosition()
-        async function getPosition() {
+        getReserveOrder()
+        async function getReserveOrder() {
             let innerHTML = ''
-            await fetch('/getPosition', {
+            await fetch('/getReserveOrder', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
             }).then(res => res.json()).then(res => {
-                console.log(res);
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
-                            <th scope="col">名稱</th>
-                            <th scope="col">頻道</th>
-                            <th scope="col">輪替數</th>
+                            <th scope="col">頻道名稱</th>
                             <th scope="col">備註</th>
-                            <th scope="col">委刊數</th>
                         </tr>
                     </thead>
                     <tbody class="renderTable">
                     `;
-                for (let item = 0; item < res.allPosition.length; item++) {
+                for (let item = 0; item < res.allChannel.length; item++) {
                     innerHTML +=
                         ` 
-                        <tr delId="${res.allPosition[item].id}">
-                            <td scope="row" data-th="名稱" cal="name" calId="${res.allPosition[item].id}">${res.allPosition[item].name}</td>
-                            <td data-th="頻道" cal="channel">${res.allPosition[item].channelName}</td>
-                            <td data-th="輪替數" cal="rotation">${res.allPosition[item].rotation}</td>
-                            <td data-th="備註" cal="memo">${res.allPosition[item].memo}</td>
-                            <td data-th="委刊數">${res.allCalendarIdNumbers[item]}</td>
+                        <tr delId="${res.allChannel[item].id}">
+                            <td scope="row" data-th="頻道名稱"><a href="/ch/${res.allChannel[item].link}" target=_blank>${res.allChannel[item].name}</a></td>
+                            <td data-th="備註" cal="memo">${res.allChannel[item].memo}</td>
                         </tr>
                     `;
 
                 }
                 innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
-                var editPositionTable = new BSTable("editTable", {
-                    onDelete: async function(button) {
-                        await fetch('/delete_position', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                "delId": delId,
-                            })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
-                        })
-                    },
-                });
-                editPositionTable.init()
-
-                //動態新增完後讓功能欄上色
-                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
-                let calId = '',
-                    name = '',
-                    rotation = '',
-                    memo = '';
-
-                //動態監聽按下acep新增欄位
-                $('.btn-group').delegate("#bAcep", "click", async function() {
-                    let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function() {
-                        calId = $(this).parent().find("td").attr('calId')
-                        name = $(this).parent().find("td[cal=name]").text()
-                        rotation = $(this).parent().find("td[cal=rotation]").text()
-                        memo = $(this).parent().find("td[cal=memo]").text()
-                    })
-                    await fetch('/update_position', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            "calId": calId,
-                            "name": name,
-                            "rotation": rotation,
-                            "memo": memo,
-                        })
-                    }).then(res => res.json()).then(res => {
-                        console.log(res);
-                    })
-                })
-
             })
         }
-
-        $(function() {
-            $(".datepicker").datepicker();
-        });
     </script>
 </body>
 

@@ -65,8 +65,7 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <li class="nav-item  menu-open">
                             <a href="#" class="nav-link active">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -82,7 +81,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/channel" class="nav-link">
+                                    <a href="/reserveOrder" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>預約排程</p>
                                     </a>
@@ -132,9 +131,12 @@
                                 </li>
                                 <li class="breadcrumb-item">新增委刊單</li>
                             </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
 
@@ -147,43 +149,36 @@
                             <div class="card">
                                 <div class="card-header card-warning card-outline">
                                     <h3 class="card-title">
-                                        <i class="fas fa-edit"></i>
-                                        新增委刊單
+                                        <i class="fas fa-edit"></i> 新增委刊單
                                     </h3>
                                 </div>
-                                <form class="form-horizontal" role="form" action="/create_order" method="post"
-                                    onsubmit="" id="form">
+                                <form class="form-horizontal" role="form" action="/create_order" method="post" onsubmit="" id="form">
                                     <div class="card-body">
                                         <div class="tab-content">
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="">活動名稱</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入活動名稱"
-                                                        name="name" id="name">
+                                                    <input type="text" class="form-control" placeholder="請輸入活動名稱" name="name" id="name">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">廣告主</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入廣告主"
-                                                        name="advertisers" id="advertisers">
+                                                    <input type="text" class="form-control" placeholder="請輸入廣告主" name="advertisers" id="advertisers">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">委刊公司</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入委刊公司"
-                                                        name="customer_company" id="customer_company">
+                                                    <input type="text" class="form-control" placeholder="請輸入委刊公司" name="customer_company" id="customer_company">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">聯絡人</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入聯絡人"
-                                                        name="salesperson" id="salesperson">
+                                                    <input type="text" class="form-control" placeholder="請輸入聯絡人" name="salesperson" id="salesperson">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>走期 </label>
-                                                    <input type="text" class="form-control"
-                                                        name="schedule_time" id="schedule_time">
+                                                    <input type="text" class="form-control" name="schedule_time" id="schedule_time">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">類型</label>
@@ -211,7 +206,8 @@
                         </div>
                     </div>
                     <!-- /.row (main row) -->
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
         </div>
@@ -250,19 +246,19 @@
     <script src="./js/index/daterangepicker.js"></script>
 
     <script>
-        $(function () {
+        $(function() {
 
             // jQuery Validation Plugin 的Twitter BootStrap 3 支援
             $.validator.setDefaults({
-                highlight: function (element) {
+                highlight: function(element) {
                     $(element).closest('.form-group').addClass('has-error');
                 },
-                unhighlight: function (element) {
+                unhighlight: function(element) {
                     $(element).closest('.form-group').removeClass('has-error');
                 },
                 errorElement: 'span',
                 errorClass: 'help-block',
-                errorPlacement: function (error, element) {
+                errorPlacement: function(error, element) {
                     if (element.parent('.controls').length) {
                         error.insertAfter(element.parent());
                     } else {
@@ -303,11 +299,12 @@
                 "endDate": pickerYesterday,
                 "minDate": "01/01/2021",
                 "maxDate": pickerYesterday
-            }, function (start, end, label) {});
+            }, function(start, end, label) {});
         }
-        $(function () {
+        $(function() {
             $(".datepicker").datepicker();
         });
     </script>
 </body>
+
 </html>

@@ -3,12 +3,17 @@ import express from 'express';
 import moment from 'moment';
 
 let router = express.Router();
-router.get('/:channel', async function(req, res) {
-    console.log(req.session.user);
+router.get('/:url', async function(req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         // if (req.session.user != undefined) {
-    let channel = req.params.channel
+    let url = req.params.url
+    let getChannelNameSql = "select link,name from sale_booking.channel where link = ? "
+    let getChannelNameData = [url]
+    let getChannel = await query(getChannelNameSql, getChannelNameData)
+
+    let channel = getChannel[0].link
+    let channelName = getChannel[0].name
     req.session.channel = 'www';
     let user = {
         account: 'linx',
@@ -16,9 +21,10 @@ router.get('/:channel', async function(req, res) {
         type: 'admin',
     }
     req.session.user = user;
-    res.render(channel, {
+    res.render(url, {
         today,
-        channel
+        channel,
+        channelName
     });
     // } else {
     //     res.render('login', {
@@ -36,7 +42,7 @@ router.get('/', async function(req, res) {
 });
 
 router.post('/renderChannel', async function(req, res) {
-    let beforeCreateChannelSql = "select domain from sale_booking.channel order by domain"
+    let beforeCreateChannelSql = "select link,name from sale_booking.channel"
     let allChannel = await query(beforeCreateChannelSql)
     res.send(JSON.stringify({
         'channel': allChannel,
@@ -52,7 +58,7 @@ router.post('/renderSchedule', async function(req, res) {
         renderScheduleCondition = ' AND create_by = "' + user + '"'
     }
     let channel = req.body.channel;
-    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channel = ? " + renderScheduleCondition + ""
+    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? " + renderScheduleCondition + ""
     let beforeCreateScheduleData = [channel]
     let allSchedule = await query(beforeCreateScheduleSql, beforeCreateScheduleData)
     res.send(JSON.stringify({
@@ -62,7 +68,7 @@ router.post('/renderSchedule', async function(req, res) {
 })
 router.post('/renderCalendar', async function(req, res) {
     let channel = req.body.channel;
-    let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channel = ? order by orderKey"
+    let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channelId = ? order by orderKey"
     let beforeCreateCalendarData = [channel]
     let allCalendar = await query(beforeCreateCalendarSql, beforeCreateCalendarData)
     res.send(JSON.stringify({
@@ -121,13 +127,13 @@ router.post('/beforeCreateSchedule', async function(req, res) {
     let end = moment(req.body.end._date).format('YYYY-MM-DD HH:mm:ss')
     let category = req.body.category
     let state = req.body.state
-    let channel = req.body.channel;
+    let channelId = req.body.channel;
     let scheduleBody = req.body.scheduleBody;
 
-    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`state`,`channel`,`create_date`,`create_by`,`update_date`,`update_by`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
-    let newScheduleData = [id, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, channel, nowDate, user, nowDate, user]
-    console.log(newScheduleData);
+    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`channelId`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`state`,`create_date`,`create_by`,`update_date`,`update_by`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+    let newScheduleData = [id, channelId, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, nowDate, user, nowDate, user]
     await query(beforeCreateScheduleSql, newScheduleData)
+
     res.send(JSON.stringify({
         'beforeCreateSchedule': 'succeed',
     }));

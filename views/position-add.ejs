@@ -78,7 +78,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/channel" class="nav-link">
+                                    <a href="/reserveOrder" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>預約排程</p>
                                     </a>
@@ -158,16 +158,11 @@
                                                     <input type="text" class="form-control" placeholder="請輸入版位名稱" name="name" id="name">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="">頻道</label>
-                                                    <select class="form-control" name="channel" id="channel">
-                                                        <option value="www">主網</option>
-                                                        <option value="babyou">姊妹淘</option>
-                                                        <option value="petsmao">寵毛</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="">子頻道名稱</label>
-                                                    <input type="text" class="form-control" placeholder="請輸入子頻道名稱(即時、焦點等等)" name="subChannel" id="subChannel">
+                                                    <label for="">頻道名稱</label>
+                                                    <div class="dropdown">
+                                                        <select class="form-control dropdown-toggle channelName" name="channelId" id="channelId" data-toggle="dropdown"></select>
+                                                        <ul class="dropdown-menu"></ul>
+                                                    </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">版位顏色</label>
@@ -196,8 +191,8 @@
                                                 <div class="form-group">
                                                     <label for="">狀態</label>
                                                     <select class="form-control" name="status" id="status">
-                                                        <option value="">正常</option>
-                                                        <option value="">停用</option>
+                                                        <option value="1">正常</option>
+                                                        <option value="0">停用</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -248,6 +243,26 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
+        renderChannel()
+        async function renderChannel() {
+            await fetch('/renderChannel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            }).then(res => res.json()).then((allChannel) => {
+                console.log(allChannel.channel);
+                $.each(allChannel.channel, function(index, val) {
+                    console.log(val.name);
+                    $('.channelName').append(
+                        `
+                            <option class="dropdown-item" value=` + val.link + "&&" + val.name + `>` + val.name + `</option>
+                        `
+                    );
+                })
+            })
+        }
         $(function() {
             // jQuery Validation Plugin 的Twitter BootStrap 3 支援
             $.validator.setDefaults({
@@ -271,14 +286,15 @@
             $('#form').validate({
                 rules: {
                     name: "required",
+                    channelId: "required",
                     rotation: {
-                        equalTo: password,
                         required: true,
                     },
                     color: "required",
                 },
                 messages: {
                     name: "請輸入版位名稱",
+                    channelId: "請輸入頻道名稱",
                     color: "請輸入版位顏色",
                     rotation: "請輸入輪替數",
                 }

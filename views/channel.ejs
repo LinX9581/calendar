@@ -62,8 +62,7 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -79,7 +78,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/channel" class="nav-link">
+                                    <a href="/reserveOrder" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>預約排程</p>
                                     </a>
@@ -128,9 +127,12 @@
                                 <li class="breadcrumb-item"><a href="channel"><i class="fa fa-home"></i> 頻道管理</a>
                                 </li>
                             </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
 
@@ -146,8 +148,7 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter"
-                                                        data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋客戶</button>
@@ -160,7 +161,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table" style="width: 100%;">
+                                                    <table class="table nowrap hover order-table" id="editTable" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -171,7 +172,8 @@
                         </div>
                     </div>
                     <!-- /.row (main row) -->
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
         </div>
@@ -188,6 +190,8 @@
     <!-- jQuery -->
     <script src="js/common/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
+    <!-- bstable -->
+    <script src="js/index/bstable.js"></script>
     <!-- tableSearch -->
     <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
@@ -205,15 +209,20 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        $(function () {
+        $(function() {
             $(".datepicker").datepicker();
         });
+        let delId = ''
+        let isDel = ''
+
         getChannel()
         async function getChannel() {
             let innerHTML = ''
             await fetch('/getChannel', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
             }).then(res => res.json()).then(res => {
                 console.log(res.allChannel);
                 innerHTML +=
@@ -223,11 +232,9 @@
                             <th scope="col">網域</th>
                             <th scope="col">備註</th>
                             <th scope="col">廣告版位數</th>
-                            <th width="25px" style="text-align: center;"></th>
                         </tr>
                     </thead>
-                    <tbody class="deptDataBody">
-                    </tbody>
+                    <tbody class="renderTable">
                     `;
                 for (let item = 0; item < res.allChannel.length; item++) {
                     if (res.allAdNumbers[item] == undefined) {
@@ -235,46 +242,68 @@
                     }
                     innerHTML +=
                         ` 
-                        <tr>
-                            <td scope="row" data-th="名稱">
-                                ${res.allChannel[item].name} 
-                            </td>
-                            <td data-th="網域">
-                                <a href="/ch/${res.allChannel[item].domain}" target=_blank>${res.allChannel[item].domain}</a>
-                            </td>
-                            <td data-th="備註">
-                                ${res.allChannel[item].memo} 
-                            </td>
-                            <td data-th="廣告版位數">
-                                ${res.allAdNumbers[item]} 
-                            </td>
-                            <th>
-                                <a href="#"><i class="far fa-trash-alt delBtn" delId="${res.allChannel[item].domain}"></i></a>
-                            </th>
+                        <tr delId="${res.allChannel[item].link}">
+                            <td scope="row" data-th="名稱" channelId="${res.allChannel[item].link}">${res.allChannel[item].name}</td>
+                            <td data-th="網域">${res.allChannel[item].domain}</td>
+                            <td data-th="備註">${res.allChannel[item].memo}</td>
+                            <td data-th="廣告版位數">${res.allAdNumbers[item]}</td>
                         </tr>
                     `;
-
                 }
+                innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
-            })
-            $('.delBtn').click(async function () {
-                let delId = $(this).attr('delId')
-                let isDel = confirm('確定刪除 ' + delId + ' ?')
-                if (isDel) {
-                    $(this).parent().parent().parent().remove()
-                    await fetch('/delete_channel', {
+
+                var editChannelTable = new BSTable("editTable", {
+                    onDelete: async function(button) {
+                        await fetch('/delete_channel', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "delId": delId,
+                            })
+                        }).then(res => res.json()).then(res => {
+                            console.log(res);
+                        })
+                    },
+                });
+                editChannelTable.init()
+
+                //動態新增完後讓功能欄上色
+                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                let channelId = '',
+                    name = '',
+                    domain = '',
+                    memo = '';
+
+                //動態監聽按下acep新增欄位
+                $('.btn-group').delegate("#bAcep", "click", async function() {
+                    let currentRow = $(this).parents('tr');
+                    currentRow.find('td').each(function() {
+                        channelId = $(this).parent().find("td").attr('channelId')
+                        name = $(this).parent().find("td[cal=name]").text()
+                        domain = $(this).parent().find("td[cal=domain]").text()
+                        memo = $(this).parent().find("td[cal=memo]").text()
+                    })
+                    await fetch('/update_channel', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({
-                            "delId": delId,
+                            "channelId": channelId,
+                            "name": name,
+                            "domain": domain,
+                            "memo": memo,
                         })
                     }).then(res => res.json()).then(res => {
                         console.log(res);
                     })
-                }
+                })
             })
-        }
 
+        }
     </script>
 </body>
 

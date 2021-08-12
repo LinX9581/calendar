@@ -19,33 +19,12 @@
 
 <body>
     <div id="lnb">
-        <div class="channel lnb-new-schedule" channel=<%=channel %>>
+        <div class="channel lnb-new-schedule" channel="<%=channel %>">
             <div class="dropdown">
                 <button id="btn-new-schedule" class="btn btn-default btn-block lnb-new-schedule-btn dropdown-toggle" data-toggle="dropdown">
-                    <%= channel %> <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
+                    <%= channelName %> <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
                 </button>
                 <div class="dropdown-menu"></div>
-            </div>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="addListArea">
-                    <input type="text" class="form-control form-control-sm" id="addListInput">
-                </div>
-            </div>
-            <div class="row">
-                <select class="form-control form-control-sm " id="addListColorInput">
-                    <option></option>
-                    <option>purple</option>
-                    <option>blue</option>
-                    <option>green</option>
-                    <option>gray</option>
-                    <option>orange</option>
-                    <option>red</option>
-                    <option>yellow</option>
-                    <option>black</option>
-                </select>
-                <button class="btn btn-primary col btn-sm" id="addListBtn">Add List</button>
             </div>
         </div>
         <div id="lnb-calendars" class="lnb-calendars">

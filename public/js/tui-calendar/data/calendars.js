@@ -184,17 +184,12 @@ async function renderChannel() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            "channel": channel,
-        })
+        body: JSON.stringify({})
     }).then(res => res.json()).then((allChannel) => {
-        console.log(allChannel);
-        console.log(allChannel.channel);
         $.each(allChannel.channel, function(index, val) {
-            console.log(val);
             $('.dropdown-menu').append(
                 `
-                <a class="dropdown-item" href="/ch/` + val.domain + `">` + val.domain + `</a>
+                <a class="dropdown-item" href="/ch/` + val.link + `">` + val.name + `</a>
             `
             );
         })

@@ -143,10 +143,10 @@ router.post('/getPosition', async function(req, res) {
             eachCalendarIdNumbers[item] = eachCalendarIdNumbers[item] ? eachCalendarIdNumbers[item] + 1 : 1;
         });
 
-        let getPositionSql = 'SELECT id,name,channel,rotation,memo FROM sale_booking.calendar_list ORDER BY channel'
+        //先撈出 channelId 再去要該channel的名稱
+        let getPositionSql = 'SELECT id,name,channelId,channelName,rotation,memo FROM sale_booking.calendar_list ORDER BY channel'
         let allPosition = await query(getPositionSql)
-
-        //如果該頻道沒廣告怎該索引=0
+            //如果該頻道沒廣告怎該索引=0
         let eachCalendarIdNumbersArray = allPosition.map(e => {
             if (eachCalendarIdNumbers[e.id] == undefined) eachCalendarIdNumbers[e.id] = 0;
             return eachCalendarIdNumbers[e.id]
@@ -195,22 +195,26 @@ router.post('/create_position', async function(req, res) {
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let id = String(Date.now()),
+            channelId = req.body.channelId,
             name = req.body.name,
-            color = req.body.name,
-            channel = req.body.channel,
+            color = '#ffffff',
+            calendarBgColor = req.body.color,
+            calendarDragBgColor = req.body.color,
+            calendarBorderColor = req.body.color,
             rotation = req.body.rotation,
             memo = req.body.memo,
             status = req.body.status;
         let userName = req.session.user.name
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`, `color`, `name`, `channel`, `rotation`, `memo`, `status`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
-        let createPositionData = [id, color, name, channel, rotation, memo, status, createTime, userName, createTime, userName]
-        await query(createPositionSql, createPositionData)
+        let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`,`channelId`,`channelName`,`color`,`bgcolor`,`dragbgcolor`,`bordercolor`,`name`,`rotation`,`memo`,`status`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        let createPositionData = [id, channelId.split('&&')[0], channelId.split('&&')[1], color, calendarBgColor, calendarDragBgColor, calendarBorderColor, name, rotation, memo, status, createTime, userName, createTime, userName]
         console.log(createPositionData);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create position : ' + channel + ' ' + name, function(error) {
+        await query(createPositionSql, createPositionData)
+
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create position : ' + name, function(error) {
             if (error) console.log(error)
         })
-        console.log(req.session.user.name + ' create position : ' + channel + ' ' + name);
+        console.log(req.session.user.name + ' create position : ' + name);
 
         res.render('position', {
             userName
@@ -278,6 +282,44 @@ router.get('/order-add', function(req, res) {
             title,
             userName
         });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.get('/reserveOrder', async function(req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let userName = req.session.user.name
+
+        res.render('reserveOrder', {
+            today,
+            title,
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/getReserveOrder', async function(req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        //取得個頻道的廣告數
+        let getChannelSql = 'SELECT link,name,memo FROM sale_booking.channel ORDER BY link'
+        let allChannel = await query(getChannelSql)
+
+        res.send(JSON.stringify({
+            'allChannel': allChannel,
+        }));
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -559,6 +601,23 @@ router.get('/channel', function(req, res) {
         })
     }
 });
+router.post('/renderChannel', async function(req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        let renderChannelSql = "select link,name from sale_booking.channel order by link"
+        let allChannel = await query(renderChannelSql)
+        res.send(JSON.stringify({
+            'channel': allChannel,
+            'render channel': 'succeed',
+        }));
+
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
 router.get('/channel-add', function(req, res) {
     req.session.user = user;
     if (req.session.user != undefined) {
@@ -597,10 +656,10 @@ router.post('/getChannel', async function(req, res) {
         });
 
         //取得個頻道的廣告數
-        let getChannelSql = 'SELECT name,domain,memo FROM sale_booking.channel ORDER BY domain'
+        let getChannelSql = 'SELECT link,name,domain,memo FROM sale_booking.channel ORDER BY link'
         let allChannel = await query(getChannelSql)
 
-        //如果該頻道沒廣告怎該索引=0
+        //如果該頻道沒廣告則該索引=0
         let eachChannelAdNumbersArray = allChannel.map(e => {
             if (eachChannelAdNumbers[e.domain] == undefined) eachChannelAdNumbers[e.domain] = 0;
             return eachChannelAdNumbers[e.domain]
@@ -617,49 +676,62 @@ router.post('/getChannel', async function(req, res) {
     }
 });
 
+router.post('/update_channel', async function(req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        let renderChannelCondition = ''
+            //判斷權限是user 就多一個 where條件
+        if (req.session.user.type == 'User') {
+            let user = req.session.user.account;
+            renderChannelCondition = ' WHERE create_by = "' + user + '"'
+        }
+        let calId = req.body.calId,
+            name = req.body.name,
+            domain = req.body.domain,
+            memo = req.body.memo
+        let updateChannelSql = 'UPDATE sale_booking.calendar_list SET name=?, domain=?, memo=? WHERE id=?'
+        let updateChannelData = [name, domain, memo, calId]
+        await query(updateChannelSql, updateChannelData)
+        res.send(JSON.stringify({
+            'update_channel': '成功',
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
 router.post('/create_channel', async function(req, res) {
     req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let link = String(Date.now());
         let userName = req.session.user.name
         let domain = req.body.domain;
-        let channel = domain;
-        let isChannelExistSql = 'SELECT 1 from sale_booking.channel where domain = ?'
-        let isChannelExistData = [channel]
-        let isChannelExistRes = await query(isChannelExistSql, isChannelExistData)
-            //避免重複新增channel
-        if (isChannelExistRes == '') {
-            let channelIsExist = ''
-            let name = req.body.name,
-                memo = req.body.memo,
-                status = req.body.status;
-            req.session.channel = channel;
-            let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
-            let createChannelSql = 'INSERT INTO sale_booking.`channel` (`name`,`domain`,`memo`,`status`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?)'
-            let createChannelData = [name, domain, memo, status, createTime, userName, createTime, userName]
-            await query(createChannelSql, createChannelData)
-            fs.copyFile("/var/www/calendar/views/channel/www.ejs", "/var/www/calendar/views/channel/" + channel + ".ejs", (err) => {
-                if (err) {
-                    console.log("Error Found:", err);
-                }
-            });
+        let name = req.body.name,
+            memo = req.body.memo,
+            status = req.body.status;
+        req.session.channel = link;
+        let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let createChannelSql = 'INSERT INTO sale_booking.`channel` (`link`,`name`,`domain`,`memo`,`status`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?)'
+        let createChannelData = [link, name, domain, memo, status, createTime, userName, createTime, userName]
+        await query(createChannelSql, createChannelData)
+        fs.copyFile("/var/www/calendar/views/channel/www.ejs", "/var/www/calendar/views/channel/" + link + ".ejs", (err) => {
+            if (err) {
+                console.log("Error Found:", err);
+            }
+        });
 
-            fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name, function(error) {
-                if (error) console.log(error)
-            })
-            console.log(req.session.user.name + ' create channel ' + name);
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name, function(error) {
+            if (error) console.log(error)
+        })
+        console.log(req.session.user.name + ' create channel ' + name);
 
-            res.render('channel', {
-                userName,
-                channelIsExist
-            });
-        } else {
-            let channelIsExist = '頻道已存在'
-            res.render('channel-add', {
-                userName,
-                channelIsExist
-            });
-        }
+        res.render('channel', {
+            userName,
+        });
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -673,7 +745,7 @@ router.post('/delete_channel', async function(req, res) {
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let delId = req.body.delId;
-        let deleteChannelSql = 'DELETE FROM sale_booking.`channel` WHERE domain = ?'
+        let deleteChannelSql = 'DELETE FROM sale_booking.`channel` WHERE link = ?'
         let deleteChannelData = [delId]
         await query(deleteChannelSql, deleteChannelData)
 
