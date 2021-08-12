@@ -6,8 +6,15 @@ import fs from 'fs';
 import md5 from 'md5';
 import { exec } from 'child_process';
 
+let user = {
+    account: 'linx',
+    name: 'linx',
+    type: 'admin',
+}
+
+
 let router = express.Router();
-router.get('/validate', function (req, res) {
+router.get('/validate', function(req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     res.render('validate', {
@@ -16,7 +23,7 @@ router.get('/validate', function (req, res) {
     });
     console.log("validate connect")
 });
-router.get('/', function (req, res) {
+router.get('/', function(req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     res.render('login', {
@@ -25,13 +32,13 @@ router.get('/', function (req, res) {
     });
     // console.log("sit connect")
 });
-router.get('/login', function (req, res) {
-    req.session.destroy(function () {
+router.get('/login', function(req, res) {
+    req.session.destroy(function() {
         // res.redirect('/');
         res.render('logout', {});
     })
 });
-router.post('/', async function (req, res) {
+router.post('/', async function(req, res) {
     let title = 'NOW Booking'
     let loginTime = new moment().format('YYYY-MM-DD HH:mm:ss')
     let account = req.body.account
@@ -47,7 +54,7 @@ router.post('/', async function (req, res) {
 
         console.log(loginTime + " " + userName + " 已登入 Type: " + userType)
         let userLoginTrace = loginTime + " " + userName + "已登入 Type: " + userType + "\n"
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function(error) {
             if (error) console.log(error)
         })
 
@@ -80,7 +87,8 @@ router.post('/', async function (req, res) {
     }
 })
 
-router.get('/position', function (req, res) {
+router.get('/position', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let userType = req.session.user.type
         let title = 'NOW Booking '
@@ -100,7 +108,27 @@ router.get('/position', function (req, res) {
     }
 });
 
-router.post('/getPosition', async function (req, res) {
+router.get('/position-add', function(req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let userName = req.session.user.name
+        res.render('position-add', {
+            today,
+            title,
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/getPosition', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         //取得頻道組成陣列
         let getCalendarIdNumbersSql = 'SELECT calendarId FROM sale_booking.`schedule_event` ORDER BY calendarId'
@@ -111,7 +139,7 @@ router.post('/getPosition', async function (req, res) {
 
         //加總重複calendarId個數 ex. a:1 b:3 c:4
         let eachCalendarIdNumbers = {};
-        calendarId.forEach(function (item) {
+        calendarId.forEach(function(item) {
             eachCalendarIdNumbers[item] = eachCalendarIdNumbers[item] ? eachCalendarIdNumbers[item] + 1 : 1;
         });
 
@@ -135,15 +163,19 @@ router.post('/getPosition', async function (req, res) {
     }
 });
 
-router.post('/update_position', async function (req, res) {
+router.post('/update_position', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let renderPositionCondition = ''
-        //判斷權限是user 就多一個 where條件
+            //判斷權限是user 就多一個 where條件
         if (req.session.user.type == 'User') {
             let user = req.session.user.account;
             renderPositionCondition = ' WHERE create_by = "' + user + '"'
         }
-        let calId = req.body.calId, name = req.body.name, rotation = req.body.rotation, memo = req.body.memo
+        let calId = req.body.calId,
+            name = req.body.name,
+            rotation = req.body.rotation,
+            memo = req.body.memo
         let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?, rotation=?, memo=? WHERE id=?'
         let updatePositionData = [name, rotation, memo, calId]
         await query(updatePositionSql, updatePositionData)
@@ -158,7 +190,41 @@ router.post('/update_position', async function (req, res) {
     }
 });
 
-router.post('/delete_position', async function (req, res) {
+router.post('/create_position', async function(req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let id = String(Date.now()),
+            name = req.body.name,
+            color = req.body.name,
+            channel = req.body.channel,
+            rotation = req.body.rotation,
+            memo = req.body.memo,
+            status = req.body.status;
+        let userName = req.session.user.name
+        let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`, `color`, `name`, `channel`, `rotation`, `memo`, `status`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
+        let createPositionData = [id, color, name, channel, rotation, memo, status, createTime, userName, createTime, userName]
+        await query(createPositionSql, createPositionData)
+        console.log(createPositionData);
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create position : ' + channel + ' ' + name, function(error) {
+            if (error) console.log(error)
+        })
+        console.log(req.session.user.name + ' create position : ' + channel + ' ' + name);
+
+        res.render('position', {
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/delete_position', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let delId = req.body.delId;
@@ -166,7 +232,7 @@ router.post('/delete_position', async function (req, res) {
         let deletePostionData = [delId]
         await query(deletePostionSql, deletePostionData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete postion ' + delId);
@@ -182,7 +248,8 @@ router.post('/delete_position', async function (req, res) {
     }
 });
 
-router.get('/order', function (req, res) {
+router.get('/order', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -200,7 +267,8 @@ router.get('/order', function (req, res) {
     }
 });
 
-router.get('/order-add', function (req, res) {
+router.get('/order-add', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -218,10 +286,11 @@ router.get('/order-add', function (req, res) {
     }
 });
 
-router.post('/getOrder', async function (req, res) {
+router.post('/getOrder', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let renderOrderCondition = ''
-        //判斷權限是user 就多一個 where條件
+            //判斷權限是user 就多一個 where條件
         if (req.session.user.type == 'User') {
             let account = req.session.user.account;
             renderOrderCondition = ' WHERE create_by = "' + account + '"'
@@ -239,15 +308,21 @@ router.post('/getOrder', async function (req, res) {
     }
 });
 
-router.post('/update_order', async function (req, res) {
+router.post('/update_order', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let renderOrderCondition = ''
-        //判斷權限是user 就多一個 where條件
+            //判斷權限是user 就多一個 where條件
         if (req.session.user.type == 'User') {
             let user = req.session.user.account;
             renderOrderCondition = ' WHERE create_by = "' + user + '"'
         }
-        let orderId = req.body.orderId, advertisers = req.body.advertisers, title = req.body.title, ad_type = req.body.ad_type, salesperson = req.body.salesperson, memo = req.body.memo
+        let orderId = req.body.orderId,
+            advertisers = req.body.advertisers,
+            title = req.body.title,
+            ad_type = req.body.ad_type,
+            salesperson = req.body.salesperson,
+            memo = req.body.memo
         let updateOrderSql = 'UPDATE sale_booking.order_list SET advertisers=?, title=?, ad_type=?, salesperson=?, memo=? WHERE id=?'
         let updateOrderData = [advertisers, title, ad_type, salesperson, memo, orderId]
         await query(updateOrderSql, updateOrderData)
@@ -262,10 +337,16 @@ router.post('/update_order', async function (req, res) {
     }
 });
 
-router.post('/create_order', async function (req, res) {
+router.post('/create_order', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let name = req.body.name, advertisers = req.body.advertisers, customer_company = req.body.customer_company, salesperson = req.body.salesperson, ad_type = req.body.ad_type, memo = req.body.memo
+        let name = req.body.name,
+            advertisers = req.body.advertisers,
+            customer_company = req.body.customer_company,
+            salesperson = req.body.salesperson,
+            ad_type = req.body.ad_type,
+            memo = req.body.memo
         let schedule_time = req.body.schedule_time.split('-');
 
         let userName = req.session.user.name
@@ -273,7 +354,7 @@ router.post('/create_order', async function (req, res) {
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
         let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, account, createTime, account]
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create name ' + name);
@@ -290,7 +371,8 @@ router.post('/create_order', async function (req, res) {
     }
 });
 
-router.post('/delete_order', async function (req, res) {
+router.post('/delete_order', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let delId = req.body.delId;
@@ -298,7 +380,7 @@ router.post('/delete_order', async function (req, res) {
         let deleteOrderData = [delId]
         await query(deleteOrderSql, deleteOrderData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete order ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete order ' + delId, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete order ' + delId);
@@ -315,7 +397,8 @@ router.post('/delete_order', async function (req, res) {
 });
 
 
-router.get('/customer', function (req, res) {
+router.get('/customer', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -333,7 +416,8 @@ router.get('/customer', function (req, res) {
     }
 });
 
-router.post('/getCustomer', async function (req, res) {
+router.post('/getCustomer', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let getCustomerSql = 'SELECT code,name,contacts,phone,memo FROM sale_booking.customer ORDER BY name'
         let allCustomer = await query(getCustomerSql)
@@ -348,7 +432,8 @@ router.post('/getCustomer', async function (req, res) {
     }
 });
 
-router.get('/customer-add', function (req, res) {
+router.get('/customer-add', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -366,15 +451,20 @@ router.get('/customer-add', function (req, res) {
     }
 });
 
-router.post('/update_customer', async function (req, res) {
+router.post('/update_customer', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let rendercustomerCondition = ''
-        //判斷權限是user 就多一個 where條件
+            //判斷權限是user 就多一個 where條件
         if (req.session.user.type == 'User') {
             let user = req.session.user.account;
             rendercustomerCondition = ' WHERE create_by = "' + user + '"'
         }
-        let code = req.body.code, name = req.body.name, contacts = req.body.contacts, phone = req.body.phone, memo = req.body.memo
+        let code = req.body.code,
+            name = req.body.name,
+            contacts = req.body.contacts,
+            phone = req.body.phone,
+            memo = req.body.memo
         let updateCustomerSql = 'UPDATE sale_booking.customer SET name=?, contacts=?, phone=?, memo=? WHERE code=?'
         let updateCustomerData = [name, contacts, phone, memo, code]
         await query(updateCustomerSql, updateCustomerData)
@@ -389,16 +479,27 @@ router.post('/update_customer', async function (req, res) {
     }
 });
 
-router.post('/create_customer', async function (req, res) {
+router.post('/create_customer', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let code = req.body.code, name = req.body.name, contacts = req.body.contacts, phone = req.body.phone, email = req.body.email, sale_name = req.body.sale_name, tax_id = req.body.tax_id, postal_code = req.body.postal_code, address = req.body.address, payment_terms = req.body.payment_terms, memo = req.body.memo
+        let code = req.body.code,
+            name = req.body.name,
+            contacts = req.body.contacts,
+            phone = req.body.phone,
+            email = req.body.email,
+            sale_name = req.body.sale_name,
+            tax_id = req.body.tax_id,
+            postal_code = req.body.postal_code,
+            address = req.body.address,
+            payment_terms = req.body.payment_terms,
+            memo = req.body.memo
         let userName = req.session.user.name
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createCustomerSql = 'INSERT INTO sale_booking.`customer` (`code`, `name`, `contacts`, `phone`, `email`, `sale_name`,`tax_id`,`postal_code`,`address`,`payment_terms`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         let createCustomerData = [code, name, contacts, phone, email, sale_name, tax_id, postal_code, address, payment_terms, memo, createTime, userName, createTime, userName]
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create customer ' + code);
@@ -415,7 +516,8 @@ router.post('/create_customer', async function (req, res) {
     }
 });
 
-router.post('/delete_customer', async function (req, res) {
+router.post('/delete_customer', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let delId = req.body.delId;
@@ -423,7 +525,7 @@ router.post('/delete_customer', async function (req, res) {
         let deleteCustomerData = [delId]
         await query(deleteCustomerSql, deleteCustomerData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete customer ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete customer ' + delId, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete customer ' + delId);
@@ -439,7 +541,8 @@ router.post('/delete_customer', async function (req, res) {
     }
 });
 
-router.get('/channel', function (req, res) {
+router.get('/channel', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -456,7 +559,8 @@ router.get('/channel', function (req, res) {
         })
     }
 });
-router.get('/channel-add', function (req, res) {
+router.get('/channel-add', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -476,7 +580,8 @@ router.get('/channel-add', function (req, res) {
     }
 });
 
-router.post('/getChannel', async function (req, res) {
+router.post('/getChannel', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         //取得頻道組成陣列
         let getAdNumbersSql = 'SELECT channel FROM sale_booking.`calendar_list` ORDER BY channel'
@@ -487,7 +592,7 @@ router.post('/getChannel', async function (req, res) {
 
         //加總重複channel個數 ex. www:1 babou:3 petsmao:4
         let eachChannelAdNumbers = {};
-        channel.forEach(function (item) {
+        channel.forEach(function(item) {
             eachChannelAdNumbers[item] = eachChannelAdNumbers[item] ? eachChannelAdNumbers[item] + 1 : 1;
         });
 
@@ -512,7 +617,8 @@ router.post('/getChannel', async function (req, res) {
     }
 });
 
-router.post('/create_channel', async function (req, res) {
+router.post('/create_channel', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
@@ -521,10 +627,12 @@ router.post('/create_channel', async function (req, res) {
         let isChannelExistSql = 'SELECT 1 from sale_booking.channel where domain = ?'
         let isChannelExistData = [channel]
         let isChannelExistRes = await query(isChannelExistSql, isChannelExistData)
-        //避免重複新增channel
+            //避免重複新增channel
         if (isChannelExistRes == '') {
             let channelIsExist = ''
-            let name = req.body.name, memo = req.body.memo, status = req.body.status;
+            let name = req.body.name,
+                memo = req.body.memo,
+                status = req.body.status;
             req.session.channel = channel;
             let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
             let createChannelSql = 'INSERT INTO sale_booking.`channel` (`name`,`domain`,`memo`,`status`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?)'
@@ -536,7 +644,7 @@ router.post('/create_channel', async function (req, res) {
                 }
             });
 
-            fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name, function (error) {
+            fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name, function(error) {
                 if (error) console.log(error)
             })
             console.log(req.session.user.name + ' create channel ' + name);
@@ -560,7 +668,8 @@ router.post('/create_channel', async function (req, res) {
     }
 });
 
-router.post('/delete_channel', async function (req, res) {
+router.post('/delete_channel', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let delId = req.body.delId;
@@ -576,7 +685,7 @@ router.post('/delete_channel', async function (req, res) {
         let deleteScheduleListFromThisChannelData = [delId]
         await query(deleteScheduleListFromThisChannelSql, deleteScheduleListFromThisChannelData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete channel ID : ' + delId);
@@ -597,7 +706,8 @@ router.post('/delete_channel', async function (req, res) {
     }
 });
 
-router.get('/privilege', function (req, res) {
+router.get('/privilege', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let userType = req.session.user.type
         let title = 'NOW Booking '
@@ -617,7 +727,8 @@ router.get('/privilege', function (req, res) {
     }
 });
 
-router.post('/getPrivilege', async function (req, res) {
+router.post('/getPrivilege', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         //取得每個人建立的委刊數組成陣列
         let getAdNumbersSql = 'SELECT create_by FROM sale_booking.`order_list` ORDER BY create_by'
@@ -628,7 +739,7 @@ router.post('/getPrivilege', async function (req, res) {
 
         //加總重複channel個數 ex. userA:1 userB:3 userC:4
         let eachUserOrderNumbers = {};
-        order.forEach(function (item) {
+        order.forEach(function(item) {
             eachUserOrderNumbers[item] = eachUserOrderNumbers[item] ? eachUserOrderNumbers[item] + 1 : 1;
         });
         let getAccountSql = 'SELECT name,account,email,type FROM sale_booking.user ORDER BY name'
@@ -651,7 +762,8 @@ router.post('/getPrivilege', async function (req, res) {
     }
 });
 
-router.get('/privilege-add', function (req, res) {
+router.get('/privilege-add', function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -669,7 +781,8 @@ router.get('/privilege-add', function (req, res) {
     }
 });
 
-router.post('/delete_account', async function (req, res) {
+router.post('/delete_account', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let delId = req.body.delId;
@@ -677,7 +790,7 @@ router.post('/delete_account', async function (req, res) {
         let deleteAccountData = [delId]
         await query(deleteAccountSql, deleteAccountData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete account : ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete account : ' + delId, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete account : ' + delId);
@@ -692,17 +805,23 @@ router.post('/delete_account', async function (req, res) {
         })
     }
 });
-router.post('/create_account', async function (req, res) {
+router.post('/create_account', async function(req, res) {
+    req.session.user = user;
     if (req.session.user != undefined) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let account = req.body.account, password = req.body.password, type = req.body.type, name = req.body.name, email = req.body.email, memo = req.body.memo
+        let account = req.body.account,
+            password = req.body.password,
+            type = req.body.type,
+            name = req.body.name,
+            email = req.body.email,
+            memo = req.body.memo
         let userName = req.session.user.name
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createAccountSql = 'INSERT INTO sale_booking.`user` (`account`, `password`, `type`, `name`, `email`, `memo`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?)'
         let createAccountData = [account, md5(password), type, name, email, memo, createTime, userName, createTime, userName]
         await query(createAccountSql, createAccountData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create account : ' + account, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create account : ' + account, function(error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create account : ' + account);
@@ -718,7 +837,7 @@ router.post('/create_account', async function (req, res) {
     }
 });
 
-router.post('/edit', function (req, res) {
+router.post('/edit', function(req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     let userName = 'req.session.user.name'

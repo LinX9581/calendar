@@ -64,8 +64,7 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -131,9 +130,12 @@
                                 </li>
                                 <li class="breadcrumb-item">新增帳號</li>
                             </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
 
@@ -146,34 +148,29 @@
                             <div class="card">
                                 <div class="card-header card-warning card-outline">
                                     <h3 class="card-title">
-                                        <i class="fas fa-edit"></i>
-                                        新增帳號
+                                        <i class="fas fa-edit"></i> 新增帳號
                                     </h3>
                                 </div>
-                                <form class="form-horizontal" role="form" action="/create_account" method="post"
-                                    onsubmit="" id="form">
+                                <form class="form-horizontal" role="form" action="/create_account" method="post" onsubmit="" id="form">
                                     <div class="card-body">
                                         <div class="tab-content">
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="">登入帳號</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control account" id="account"
-                                                        name="account" type="account" placeholder="請輸入登入帳號">
+                                                    <input type="text" class="form-control account" id="account" name="account" type="account" placeholder="請輸入登入帳號">
                                                     <div class="messages"></div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">登入密碼</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control password" id="password"
-                                                        name="password" type="password" placeholder="請輸入登入密碼">
+                                                    <input type="text" class="form-control password" id="password" name="password" type="password" placeholder="請輸入登入密碼">
                                                     <div class="messages"></div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">確認登入密碼</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control password_check"
-                                                        name="equality" type="equality" placeholder="請輸入登入密碼">
+                                                    <input type="text" class="form-control password_check" name="equality" type="equality" placeholder="請輸入登入密碼">
                                                     <div class="messages"></div>
                                                 </div>
                                                 <div class="form-group">
@@ -187,15 +184,13 @@
                                                 <div class="form-group">
                                                     <label for="">帳號名稱</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control name" placeholder="請輸入帳號名稱"
-                                                        name="name" type="name">
+                                                    <input type="text" class="form-control name" placeholder="請輸入帳號名稱" name="name" type="name">
                                                     <div class="messages"></div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">電子郵件</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control email" placeholder="請輸入電子郵件"
-                                                        name="email" type="email">
+                                                    <input type="text" class="form-control email" placeholder="請輸入電子郵件" name="email" type="email">
                                                     <div class="messages"></div>
                                                 </div>
                                                 <div class="form-group memo">
@@ -206,8 +201,7 @@
 
                                                 <div class="form-group">
                                                     <div class="col-sm-offset-3 col-sm-6">
-                                                        <button type="submit"
-                                                            class="btn btn-primary btn-lg btn-block">送出</button>
+                                                        <button type="submit" class="btn btn-primary btn-lg btn-block">送出</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -218,7 +212,8 @@
                         </div>
                     </div>
                     <!-- /.row (main row) -->
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
         </div>
@@ -252,19 +247,18 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        $(function () {
-
+        $(function() {
             // jQuery Validation Plugin 的Twitter BootStrap 3 支援
             $.validator.setDefaults({
-                highlight: function (element) {
+                highlight: function(element) {
                     $(element).closest('.form-group').addClass('has-error');
                 },
-                unhighlight: function (element) {
+                unhighlight: function(element) {
                     $(element).closest('.form-group').removeClass('has-error');
                 },
                 errorElement: 'span',
                 errorClass: 'help-block',
-                errorPlacement: function (error, element) {
+                errorPlacement: function(error, element) {
                     if (element.parent('.controls').length) {
                         error.insertAfter(element.parent());
                     } else {
@@ -310,7 +304,7 @@
                 }
             });
         });
-        $(function () {
+        $(function() {
             $(".datepicker").datepicker();
         });
     </script>

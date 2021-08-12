@@ -63,8 +63,7 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -129,9 +128,12 @@
                                 <li class="breadcrumb-item"><a href="privilege"><i class="fa fa-home"></i> 帳號管理</a>
                                 </li>
                             </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
 
@@ -147,8 +149,7 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter"
-                                                        data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋帳號</button>
@@ -161,7 +162,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table nowrap hover order-table" style="width: 100%;">
+                                                    <table class="table nowrap hover order-table dataTable" style="width: 100%;">
 
                                                     </table>
                                                 </div>
@@ -173,7 +174,8 @@
                         </div>
                     </div>
                     <!-- /.row (main row) -->
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
         </div>
@@ -219,7 +221,9 @@
             let innerHTML = ''
             await fetch('/getPrivilege', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
             }).then(res => res.json()).then(res => {
                 innerHTML +=
                     `<thead>
@@ -264,8 +268,8 @@
 
                 }
                 $('.table').html(innerHTML)
-                
-                $('.delBtn').click(async function () {
+
+                $('.delBtn').click(async function() {
                     let delId = $(this).attr('delId')
                     console.log(delId);
                     let isDel = confirm('確定刪除 ' + delId + ' ?')
@@ -273,7 +277,9 @@
                         $(this).parent().parent().parent().remove()
                         await fetch('/delete_account', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
                             body: JSON.stringify({
                                 "delId": delId,
                             })

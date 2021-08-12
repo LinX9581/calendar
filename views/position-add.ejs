@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>廣告版面</title>
+    <title>委刊單</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Font Awesome -->
@@ -20,11 +20,12 @@
     <link rel="stylesheet" href="css/index/fixedColumns.bootstrap4.min.css">
     <!-- modify style -->
     <link rel="stylesheet" href="css/index/style.css">
+    <!-- validate style -->
+    <link rel="stylesheet" href="css/index/validate.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <!-- Left navbar links -->
@@ -49,7 +50,6 @@
             </ul>
         </nav>
         <!-- /.navbar -->
-
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
@@ -92,7 +92,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link active">
+                            <a href="position" class="nav-link active">
                                 <i class="nav-icon far fa-eye"></i>
                                 <p>廣告版面</p>
                             </a>
@@ -115,7 +115,6 @@
             </div>
             <!-- /.sidebar -->
         </aside>
-
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -124,8 +123,9 @@
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="position"><i class="fa fa-home"></i> 廣告版面</a>
+                                <li class="breadcrumb-item"><a href="position-add"><i class="fa fa-home"></i> 廣告版面</a>
                                 </li>
+                                <li class="breadcrumb-item">新增版位</li>
                             </ol>
                         </div>
                         <!-- /.col -->
@@ -142,29 +142,70 @@
                     <!-- Main row -->
                     <div class="row">
                         <div class="col-12">
-                            <div class="card card-warning card-outline">
-                                <form>
+                            <div class="card">
+                                <div class="card-header card-warning card-outline">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-edit"></i> 新增版位
+                                    </h3>
+                                </div>
+                                <form class="form-horizontal" role="form" action="/create_position" method="post" onsubmit="" id="form">
                                     <div class="card-body">
                                         <div class="tab-content">
-                                            <div class="row">
-                                                <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="">版位名稱</label>
+                                                    <span></span>
+                                                    <input type="text" class="form-control" placeholder="請輸入版位名稱" name="name" id="name">
                                                 </div>
-                                                <div class="col-md-4 col-xl-2 form-group">
-                                                    <button class="btn btn-primary" type="button">搜尋版位</button>
+                                                <div class="form-group">
+                                                    <label for="">頻道</label>
+                                                    <select class="form-control" name="channel" id="channel">
+                                                        <option value="www">主網</option>
+                                                        <option value="babyou">姊妹淘</option>
+                                                        <option value="petsmao">寵毛</option>
+                                                    </select>
                                                 </div>
-                                                <div class="col-md-4 col-xl-2 form-group">
-                                                    <a href="position-add">
-                                                        <button class="btn btn-primary" type="button">新增版位</button>
-                                                    </a>
+                                                <div class="form-group">
+                                                    <label for="">子頻道名稱</label>
+                                                    <input type="text" class="form-control" placeholder="請輸入子頻道名稱(即時、焦點等等)" name="subChannel" id="subChannel">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="">版位顏色</label>
+                                                    <select class="form-control" name="color" id="color">
+                                                        <option></option>
+                                                        <option>purple</option>
+                                                        <option>blue</option>
+                                                        <option>green</option>
+                                                        <option>gray</option>
+                                                        <option>orange</option>
+                                                        <option>red</option>
+                                                        <option>yellow</option>
+                                                        <option>black</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="">輪替數</label>
+                                                    <span></span>
+                                                    <input type="text" class="form-control" placeholder="請輸入輪替數" name="rotation" id="rotation">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="">備註</label>
+                                                    <span></span>
+                                                    <input type="text" class="form-control" name="memo" id="memo">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="">狀態</label>
+                                                    <select class="form-control" name="status" id="status">
+                                                        <option value="">正常</option>
+                                                        <option value="">停用</option>
+                                                    </select>
                                                 </div>
                                             </div>
-                                            <div class="tab-pane fade show active" id="tab1">
-                                                <div class="data-table">
-                                                    <table class="table nowrap hover order-table dataTable" id="editTable" style="width: 100%;">
-                                                    </table>
-                                                </div>
-                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-3 col-sm-6">
+                                            <button type="submit" class="btn btn-primary btn-lg btn-block">送出</button>
                                         </div>
                                     </div>
                                 </form>
@@ -190,10 +231,8 @@
     <!-- jQuery -->
     <script src="js/common/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
-    <!-- bstable -->
-    <script src="js/index/bstable.js"></script>
-    <!-- tableSearch -->
-    <script src="js/index/tableSearch.js"></script>
+    <!-- validate -->
+    <script src="js/index/validate.js"></script>
     <!-- Bootstrap 4 -->
     <script src="js/index/bootstrap.bundle.min.js"></script>
     <script src="js/index/jquery.scrolling-tabs.min.js"></script>
@@ -209,102 +248,42 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        let userType = $('.userType').attr('value')
-        let delId = ''
-        let isDel = ''
-
-        getPosition()
-        async function getPosition() {
-            let innerHTML = ''
-            await fetch('/getPosition', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+        $(function() {
+            // jQuery Validation Plugin 的Twitter BootStrap 3 支援
+            $.validator.setDefaults({
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
                 },
-            }).then(res => res.json()).then(res => {
-                console.log(res);
-                innerHTML +=
-                    `<thead>
-                        <tr class="tr-main">
-                            <th scope="col">名稱</th>
-                            <th scope="col">頻道</th>
-                            <th scope="col">輪替數</th>
-                            <th scope="col">備註</th>
-                            <th scope="col">委刊數</th>
-                        </tr>
-                    </thead>
-                    <tbody class="renderTable">
-                    `;
-                for (let item = 0; item < res.allPosition.length; item++) {
-                    innerHTML +=
-                        ` 
-                        <tr delId="${res.allPosition[item].id}">
-                            <td scope="row" data-th="名稱" cal="name" calId="${res.allPosition[item].id}">${res.allPosition[item].name}</td>
-                            <td data-th="頻道" cal="channel">${res.allPosition[item].channel}</td>
-                            <td data-th="輪替數" cal="rotation">${res.allPosition[item].rotation}</td>
-                            <td data-th="備註" cal="memo">${res.allPosition[item].memo}</td>
-                            <td data-th="委刊數">${res.allCalendarIdNumbers[item]}</td>
-                        </tr>
-                    `;
-
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                },
+                errorElement: 'span',
+                errorClass: 'help-block',
+                errorPlacement: function(error, element) {
+                    if (element.parent('.controls').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
                 }
-                innerHTML += `</tbody>`
-                $('.table').html(innerHTML)
-                var editPositionTable = new BSTable("editTable", {
-                    onDelete: async function(button) {
-                        await fetch('/delete_position', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                "delId": delId,
-                            })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
-                        })
+            });
+            // jQuery Validation Plugin的套用
+            $('#form').validate({
+                rules: {
+                    name: "required",
+                    rotation: {
+                        equalTo: password,
+                        required: true,
                     },
-                });
-                editPositionTable.init()
-
-                //動態新增完後讓功能欄上色
-                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
-                let calId = '',
-                    name = '',
-                    advertisers = '',
-                    title = '',
-                    ad_type = '',
-                    salesperson = '',
-                    memo = '';
-
-                //動態監聽按下acep新增欄位
-                $('.btn-group').delegate("#bAcep", "click", async function() {
-                    let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function() {
-                        calId = $(this).parent().find("td").attr('calId')
-                        name = $(this).parent().find("td[cal=name]").text()
-                        rotation = $(this).parent().find("td[cal=rotation]").text()
-                        memo = $(this).parent().find("td[cal=memo]").text()
-                    })
-                    await fetch('/update_position', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            "calId": calId,
-                            "name": name,
-                            "rotation": rotation,
-                            "memo": memo,
-                        })
-                    }).then(res => res.json()).then(res => {
-                        console.log(res);
-                    })
-                })
-
-            })
-        }
-
+                    color: "required",
+                },
+                messages: {
+                    name: "請輸入版位名稱",
+                    color: "請輸入版位顏色",
+                    rotation: "請輸入輪替數",
+                }
+            });
+        });
         $(function() {
             $(".datepicker").datepicker();
         });
