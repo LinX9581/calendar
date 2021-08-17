@@ -131,7 +131,7 @@ router.post('/getPosition', async function(req, res) {
     req.session.user = user;
     if (req.session.user != undefined) {
         //取得頻道組成陣列
-        let getCalendarIdNumbersSql = 'SELECT calendarId FROM sale_booking.`schedule_event` ORDER BY calendarId'
+        let getCalendarIdNumbersSql = 'SELECT calendarId FROM sale_booking.`schedule_event` ORDER BY id'
         let getCalendarId = await query(getCalendarIdNumbersSql)
         let calendarId = getCalendarId.map(e => {
             return e.calendarId
@@ -144,7 +144,7 @@ router.post('/getPosition', async function(req, res) {
         });
 
         //先撈出 channelId 再去要該channel的名稱
-        let getPositionSql = 'SELECT id,name,channelId,channelName,rotation,memo FROM sale_booking.calendar_list ORDER BY channel'
+        let getPositionSql = 'SELECT id,name,channelId,channelName,rotation,memo FROM sale_booking.calendar_list ORDER BY orderKey'
         let allPosition = await query(getPositionSql)
             //如果該頻道沒廣告怎該索引=0
         let eachCalendarIdNumbersArray = allPosition.map(e => {
@@ -208,7 +208,6 @@ router.post('/create_position', async function(req, res) {
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`,`channelId`,`channelName`,`color`,`bgcolor`,`dragbgcolor`,`bordercolor`,`name`,`rotation`,`memo`,`status`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         let createPositionData = [id, channelId.split('&&')[0], channelId.split('&&')[1], color, calendarBgColor, calendarDragBgColor, calendarBorderColor, name, rotation, memo, status, createTime, userName, createTime, userName]
-        console.log(createPositionData);
         await query(createPositionSql, createPositionData)
 
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create position : ' + name, function(error) {

@@ -4,6 +4,11 @@
 /* eslint-env jquery */
 /* global moment, tui, chance */
 /* global findCalendar, CalendarList, ScheduleList */
+
+/**
+ * calendar event handlers  : schedule的觸發事件 (新增、移除、更新、)
+ * default function         : 套件預設function
+ */
 var socket = io();
 
 (async function (window, Calendar) {
@@ -35,7 +40,7 @@ var socket = io();
         }
     });
 
-    // event handlers
+    // calendar event handlers
     cal.on({
         'clickMore': function (e) {
             console.log('clickMore', e);
@@ -55,7 +60,7 @@ var socket = io();
                 $('.dropdown_getCalBtn').attr('thisCalId', updateScheduleEvent.calendarId)
                 //讓編輯委刊單的order預設選項和stlye為原來選擇的order
                 $('.dropdown_getOrderBtn').html('<span class="dropDownName">' + updateScheduleEvent.title + '</span><i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>')
-                $('.dropdown_getOrderBtn').attr('thisCalId',$('.dropdown_getOrderUl>li[value=' + updateScheduleEvent.title + ']').attr('getChooseOrderId'))
+                $('.dropdown_getOrderBtn').attr('thisCalId', $('.dropdown_getOrderUl>li[value=' + updateScheduleEvent.title + ']').attr('getChooseOrderId'))
                 $('.dropdown_getOrderBtn').attr('thisOrderTitle', updateScheduleEvent.title)
 
                 editScheduleId = updateScheduleEvent.id
@@ -181,30 +186,49 @@ var socket = io();
             end: e.end,
             category: 'allday'
         };
-        socket.emit('create schedule', [schedule], channel);
-        cal.createSchedules([schedule]);
 
-        await fetch('/ch/beforeCreateSchedule', {
+        await fetch('/ch/checkPositionRotation', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                "id": schedule.id,
                 "calendarId": schedule.calendarId,
-                "title": orderTitle,
-                "isAllDay": e.isAllDay,
-                "start": schedule.start,
-                "end": schedule.end,
-                "category": schedule.category,
-                "dueDateClass": e.dueDateClass,
-                "state": e.state,
-                "channel": channel,
-                "orderId": orderId
             })
-        }).then(res => res.json()).then((beforeCreateScheduleRes) => {
-            console.log(beforeCreateScheduleRes);
+        }).then(res => res.json()).then((checkPositionRotation) => {
+            console.log(checkPositionRotation);
+            if (checkPositionRotation.rotationOverflow == '-1') {
+                alert('輪替數超過')
+            } else {
+                socket.emit('create schedule', [schedule], channel);
+                cal.createSchedules([schedule]);
+                beforeCreateSchedule()
+            }
         })
+
+        async function beforeCreateSchedule() {
+            await fetch('/ch/beforeCreateSchedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "id": schedule.id,
+                    "calendarId": schedule.calendarId,
+                    "title": orderTitle,
+                    "isAllDay": e.isAllDay,
+                    "start": schedule.start,
+                    "end": schedule.end,
+                    "category": schedule.category,
+                    "dueDateClass": e.dueDateClass,
+                    "state": e.state,
+                    "channel": channel,
+                    "orderId": orderId
+                })
+            }).then(res => res.json()).then((beforeCreateScheduleRes) => {
+                console.log(beforeCreateScheduleRes);
+            })
+        }
     }
 
     //底下都是原套件 devault function

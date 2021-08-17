@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Sales Booking DEMO</title>
+    <!-- bootstrap4 CSS -->
+    <link rel="stylesheet" type="text/css" href="css/common/bootstrap4.min.css">
+    <!-- font awesome CSS -->
+    <link rel="stylesheet" type="text/css" href="css/common/fontawesome.css">
+    <!-- tui-calendar CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-time-picker.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-date-picker.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/tui-calendar.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/default.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/icons.css">
+    <link rel="stylesheet" type="text/css" href="/css/tui-calendar/dropdown.css">
+</head>
+
+<body>
+    <div id="lnb">
+        <div class="channel lnb-new-schedule" channel="<%=channel %>">
+            <div class="dropdown">
+                <button id="btn-new-schedule" class="btn btn-default btn-block lnb-new-schedule-btn dropdown-toggle" data-toggle="dropdown">
+                    <%= channelName %> <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
+                </button>
+                <div class="dropdown-menu"></div>
+            </div>
+        </div>
+        <div id="lnb-calendars" class="lnb-calendars">
+            <div>
+                <div class="lnb-calendars-item">
+                    <label>
+                        <input class="tui-full-calendar-checkbox-square" type="checkbox" value="all" checked>
+                        <span></span>
+                        <strong>View all</strong>
+                    </label>
+                </div>
+            </div>
+            <div id="calendarList" class="lnb-calendars-d1">
+            </div>
+        </div>
+        <div class="lnb-footer">
+
+        </div>
+    </div>
+    <div id="right">
+        <div id="menu">
+            <span class="dropdown">
+                <button id="dropdownMenu-calendarType" class="btn btn-default btn-sm dropdown-toggle" type="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <i id="calendarTypeIcon" class="calendar-icon ic_view_month" style="margin-right: 4px;"></i>
+                    <span id="calendarTypeName">Dropdown</span>&nbsp;
+            <i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu-calendarType">
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-daily">
+                        <i class="calendar-icon ic_view_day"></i>Daily
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weekly">
+                        <i class="calendar-icon ic_view_week"></i>Weekly
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-monthly">
+                        <i class="calendar-icon ic_view_month"></i>Month
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks2">
+                        <i class="calendar-icon ic_view_week"></i>2 weeks
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a class="dropdown-menu-title" role="menuitem" data-action="toggle-weeks3">
+                        <i class="calendar-icon ic_view_week"></i>3 weeks
+                    </a>
+                </li>
+                <li role="presentation" class="dropdown-divider"></li>
+                <li role="presentation">
+                    <a role="menuitem" data-action="toggle-workweek">
+                        <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-workweek" checked>
+                        <span class="checkbox-title"></span>Show weekends
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" data-action="toggle-start-day-1">
+                        <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-start-day-1">
+                        <span class="checkbox-title"></span>Start Week on Monday
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" data-action="toggle-narrow-weekend">
+                        <input type="checkbox" class="tui-full-calendar-checkbox-square" value="toggle-narrow-weekend">
+                        <span class="checkbox-title"></span>Narrower than weekdays
+                    </a>
+                </li>
+            </ul>
+            </span>
+            <span id="menu-navi">
+                <button type="button" class="btn btn-default btn-sm move-today" data-action="move-today">Today</button>
+                <button type="button" class="btn btn-default btn-sm move-day" data-action="move-prev">
+                    <i class="calendar-icon ic-arrow-line-left" data-action="move-prev"></i>
+                </button>
+                <button type="button" class="btn btn-default btn-sm move-day" data-action="move-next">
+                    <i class="calendar-icon ic-arrow-line-right" data-action="move-next"></i>
+                </button>
+            </span>
+            <span id="renderRange" class="render-range"></span>
+        </div>
+        <div id="calendar"></div>
+
+        <!-- 新增委託單 -->
+        <div class="modal fade" id="create_schedule_dropdown" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 新增委託單
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <div class="dropdown_create_schedule">
+                                    <span>廣告版位</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"></div>
+                                    <ul class="dropdown_calendar_ul dropdown_getCalUl" id=""></ul>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="dropdown_create_schedule">
+                                    <span>委刊單</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getOrderBtn"> </div>
+                                    <ul class="dropdown_calendar_ul dropdown_getOrderUl" id=""></ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="create_scedule" data-dismiss="modal">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 委託單內容 -->
+        <div class="modal" tabindex="-1" role="dialog" id="click_schedule_dropdown">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 委託單內容
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <div class="dropdown_create_schedule">
+                                    <span>廣告版位</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getCalBtn"></div>
+                                    <ul class="dropdown_calendar_ul dropdown_getCalUl" id=""></ul>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="dropdown_create_schedule">
+                                    <span>委刊單</span>
+                                    <div class="dropdown_getCalendarList_button dropdown_getOrderBtn"> </div>
+                                    <ul class="dropdown_calendar_ul dropdown_getOrderUl" id=""></ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary schedule_edit_btn" data-dismiss="modal">Save
+                            changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- common -->
+        <script src="./js/common/jquery-3.2.1.min.js"></script>
+        <script src="./js/common/popper.min.js"></script>
+        <script src="./js/common/bootstrap4.min.js"></script>
+        <script src="./js/common/fontawesome.js"></script>
+        <script>
+            let channel = $('.channel').attr('channel')
+        </script>
+        <!-- socket -->
+        <script src="./js/socket/socket.io.js"></script>
+        <script src="./js/socket/socket.js"></script>
+        <!-- tui-calendar -->
+        <script src="./js/tui-calendar/tui-code-snippet.min.js"></script>
+        <script src="./js/tui-calendar/tui-time-picker.min.js"></script>
+        <script src="./js/tui-calendar/tui-date-picker.min.js"></script>
+        <script src="./js/tui-calendar/moment.min.js"></script>
+        <script src="./js/tui-calendar/moment-timezone-with-data.js"></script>
+        <script src="./js/tui-calendar/chance.min.js"></script>
+        <script src="./js/tui-calendar/tui-calendar.js"></script>
+        <script src="./js/tui-calendar/data/calendars.js"></script>
+        <script src="./js/tui-calendar/data/schedules.js"></script>
+        <script src="./js/tui-calendar/app.js"></script>
+
+</body>
+
+</html>

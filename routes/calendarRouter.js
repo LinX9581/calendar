@@ -116,6 +116,24 @@ router.post('/createCalendarList', async function(req, res) {
         'add Calendar': 'succeed',
     }));
 })
+router.post('/checkPositionRotation', async function(req, res) {
+    let rotationOverflow = ''
+    let calendarId = req.body.calendarId
+    let getPositionNumbersSql = "SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE calendarId = ?"
+    let getPositionNumbersData = [calendarId]
+    let getPositionNumbers = await query(getPositionNumbersSql, getPositionNumbersData)
+
+    let getPositionRotationSql = "SELECT rotation FROM sale_booking.`calendar_list` WHERE id = ?"
+    let getPositionRotationData = [calendarId]
+    let getPositionRotation = await query(getPositionRotationSql, getPositionRotationData)
+    
+    if(getPositionRotation[0].rotation <= getPositionNumbers[0].adNumbers){
+        rotationOverflow = '-1';
+    }
+    res.send(JSON.stringify({
+        'rotationOverflow': rotationOverflow,
+    }));
+})
 router.post('/beforeCreateSchedule', async function(req, res) {
     let user = req.session.user.account;
     let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
