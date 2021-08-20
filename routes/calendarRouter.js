@@ -58,7 +58,7 @@ router.post('/renderSchedule', async function(req, res) {
         renderScheduleCondition = ' AND create_by = "' + user + '"'
     }
     let channel = req.body.channel;
-    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? " + renderScheduleCondition + ""
+    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1" + renderScheduleCondition + ""
     let beforeCreateScheduleData = [channel]
     let allSchedule = await query(beforeCreateScheduleSql, beforeCreateScheduleData)
     res.send(JSON.stringify({
@@ -68,7 +68,7 @@ router.post('/renderSchedule', async function(req, res) {
 })
 router.post('/renderCalendar', async function(req, res) {
     let channel = req.body.channel;
-    let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channelId = ? order by orderKey"
+    let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channelId = ? AND status = 1 order by orderKey"
     let beforeCreateCalendarData = [channel]
     let allCalendar = await query(beforeCreateCalendarSql, beforeCreateCalendarData)
     res.send(JSON.stringify({

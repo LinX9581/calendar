@@ -231,8 +231,9 @@
                             <th scope="col">名稱</th>
                             <th scope="col">頻道</th>
                             <th scope="col">輪替數</th>
-                            <th scope="col">備註</th>
                             <th scope="col">委刊數</th>
+                            <th scope="col">備註</th>
+                            <th scope="col">狀態</th>
                         </tr>
                     </thead>
                     <tbody class="renderTable">
@@ -244,8 +245,9 @@
                             <td scope="row" data-th="名稱" cal="name" calId="${res.allPosition[item].id}">${res.allPosition[item].name}</td>
                             <td data-th="頻道" cal="channel">${res.allPosition[item].channelName}</td>
                             <td data-th="輪替數" cal="rotation">${res.allPosition[item].rotation}</td>
-                            <td data-th="備註" cal="memo">${res.allPosition[item].memo}</td>
                             <td data-th="委刊數">${res.allCalendarIdNumbers[item]}</td>
+                            <td data-th="備註" cal="memo">${res.allPosition[item].memo}</td>
+                            <td data-th="狀態" cal="status">${res.allPosition[item].status}</td>
                         </tr>
                     `;
 
@@ -274,7 +276,8 @@
                 let calId = '',
                     name = '',
                     rotation = '',
-                    memo = '';
+                    memo = '',
+                    status = '';
 
                 //動態監聽按下acep新增欄位
                 $('.btn-group').delegate("#bAcep", "click", async function() {
@@ -284,6 +287,7 @@
                         name = $(this).parent().find("td[cal=name]").text()
                         rotation = $(this).parent().find("td[cal=rotation]").text()
                         memo = $(this).parent().find("td[cal=memo]").text()
+                        status = $(this).parent().find("td[cal=status]").text()
                     })
                     await fetch('/update_position', {
                         method: 'POST',
@@ -295,6 +299,7 @@
                             "name": name,
                             "rotation": rotation,
                             "memo": memo,
+                            "status":status
                         })
                     }).then(res => res.json()).then(res => {
                         console.log(res);

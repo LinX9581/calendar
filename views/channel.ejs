@@ -233,8 +233,9 @@
                         <tr class="tr-main">
                             <th scope="col">名稱</th>
                             <th scope="col">網域</th>
-                            <th scope="col">備註</th>
                             <th scope="col">廣告版位數</th>
+                            <th scope="col">備註</th>
+                            <th scope="col">狀態</th>
                         </tr>
                     </thead>
                     <tbody class="renderTable">
@@ -246,10 +247,11 @@
                     innerHTML +=
                         ` 
                         <tr delId="${res.allChannel[item].link}">
-                            <td scope="row" data-th="名稱" channelId="${res.allChannel[item].link}">${res.allChannel[item].name}</td>
-                            <td data-th="網域">${res.allChannel[item].domain}</td>
-                            <td data-th="備註">${res.allChannel[item].memo}</td>
+                            <td scope="row" data-th="名稱" cal="name" channelId="${res.allChannel[item].link}">${res.allChannel[item].name}</td>
+                            <td data-th="網域" cal="domain">${res.allChannel[item].domain}</td>
                             <td data-th="廣告版位數">${res.allAdNumbers[item]}</td>
+                            <td data-th="備註" cal="memo">${res.allChannel[item].memo}</td>
+                            <td data-th="狀態" cal="status">${res.allChannel[item].status}</td>
                         </tr>
                     `;
                 }
@@ -278,7 +280,8 @@
                 let channelId = '',
                     name = '',
                     domain = '',
-                    memo = '';
+                    memo = '',
+                    status = '';
 
                 //動態監聽按下acep新增欄位
                 $('.btn-group').delegate("#bAcep", "click", async function() {
@@ -288,6 +291,7 @@
                         name = $(this).parent().find("td[cal=name]").text()
                         domain = $(this).parent().find("td[cal=domain]").text()
                         memo = $(this).parent().find("td[cal=memo]").text()
+                        status = $(this).parent().find("td[cal=status]").text()
                     })
                     await fetch('/update_channel', {
                         method: 'POST',
@@ -299,6 +303,7 @@
                             "name": name,
                             "domain": domain,
                             "memo": memo,
+                            "status": status,
                         })
                     }).then(res => res.json()).then(res => {
                         console.log(res);
