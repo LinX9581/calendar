@@ -111,19 +111,22 @@ var socket = io();
         },
         'beforeDeleteSchedule': async function (e) {
             console.log('beforeDeleteSchedule', e);
-            await fetch('/ch/beforeDeleteSchedule', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "deleteId": e.schedule.id,
+            let isDel = confirm('確定刪除?')
+            if (isDel) {
+                await fetch('/ch/beforeDeleteSchedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "deleteId": e.schedule.id,
+                    })
+                }).then(res => res.json()).then((jsonData) => {
+                    return 0;
                 })
-            }).then(res => res.json()).then((jsonData) => {
-                return 0;
-            })
-            socket.emit('delete schedule', e.schedule.id, e.schedule.calendarId, channel);
-            cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
+                socket.emit('delete schedule', e.schedule.id, e.schedule.calendarId, channel);
+                cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
+            }
         },
         'clickTimezonesCollapseBtn': function (timezonesCollapsed) {
             if (timezonesCollapsed) {
