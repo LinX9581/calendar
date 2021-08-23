@@ -64,7 +64,8 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="true">
                         <li class="nav-item  menu-open">
                             <a href="#" class="nav-link active">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -150,7 +151,8 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋委刊單</button>
@@ -163,7 +165,8 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table rwdtb-scroll nowrap hover order-table" style="width: 100%;" id="editTable">
+                                                    <table class="table rwdtb-scroll nowrap hover order-table"
+                                                        style="width: 100%;" id="editTable">
                                                     </table>
                                                 </div>
                                             </div>
@@ -187,35 +190,35 @@
       </div>-->
         </footer>
 
-                <!-- 委託單內容 -->
-                <div class="modal" tabindex="-1" role="dialog" id="click_schedule_dropdown">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-edit"></i> 委託單內容
-                                </h3>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+        <!-- 委託單內容 -->
+        <div class="modal" tabindex="-1" role="dialog" id="orderDetailModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 委託單內容
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="cal-3">
+                                123123
                             </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="cal-3">
-                                        123123
-                                    </div>
-                                    <div class="cal-3">
-                                        456465
-                                    </div>
-                                    <div class="cal-3">
-                                        78979879
-                                    </div>
-                                </div>
+                            <div class="cal-3">
+                                456465
+                            </div>
+                            <div class="cal-3">
+                                78979879
                             </div>
                         </div>
                     </div>
                 </div>
-        
+            </div>
+        </div>
+
     </div>
     <!-- ./wrapper -->
 
@@ -223,7 +226,7 @@
     <script src="js/common/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
     <!-- bstable -->
-    <script src="js/index/bstable.js"></script>
+    <script src="js/index/bstableCustomer.js"></script>
     <!-- tableSearch -->
     <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
@@ -241,7 +244,7 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        $(function() {
+        $(function () {
             $(".datepicker").datepicker();
         });
         let delId = ''
@@ -286,7 +289,7 @@
                 innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
                 var editOrderTable = new BSTable("editTable", {
-                    onDelete: async function(button) {
+                    onDelete: async function (button) {
                         console.log('testset');
                         await fetch('/delete_order', {
                             method: 'POST',
@@ -305,8 +308,10 @@
                 editOrderTable.init()
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
 
-                console.log(isDel);
-                console.log(delId);
+                $('.orderDetail').click(function () {
+                    console.log('click order detail');
+                    $('#orderDetailModal').modal('show');
+                })
 
                 let orderId = '',
                     advertisers = '',
@@ -315,9 +320,9 @@
                     salesperson = '',
                     memo = '';
 
-                $('.btn-group').delegate("#bAcep", "click", async function() {
+                $('.btn-group').delegate("#bAcep", "click", async function () {
                     let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function() {
+                    currentRow.find('td').each(function () {
                         orderId = $(this).parent().find("td[cal=orderId]").text()
                         advertisers = $(this).parent().find("td[cal=advertisers]").text()
                         title = $(this).parent().find("td[cal=title]").text()
@@ -344,6 +349,7 @@
                 })
             })
         }
+
     </script>
 </body>
 

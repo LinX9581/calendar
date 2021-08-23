@@ -176,7 +176,9 @@ router.post('/update_position', async function (req, res) {
             name = req.body.name,
             rotation = req.body.rotation,
             memo = req.body.memo,
-            status = req.body.status;
+            status = req.body.status,
+            update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
+            update_by = req.session.user.account;
 
         //頻道停用啟用、相對應的schedule跟著停用啟用
         if(status == '0'){
@@ -189,9 +191,15 @@ router.post('/update_position', async function (req, res) {
             await query(updateScheduleSql, updateScheduleData)
         }
 
-        let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?, rotation=?, memo=?, status=? WHERE id=?'
-        let updatePositionData = [name, rotation, memo, status, calId]
+        let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?, rotation=?, memo=?, status=?, update_date=?, update_by=? WHERE id=?'
+        let updatePositionData = [name, rotation, memo, status, update_date, update_by, calId]
         await query(updatePositionSql, updatePositionData)
+
+        console.log(update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData)
+        let userLoginTrace = update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData + "\n"
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+            if (error) console.log(error)
+        })
 
         res.send(JSON.stringify({
             'update_position': '成功',
@@ -224,7 +232,7 @@ router.post('/create_position', async function (req, res) {
         let createPositionData = [id, channelId.split('&&')[0], channelId.split('&&')[1], color, calendarBgColor, calendarDragBgColor, calendarBorderColor, name, rotation, memo, status, createTime, userName, createTime, userName]
         await query(createPositionSql, createPositionData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create position : ' + name, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create position : ' + name + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create position : ' + name);
@@ -249,7 +257,7 @@ router.post('/delete_position', async function (req, res) {
         let deletePostionData = [delId]
         await query(deletePostionSql, deletePostionData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete postion ' + delId);
@@ -377,10 +385,25 @@ router.post('/update_order', async function (req, res) {
             title = req.body.title,
             ad_type = req.body.ad_type,
             salesperson = req.body.salesperson,
-            memo = req.body.memo
-        let updateOrderSql = 'UPDATE sale_booking.order_list SET advertisers=?, title=?, ad_type=?, salesperson=?, memo=? WHERE id=?'
-        let updateOrderData = [advertisers, title, ad_type, salesperson, memo, orderId]
+            memo = req.body.memo,
+            update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
+            update_by = req.session.user.account;
+
+        let updateOrderSql = 'UPDATE sale_booking.order_list SET advertisers=?, title=?, ad_type=?, salesperson=?, memo=?, update_date=?, update_by=? WHERE id=?'
+        let updateOrderData = [advertisers, title, ad_type, salesperson, memo, update_date, update_by, orderId]
         await query(updateOrderSql, updateOrderData)
+
+        //當委刊單活動名稱改變時，schedule的title跟著改變
+        let updateScheduleTitleSql = 'UPDATE sale_booking.schedule_event SET title=? where orderId=?'
+        let updateScheduleTitleData = [title,orderId]
+        await query(updateScheduleTitleSql, updateScheduleTitleData)
+
+        console.log(update_date + " " + req.session.user.account + " updateOrder: " + updateOrderData)
+        let userLoginTrace = update_date + " " + req.session.user.account + " updateOrder: " + updateOrderData + "\n"
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+            if (error) console.log(error)
+        })
+
         res.send(JSON.stringify({
             'update_order': '成功',
         }));
@@ -409,7 +432,7 @@ router.post('/create_order', async function (req, res) {
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
         let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, account, createTime, account]
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create name ' + name);
@@ -435,7 +458,7 @@ router.post('/delete_order', async function (req, res) {
         let deleteOrderData = [delId]
         await query(deleteOrderSql, deleteOrderData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete order ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete order ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete order ' + delId);
@@ -519,13 +542,23 @@ router.post('/update_customer', async function (req, res) {
             name = req.body.name,
             contacts = req.body.contacts,
             phone = req.body.phone,
-            memo = req.body.memo
-        let updateCustomerSql = 'UPDATE sale_booking.customer SET name=?, contacts=?, phone=?, memo=? WHERE code=?'
-        let updateCustomerData = [name, contacts, phone, memo, code]
+            memo = req.body.memo,
+            update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
+            update_by = req.session.user.account;
+
+        let updateCustomerSql = 'UPDATE sale_booking.customer SET name=?, contacts=?, phone=?, memo=?, update_date=?, update_by=? WHERE code=?'
+        let updateCustomerData = [name, contacts, phone, memo, update_date, update_by, code]
         await query(updateCustomerSql, updateCustomerData)
+
+        console.log(update_date + " " + req.session.user.account + " updateCustomer: " + updateCustomerData)
+        let userLoginTrace = update_date + " " + req.session.user.account + " updateCustomer: " + updateCustomerData + "\n"
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+            if (error) console.log(error)
+        })
+
         res.send(JSON.stringify({
             'update_customer': '成功',
-        }));
+        }));G
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -548,13 +581,14 @@ router.post('/create_customer', async function (req, res) {
             postal_code = req.body.postal_code,
             address = req.body.address,
             payment_terms = req.body.payment_terms,
-            memo = req.body.memo
+            memo = req.body.memo;
+
         let userName = req.session.user.name
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createCustomerSql = 'INSERT INTO sale_booking.`customer` (`code`, `name`, `contacts`, `phone`, `email`, `sale_name`,`tax_id`,`postal_code`,`address`,`payment_terms`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         let createCustomerData = [code, name, contacts, phone, email, sale_name, tax_id, postal_code, address, payment_terms, memo, createTime, userName, createTime, userName]
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create customer ' + code);
@@ -580,7 +614,7 @@ router.post('/delete_customer', async function (req, res) {
         let deleteCustomerData = [delId]
         await query(deleteCustomerSql, deleteCustomerData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete customer ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete customer ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete customer ' + delId);
@@ -701,12 +735,19 @@ router.post('/update_channel', async function (req, res) {
             name = req.body.name,
             domain = req.body.domain,
             memo = req.body.memo,
-            status = req.body.status;
+            status = req.body.status,
+            update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
+            update_by = req.session.user.account;
 
-        let updateChannelSql = 'UPDATE sale_booking.channel SET name=?, domain=?, memo=?, status=? WHERE link=?'
-        let updateChannelData = [name, domain, memo, status, channelId]
-        console.log(updateChannelData);
+        let updateChannelSql = 'UPDATE sale_booking.channel SET name=?, domain=?, memo=?, status=?, update_date=?, update_by=? WHERE link=?'
+        let updateChannelData = [name, domain, memo, status, update_date, update_by, channelId]
         await query(updateChannelSql, updateChannelData)
+
+        console.log(update_date + " " + req.session.user.account + " updateChannel: " + updateChannelData)
+        let userLoginTrace = update_date + " " + req.session.user.account + " updateChannel: " + updateChannelData + "\n"
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+            if (error) console.log(error)
+        })
 
         res.send(JSON.stringify({
             'update_channel': '成功',
@@ -734,13 +775,13 @@ router.post('/create_channel', async function (req, res) {
         let createChannelSql = 'INSERT INTO sale_booking.`channel` (`link`,`name`,`domain`,`memo`,`status`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?)'
         let createChannelData = [link, name, domain, memo, status, createTime, userName, createTime, userName]
         await query(createChannelSql, createChannelData)
-        fs.copyFile("/var/www/calendar/views/channel/www.ejs", "/var/www/calendar/views/channel/" + link + ".ejs", (err) => {
+        fs.copyFile("/var/www/calendar/views/channel/www.ejs", "/var/www/calendar/views/channel/" + link + ".ejs" + '\n', (err) => {
             if (err) {
                 console.log("Error Found:", err);
             }
         });
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create channel ' + name);
@@ -773,7 +814,7 @@ router.post('/delete_channel', async function (req, res) {
         let deleteScheduleListFromThisChannelData = [delId]
         await query(deleteScheduleListFromThisChannelSql, deleteScheduleListFromThisChannelData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete channel ID : ' + delId);
@@ -878,7 +919,7 @@ router.post('/delete_account', async function (req, res) {
         let deleteAccountData = [delId]
         await query(deleteAccountSql, deleteAccountData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete account : ' + delId, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete account : ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete account : ' + delId);
@@ -909,7 +950,7 @@ router.post('/create_account', async function (req, res) {
         let createAccountData = [account, md5(password), type, name, email, memo, createTime, userName, createTime, userName]
         await query(createAccountSql, createAccountData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create account : ' + account, function (error) {
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create account : ' + account + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create account : ' + account);
