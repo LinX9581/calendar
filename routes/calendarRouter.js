@@ -3,10 +3,10 @@ import express from 'express';
 import moment from 'moment';
 
 let router = express.Router();
-router.get('/:url', async function(req, res) {
+router.get('/:url', async function (req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-        // if (req.session.user != undefined) {
+    // if (req.session.user != undefined) {
     let url = req.params.url
     let getChannelNameSql = "select link,name from sale_booking.channel where link = ? "
     let getChannelNameData = [url]
@@ -34,14 +34,14 @@ router.get('/:url', async function(req, res) {
     // }
 });
 
-router.get('/', async function(req, res) {
+router.get('/', async function (req, res) {
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     res.render('test', {
         today
     });
 });
 
-router.post('/renderChannel', async function(req, res) {
+router.post('/renderChannel', async function (req, res) {
     let beforeCreateChannelSql = "select link,name from sale_booking.channel"
     let allChannel = await query(beforeCreateChannelSql)
     res.send(JSON.stringify({
@@ -50,9 +50,9 @@ router.post('/renderChannel', async function(req, res) {
     }));
 })
 
-router.post('/renderSchedule', async function(req, res) {
+router.post('/renderSchedule', async function (req, res) {
     let renderScheduleCondition = ''
-        //判斷權限是user 就多一個 where條件
+    //判斷權限是user 就多一個 where條件
     if (req.session.user.type == 'User') {
         let user = req.session.user.account;
         renderScheduleCondition = ' AND create_by = "' + user + '"'
@@ -66,7 +66,7 @@ router.post('/renderSchedule', async function(req, res) {
         'render schedule': 'succeed',
     }));
 })
-router.post('/renderCalendar', async function(req, res) {
+router.post('/renderCalendar', async function (req, res) {
     let channel = req.body.channel;
     let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channelId = ? AND status = 1 order by orderKey"
     let beforeCreateCalendarData = [channel]
@@ -76,26 +76,34 @@ router.post('/renderCalendar', async function(req, res) {
         'render Calendar': 'succeed',
     }));
 })
-router.post('/deleteCalendar', async function(req, res) {
+router.post('/deleteCalendar', async function (req, res) {
     let delIdArray = []
     let delCalId = req.body.delCalId;
-    let delCalSql = 'DELETE FROM sale_booking.calendar_list WHERE id = ?'
-    let delCalScheduleSql = 'DELETE FROM sale_booking.schedule_event WHERE calendarId = ?'
+    //停用cal
+    let delCalSql = 'UPDATE sale_booking.calendar_list SET status=0 WHERE id = ?'
+    let delCalData = [delCalId]
+    await query(delCalSql, delCalData)
+    
+    //停用該cal相關的schedule
+    let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=0 WHERE calendarId=?'
+    let updateScheduleData = [delCalId]
+    await query(updateScheduleSql, updateScheduleData)
+
+    //把相關的schedule 傳給前端停止顯示
     let delCalScheduleIdSql = 'SELECT id FROM sale_booking.schedule_event WHERE calendarId = ?'
     let delCalSqlData = [delCalId]
     let delScheduleId = await query(delCalScheduleIdSql, delCalSqlData)
-
+    
     for (const delId of delScheduleId) {
         delIdArray.push(delId)
     }
-    await query(delCalSql, delCalSqlData)
-    await query(delCalScheduleSql, delCalSqlData)
+
     res.send(JSON.stringify({
         'Delete Calendar': 'succeed',
         'delIdArray': delIdArray
     }));
 })
-router.post('/createCalendarList', async function(req, res) {
+router.post('/createCalendarList', async function (req, res) {
     let userName = req.session.user.name
     let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
     let calendarId = req.body.calendarId;
@@ -116,7 +124,7 @@ router.post('/createCalendarList', async function(req, res) {
         'add Calendar': 'succeed',
     }));
 })
-router.post('/checkPositionRotation', async function(req, res) {
+router.post('/checkPositionRotation', async function (req, res) {
     let rotationOverflow = ''
     let calendarId = req.body.calendarId
     let getPositionNumbersSql = "SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE calendarId = ?"
@@ -126,15 +134,15 @@ router.post('/checkPositionRotation', async function(req, res) {
     let getPositionRotationSql = "SELECT rotation FROM sale_booking.`calendar_list` WHERE id = ?"
     let getPositionRotationData = [calendarId]
     let getPositionRotation = await query(getPositionRotationSql, getPositionRotationData)
-    
-    if(getPositionRotation[0].rotation <= getPositionNumbers[0].adNumbers){
+
+    if (getPositionRotation[0].rotation <= getPositionNumbers[0].adNumbers) {
         rotationOverflow = '-1';
     }
     res.send(JSON.stringify({
         'rotationOverflow': rotationOverflow,
     }));
 })
-router.post('/beforeCreateSchedule', async function(req, res) {
+router.post('/beforeCreateSchedule', async function (req, res) {
     let user = req.session.user.account;
     let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
     let id = req.body.id
@@ -144,29 +152,30 @@ router.post('/beforeCreateSchedule', async function(req, res) {
     let start = moment(req.body.start._date).format('YYYY-MM-DD HH:mm:ss')
     let end = moment(req.body.end._date).format('YYYY-MM-DD HH:mm:ss')
     let category = req.body.category
-    let state = req.body.state
+    let state = '1'
     let channelId = req.body.channel;
     let scheduleBody = req.body.scheduleBody;
+    let orderId = req.body.orderId;
 
-    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`channelId`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`state`,`create_date`,`create_by`,`update_date`,`update_by`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
-    let newScheduleData = [id, channelId, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, nowDate, user, nowDate, user]
+    let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`orderId`,`channelId`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`status`,`create_date`,`create_by`,`update_date`,`update_by`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+    let newScheduleData = [id, orderId, channelId, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, nowDate, user, nowDate, user]
     await query(beforeCreateScheduleSql, newScheduleData)
 
     res.send(JSON.stringify({
         'beforeCreateSchedule': 'succeed',
     }));
 })
-router.post('/beforeDeleteSchedule', async function(req, res) {
-        let deleteId = req.body.deleteId
-        let beforeDeleteScheduleSql = "delete from sale_booking.schedule_event where id = ?"
-        let deleteScheduleData = [deleteId]
-        await query(beforeDeleteScheduleSql, deleteScheduleData)
-        res.send(JSON.stringify({
-            'beforeDeleteSchedule': 'succeed',
-        }));
-    })
-    //原套件即時同步更新時間有BUG 另外建一支API
-router.post('/beforeUpdateScheduleTime', async function(req, res) {
+router.post('/beforeDeleteSchedule', async function (req, res) {
+    let deleteId = req.body.deleteId
+    let beforeDeleteScheduleSql = "delete from sale_booking.schedule_event where id = ?"
+    let deleteScheduleData = [deleteId]
+    await query(beforeDeleteScheduleSql, deleteScheduleData)
+    res.send(JSON.stringify({
+        'beforeDeleteSchedule': 'succeed',
+    }));
+})
+//原套件即時同步更新時間有BUG 另外建一支API
+router.post('/beforeUpdateScheduleTime', async function (req, res) {
     // update 會莫名觸發兩次 但不影響運作 推測是在套件監聽事件裡面 再次觸發update導致兩次 相關code 在 app.js  'clickSchedule' & $('.schedule_edit_btn').click() 這兩個分別會觸發一次
     // if (req.body.changes != undefined) {
     let scheduleId = req.body.scheduleId
@@ -176,20 +185,20 @@ router.post('/beforeUpdateScheduleTime', async function(req, res) {
     let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET start = ?, end = ? WHERE id = ?"
     let updateScheduleData = [updateStart, updateEnd, scheduleId]
     await query(beforeUpdateScheduleSql, updateScheduleData)
-        // }
+    // }
 
     res.send(JSON.stringify({
         'beforeUpdateSchedule': 'succeed',
     }));
 })
-router.post('/beforeUpdateSchedule', async function(req, res) {
+router.post('/beforeUpdateSchedule', async function (req, res) {
     // update 會莫名觸發兩次 但不影響運作 推測是在套件監聽事件裡面 再次觸發update導致兩次 相關code 在 app.js  'clickSchedule' & $('.schedule_edit_btn').click() 這兩個分別會觸發一次
     if (req.body.changes != undefined) {
         let scheduleId = req.body.scheduleId
         let updateCalendarId = req.body.changes.calendarId
         let updateTitle = req.body.changes.title
-            // let updateStart = req.body.updateStart
-            // let updateEnd = req.body.updateEnd
+        // let updateStart = req.body.updateStart
+        // let updateEnd = req.body.updateEnd
 
         let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ? WHERE id = ?"
         let updateScheduleData = [updateCalendarId, updateTitle, scheduleId]
@@ -200,7 +209,7 @@ router.post('/beforeUpdateSchedule', async function(req, res) {
         'beforeUpdateSchedule': 'succeed',
     }));
 })
-router.get('/test', async function(req, res) {
+router.get('/test', async function (req, res) {
     let centerMember = 'asd'
     res.send(JSON.stringify({
         centerMember,

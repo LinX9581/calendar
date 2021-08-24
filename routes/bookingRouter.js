@@ -380,7 +380,7 @@ router.post('/detail_order', async function (req, res) {
         let getDetailOrderData = [delId]
         let getDetailData = await query(getDetailOrderSql, getDetailOrderData)
 
-        let getDetailOrderListSql = 'SELECT id, title, advertisers, customer_company, customer_company, ad_type, memo FROM sale_booking.order_list WHERE id = ?'
+        let getDetailOrderListSql = 'SELECT id, title, advertisers, customer_company, customer_company, ad_type, salesperson, memo FROM sale_booking.order_list WHERE id = ?'
         let getDetailOrderListData = [delId]
         let getDetailOrderList = await query(getDetailOrderListSql, getDetailOrderListData)
 

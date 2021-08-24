@@ -296,7 +296,7 @@
                 $('.bDetail').click(async function () {
                     innerDetailCustomerHTML = ''
                     $('#customerDetailModal').modal('show');
-                    
+
                     await fetch('/detail_customer', {
                         method: 'POST',
                         headers: {
@@ -315,6 +315,7 @@
                                     <th scope="col">連絡電話</th>
                                     <th scope="col">連絡信箱</th>
                                     <th scope="col">郵遞區號</th>
+                                    <th scope="col">發票地址</th>
                                     <th scope="col">統一編號</th>
                                     <th scope="col">付款條件</th>
                                     <th scope="col">服務業務</th>
@@ -330,9 +331,10 @@
                                     <td scope="row" data-th="客戶代號" cal="code">${res.getDetailData[item].code}</td>
                                     <td data-th="客戶全名" cal="name">${res.getDetailData[item].name}</td>
                                     <td data-th="連絡人" cal="contacts">${res.getDetailData[item].contacts}</td>
-                                    <td data-th="連絡電話" cal="email">${res.getDetailData[item].email}</td>
-                                    <td data-th="連絡信箱" cal="postal_code">${res.getDetailData[item].postal_code}</td>
-                                    <td data-th="郵遞區號" cal="address">${res.getDetailData[item].address}</td>
+                                    <td data-th="連絡電話" cal="phone">${res.getDetailData[item].phone}</td>
+                                    <td data-th="連絡信箱" cal="email">${res.getDetailData[item].email}</td>
+                                    <td data-th="郵遞區號" cal="postal_code">${res.getDetailData[item].postal_code}</td>
+                                    <td data-th="發票地址" cal="address">${res.getDetailData[item].address}</td>
                                     <td data-th="統一編號" cal="tax_id">${res.getDetailData[item].tax_id}</td>
                                     <td data-th="付款條件" cal="payment_terms">${res.getDetailData[item].payment_terms}</td>
                                     <td data-th="服務業務" cal="sale_name">${res.getDetailData[item].sale_name}</td>
