@@ -181,11 +181,11 @@ router.post('/update_position', async function (req, res) {
             update_by = req.session.user.account;
 
         //頻道停用啟用、相對應的schedule跟著停用啟用
-        if(status == '0'){
+        if (status == '0') {
             let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? WHERE calendarId=?'
             let updateScheduleData = [status, calId]
             await query(updateScheduleSql, updateScheduleData)
-        }else{
+        } else {
             let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? WHERE calendarId=?'
             let updateScheduleData = [status, calId]
             await query(updateScheduleSql, updateScheduleData)
@@ -371,6 +371,31 @@ router.post('/getOrder', async function (req, res) {
     }
 });
 
+router.post('/detail_order', async function (req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        let delId = req.body.delId;
+
+        let getDetailOrderSql = 'SELECT `calendar_list`.`name`,`start`,`end` FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`calendar_list` ON `calendar_list`.`id` = `schedule_event`.`calendarId` WHERE orderId = ?'
+        let getDetailOrderData = [delId]
+        let getDetailData = await query(getDetailOrderSql, getDetailOrderData)
+
+        let getAdTypeSql = 'SELECT ad_type FROM sale_booking.order_list WHERE id = ?'
+        let getAdTypeData = [delId]
+        let getAdType = await query(getAdTypeSql, getAdTypeData)
+
+        res.send(JSON.stringify({
+            'getDetailData': getDetailData,
+            'getAdType': getAdType[0].ad_type
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
 router.post('/update_order', async function (req, res) {
     req.session.user = user;
     if (req.session.user != undefined) {
@@ -395,7 +420,7 @@ router.post('/update_order', async function (req, res) {
 
         //當委刊單活動名稱改變時，schedule的title跟著改變
         let updateScheduleTitleSql = 'UPDATE sale_booking.schedule_event SET title=? where orderId=?'
-        let updateScheduleTitleData = [title,orderId]
+        let updateScheduleTitleData = [title, orderId]
         await query(updateScheduleTitleSql, updateScheduleTitleData)
 
         console.log(update_date + " " + req.session.user.account + " updateOrder: " + updateOrderData)
@@ -558,7 +583,7 @@ router.post('/update_customer', async function (req, res) {
 
         res.send(JSON.stringify({
             'update_customer': '成功',
-        }));G
+        }));
     } else {
         let title = 'NOW Booking '
         res.render('login', {

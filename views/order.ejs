@@ -196,24 +196,14 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="card-title">
-                            <i class="fas fa-edit"></i> 委託單內容
+                            <i class="fas fa-edit"></i> 委託單詳細內容
                         </h3>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="cal-3">
-                                123123
-                            </div>
-                            <div class="cal-3">
-                                456465
-                            </div>
-                            <div class="cal-3">
-                                78979879
-                            </div>
-                        </div>
+                        <table class="detailTable rwdtb-scroll nowrap hover order-table"></table>
                     </div>
                 </div>
             </div>
@@ -229,6 +219,8 @@
     <script src="js/index/bstableCustomer.js"></script>
     <!-- tableSearch -->
     <script src="js/index/tableSearch.js"></script>
+    <!-- moment -->
+    <script src="js/index/moment.js"></script>
     <!-- Bootstrap 4 -->
     <script src="js/index/bootstrap.bundle.min.js"></script>
     <script src="js/index/jquery.scrolling-tabs.min.js"></script>
@@ -253,6 +245,7 @@
         getOrder()
         async function getOrder() {
             let innerHTML = ''
+            let innerDetailOrderHTML = ''
             await fetch('/getOrder', {
                 method: 'POST',
                 headers: {
@@ -308,9 +301,47 @@
                 editOrderTable.init()
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
 
-                $('.orderDetail').click(function () {
+                $('.orderDetail').click(async function () {
                     console.log('click order detail');
+                    console.log(delId);
                     $('#orderDetailModal').modal('show');
+                    innerDetailOrderHTML = ''
+                    await fetch('/detail_order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            "delId": delId,
+                        })
+                    }).then(res => res.json()).then(res => {
+                        innerDetailOrderHTML +=
+                            `<thead>
+                        <tr class="tr-main">
+                            <th scope="col">廣告版位</th>
+                            <th scope="col">刊登方式</th>
+                            <th scope="col">時間</th>
+                        </tr>
+                    </thead>
+                    <tbody class="renderTable">
+                    `;
+                        for (let item = 0; item < res.getDetailData.length; item++) {
+                            innerDetailOrderHTML +=
+                                ` 
+                        <tr>
+                            <td scope="row" data-th="廣告版位" cal="orderId">${res.getDetailData[item].name}</td>
+                            <td data-th="刊登方式" cal="advertisers">${res.getAdType}</td>
+                            <td data-th="時間" cal="title">${moment(res.getDetailData[item].start).format('YYYY-MM-DD')} ~ ${moment(res.getDetailData[item].end).format('YYYY-MM-DD')}</td>
+                        </tr>
+                    `;
+
+                        }
+                        innerDetailOrderHTML += `</tbody>`
+                        $('.detailTable').html(innerDetailOrderHTML)
+
+                        console.log(res);
+                    })
+
                 })
 
                 let orderId = '',

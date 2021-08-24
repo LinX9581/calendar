@@ -4,6 +4,7 @@ import cors from 'cors';
 import session from 'express-session';
 import calendarRouter from './routes/calendarRouter';
 import bookingRouter from './routes/bookingRouter';
+import testRouter from './test/import_csv';
 const moment = require('moment-timezone');
 
 const app = express();

@@ -183,6 +183,11 @@ class BSTable {
             this.options.onDelete();
         }
     }
+    _rowDetail(button) {
+        // Remove the row
+        let $currentRow = $(button).parents('tr'); // access the row
+        delId = $currentRow.attr('delId');
+    }
     _rowAccept(button) {
         // Accept the changes to the row
         let $currentRow = $(button).parents('tr'); // access the row
@@ -288,6 +293,10 @@ class BSTable {
         this.table.find('tbody tr #bDel').each(function() {
             let button = this;
             button.onclick = function() { _this._rowDelete(button) }
+        });
+        this.table.find('tbody tr #orderDetail').each(function() {
+            let button = this;
+            button.onclick = function() { _this._rowDetail(button) }
         });
         this.table.find('tbody tr #bAcep').each(function() {
             let button = this;
