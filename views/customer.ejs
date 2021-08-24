@@ -64,7 +64,8 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -150,7 +151,8 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋客戶</button>
@@ -163,7 +165,9 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table rwdtb-scroll nowrap hover order-table" id="editTable" style="width: 100%;">
+                                                    <table
+                                                        class="table rwdtb-scroll nowrap hover order-table customerInfo"
+                                                        id="editTable" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -186,6 +190,25 @@
         <b>Version</b> 3.0.5
       </div>-->
         </footer>
+        <!-- 委託單內容 -->
+        <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog"
+            id="customerDetailModal">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 客戶詳細內容
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table detailTable rwdtb-scroll nowrap hover order-table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- ./wrapper -->
 
@@ -193,7 +216,7 @@
     <script src="js/common/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
     <!-- bstable -->
-    <script src="js/index/bstable.js"></script>
+    <script src="js/index/bstableCustomer.js"></script>
     <!-- tableSearch -->
     <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
@@ -217,6 +240,8 @@
         getCustomer()
         async function getCustomer() {
             let innerHTML = ''
+            let innerDetailOrderHTML = ''
+
             await fetch('/getCustomer', {
                 method: 'POST',
                 headers: {
@@ -248,9 +273,9 @@
                     `;
                 }
                 innerHTML += `</tbody>`
-                $('.table').html(innerHTML)
+                $('.customerInfo').html(innerHTML)
                 var editCustomerTable = new BSTable("editTable", {
-                    onDelete: async function(button) {
+                    onDelete: async function (button) {
                         await fetch('/delete_customer', {
                             method: 'POST',
                             headers: {
@@ -268,6 +293,58 @@
                 editCustomerTable.init()
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
 
+                $('.bDetail').click(async function () {
+                    innerDetailCustomerHTML = ''
+                    $('#customerDetailModal').modal('show');
+                    
+                    await fetch('/detail_customer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            "delId": delId,
+                        })
+                    }).then(res => res.json()).then(res => {
+                        innerDetailCustomerHTML +=
+                            `<thead>
+                                <tr class="tr-main">
+                                    <th scope="col">客戶代號</th>
+                                    <th scope="col">客戶全名</th>
+                                    <th scope="col">連絡人</th>
+                                    <th scope="col">連絡電話</th>
+                                    <th scope="col">連絡信箱</th>
+                                    <th scope="col">郵遞區號</th>
+                                    <th scope="col">統一編號</th>
+                                    <th scope="col">付款條件</th>
+                                    <th scope="col">服務業務</th>
+                                    <th scope="col">備註</th>
+                                </tr>
+                            </thead>
+                            <tbody class="renderTable">
+                            `;
+
+                        for (let item = 0; item < res.getDetailData.length; item++) {
+                            innerDetailCustomerHTML +=
+                                ` <tr delId="${res.getDetailData[item].code}">
+                                    <td scope="row" data-th="客戶代號" cal="code">${res.getDetailData[item].code}</td>
+                                    <td data-th="客戶全名" cal="name">${res.getDetailData[item].name}</td>
+                                    <td data-th="連絡人" cal="contacts">${res.getDetailData[item].contacts}</td>
+                                    <td data-th="連絡電話" cal="email">${res.getDetailData[item].email}</td>
+                                    <td data-th="連絡信箱" cal="postal_code">${res.getDetailData[item].postal_code}</td>
+                                    <td data-th="郵遞區號" cal="address">${res.getDetailData[item].address}</td>
+                                    <td data-th="統一編號" cal="tax_id">${res.getDetailData[item].tax_id}</td>
+                                    <td data-th="付款條件" cal="payment_terms">${res.getDetailData[item].payment_terms}</td>
+                                    <td data-th="服務業務" cal="sale_name">${res.getDetailData[item].sale_name}</td>
+                                    <td data-th="備註" cal="memo">${res.getDetailData[item].memo}</td>
+                                </tr>`;
+                        }
+                        innerDetailCustomerHTML += `</tbody>`
+                        $('.detailTable').html(innerDetailCustomerHTML)
+                        console.log(res);
+                    })
+                })
+
                 let code = '',
                     name = '',
                     contacts = '',
@@ -275,9 +352,9 @@
                     salesperson = '',
                     memo = ''
 
-                $('.btn-group').delegate("#bAcep", "click", async function() {
+                $('.btn-group').delegate("#bAcep", "click", async function () {
                     let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function() {
+                    currentRow.find('td').each(function () {
                         code = $(this).parent().find("td[cal=code]").text()
                         name = $(this).parent().find("td[cal=name]").text()
                         contacts = $(this).parent().find("td[cal=contacts]").text()

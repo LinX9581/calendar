@@ -165,7 +165,7 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table rwdtb-scroll nowrap hover order-table"
+                                                    <table class="table rwdtb-scroll nowrap hover order-table orderInfo"
                                                         style="width: 100%;" id="editTable">
                                                     </table>
                                                 </div>
@@ -189,10 +189,9 @@
         <b>Version</b> 3.0.5
       </div>-->
         </footer>
-
         <!-- 委託單內容 -->
-        <div class="modal" tabindex="-1" role="dialog" id="orderDetailModal">
-            <div class="modal-dialog" role="document">
+        <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog" id="orderDetailModal">
+            <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="card-title">
@@ -203,12 +202,12 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <table class="detailTable rwdtb-scroll nowrap hover order-table"></table>
+                        <table class="table detailTable rwdtb-scroll nowrap hover order-table"></table>
+                        <table class="table detailTablePosition rwdtb-scroll nowrap hover order-table"></table>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
     <!-- ./wrapper -->
 
@@ -246,6 +245,8 @@
         async function getOrder() {
             let innerHTML = ''
             let innerDetailOrderHTML = ''
+            let innerDetailOrderPositionHTML = ''
+
             await fetch('/getOrder', {
                 method: 'POST',
                 headers: {
@@ -280,7 +281,8 @@
 
                 }
                 innerHTML += `</tbody>`
-                $('.table').html(innerHTML)
+                $('.orderInfo').html(innerHTML)
+
                 var editOrderTable = new BSTable("editTable", {
                     onDelete: async function (button) {
                         console.log('testset');
@@ -301,11 +303,11 @@
                 editOrderTable.init()
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
 
-                $('.orderDetail').click(async function () {
-                    console.log('click order detail');
-                    console.log(delId);
-                    $('#orderDetailModal').modal('show');
+                $('.bDetail').click(async function () {
                     innerDetailOrderHTML = ''
+                    innerDetailOrderPositionHTML = ''
+
+                    $('#orderDetailModal').modal('show');
                     await fetch('/detail_order', {
                         method: 'POST',
                         headers: {
@@ -315,33 +317,62 @@
                             "delId": delId,
                         })
                     }).then(res => res.json()).then(res => {
+                        console.log(res);
                         innerDetailOrderHTML +=
                             `<thead>
-                        <tr class="tr-main">
-                            <th scope="col">廣告版位</th>
-                            <th scope="col">刊登方式</th>
-                            <th scope="col">時間</th>
-                        </tr>
-                    </thead>
-                    <tbody class="renderTable">
-                    `;
-                        for (let item = 0; item < res.getDetailData.length; item++) {
+                                <tr class="tr-main">
+                                    <th scope="col">委刊單</th>
+                                    <th scope="col">活動名稱</th>
+                                    <th scope="col">客戶名稱</th>
+                                    <th scope="col">客戶公司</th>
+                                    <th scope="col">刊登方式</th>
+                                    <th scope="col">業務</th>
+                                    <th scope="col">備註</th>
+                                </tr>
+                            </thead>
+                            <tbody class="renderTable">
+                            `;
+                        for (let item = 0; item < res.getDetailOrderList.length; item++) {
                             innerDetailOrderHTML +=
                                 ` 
-                        <tr>
-                            <td scope="row" data-th="廣告版位" cal="orderId">${res.getDetailData[item].name}</td>
-                            <td data-th="刊登方式" cal="advertisers">${res.getAdType}</td>
-                            <td data-th="時間" cal="title">${moment(res.getDetailData[item].start).format('YYYY-MM-DD')} ~ ${moment(res.getDetailData[item].end).format('YYYY-MM-DD')}</td>
-                        </tr>
-                    `;
-
+                                <tr>
+                                    <td scope="row" data-th="委刊單" cal="id">${res.getDetailOrderList[item].id}</td>
+                                    <td scope="row" data-th="活動名稱" cal="title">${res.getDetailOrderList[item].title}</td>
+                                    <td scope="row" data-th="客戶名稱" cal="advertisers">${res.getDetailOrderList[item].advertisers}</td>
+                                    <td scope="row" data-th="客戶公司" cal="customer_company">${res.getDetailOrderList[item].customer_company}</td>
+                                    <td data-th="刊登方式" cal="advertisers">${res.getDetailOrderList[item].ad_type}</td>
+                                    <td scope="row" data-th="業務" cal="salesperson">${res.getDetailOrderList[item].salesperson}</td>
+                                    <td scope="row" data-th="備註" cal="memo">${res.getDetailOrderList[item].memo}</td>
+                                </tr>
+                            `;
                         }
                         innerDetailOrderHTML += `</tbody>`
                         $('.detailTable').html(innerDetailOrderHTML)
 
-                        console.log(res);
-                    })
+                        innerDetailOrderPositionHTML +=
+                            `<thead>
+                                <tr class="tr-main">
+                                    <th scope="col">廣告版位</th>
+                                    <th scope="col">刊登方式</th>
+                                    <th scope="col">刊登時間</th>
+                                </tr>
+                            </thead>
+                            <tbody class="renderTable">
+                            `;
+                        for (let item = 0; item < res.getDetailData.length; item++) {
+                            innerDetailOrderPositionHTML +=
+                                ` 
+                                <tr>
+                                    <td scope="row" data-th="廣告版位" cal="orderId">${res.getDetailData[item].name}</td>
+                                    <td data-th="刊登方式" cal="advertisers">${res.getDetailOrderList[0].ad_type}</td>
+                                    <td data-th="時間" cal="time">${moment(res.getDetailData[item].start).format('YYYY-MM-DD')} ~ ${moment(res.getDetailData[item].end).format('YYYY-MM-DD')}</td>
+                                </tr>
+                            `;
+                        }
+                        innerDetailOrderPositionHTML += `</tbody>`
 
+                        $('.detailTablePosition').html(innerDetailOrderPositionHTML)
+                    })
                 })
 
                 let orderId = '',

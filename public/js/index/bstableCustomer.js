@@ -37,7 +37,7 @@ class BSTable {
                 <button id="bDel" type="button" class="btn btn-sm btn-default">
                     <span class="fa fa-trash" > </span>
                 </button>
-                <button id="orderDetail" type="button" class="btn btn-sm btn-default orderDetail">
+                <button id="bDetail" type="button" class="btn btn-sm btn-default bDetail">
                     <span class="fa fa-eye" > </span>
                 </button>
                 <button id="bAcep" type="button" class="btn btn-sm btn-default" style="display:none;">
@@ -294,7 +294,7 @@ class BSTable {
             let button = this;
             button.onclick = function() { _this._rowDelete(button) }
         });
-        this.table.find('tbody tr #orderDetail').each(function() {
+        this.table.find('tbody tr #bDetail').each(function() {
             let button = this;
             button.onclick = function() { _this._rowDetail(button) }
         });

@@ -380,13 +380,13 @@ router.post('/detail_order', async function (req, res) {
         let getDetailOrderData = [delId]
         let getDetailData = await query(getDetailOrderSql, getDetailOrderData)
 
-        let getAdTypeSql = 'SELECT ad_type FROM sale_booking.order_list WHERE id = ?'
-        let getAdTypeData = [delId]
-        let getAdType = await query(getAdTypeSql, getAdTypeData)
+        let getDetailOrderListSql = 'SELECT id, title, advertisers, customer_company, customer_company, ad_type, memo FROM sale_booking.order_list WHERE id = ?'
+        let getDetailOrderListData = [delId]
+        let getDetailOrderList = await query(getDetailOrderListSql, getDetailOrderListData)
 
         res.send(JSON.stringify({
             'getDetailData': getDetailData,
-            'getAdType': getAdType[0].ad_type
+            'getDetailOrderList': getDetailOrderList
         }));
     } else {
         let title = 'NOW Booking '
@@ -546,6 +546,26 @@ router.get('/customer-add', function (req, res) {
             title,
             userName
         });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/detail_customer', async function (req, res) {
+    req.session.user = user;
+    if (req.session.user != undefined) {
+        let delId = req.body.delId;
+
+        let getDetailCustomerSql = 'SELECT code,name,contacts,phone,email,postal_code,address,tax_id,payment_terms,sale_name,memo FROM sale_booking.`customer` WHERE code = ?'
+        let getDetailCustomerData = [delId]
+        let getDetailData = await query(getDetailCustomerSql, getDetailCustomerData)
+
+        res.send(JSON.stringify({
+            'getDetailData': getDetailData
+        }));
     } else {
         let title = 'NOW Booking '
         res.render('login', {
