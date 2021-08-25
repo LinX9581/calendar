@@ -38,7 +38,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link userType" value='<%= userType %>' href="#">
                         <%= userName %>
                             <i class="fas fa-user-circle"></i>
                     </a>
@@ -214,7 +214,7 @@
         let userType = $('.userType').attr('value')
         let delId = ''
         let isDel = ''
-
+        
         getPosition()
         async function getPosition() {
             let innerHTML = ''
@@ -273,6 +273,11 @@
 
                 //動態新增完後讓功能欄上色
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                //使用者 == User 禁止編輯
+                if(userType == 'User'){
+                    $('.renderTable tr').find('td:last').remove()
+                }
+
                 let calId = '',
                     name = '',
                     rotation = '',

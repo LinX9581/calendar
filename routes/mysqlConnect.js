@@ -4,13 +4,15 @@ const pool = Mysql.createPool({
     user: 'dev',
     password: '00000000',
 });   
-let query = async function (query,data) {
-    try {
-        const rows = await pool.query(query,data);
-        return rows[0];
-    } catch (err) {
-        console.log('SQL ERROR => ' + err);
-        return err;
-    }
-}
-module.exports = query
+
+//mysql 連線檔
+// let query = async function (query,data) {
+//     try {
+//         const rows = await pool.query(query,data);
+//         return rows[0];
+//     } catch (err) {
+//         console.log('SQL ERROR => ' + err);
+//         return err.stack;
+//     }
+// }
+module.exports = pool

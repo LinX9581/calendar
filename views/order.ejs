@@ -328,6 +328,7 @@
                                     <th scope="col">刊登方式</th>
                                     <th scope="col">業務</th>
                                     <th scope="col">備註</th>
+                                    <th scope="col">建立者</th>
                                 </tr>
                             </thead>
                             <tbody class="renderTable">
@@ -343,6 +344,7 @@
                                     <td data-th="刊登方式" cal="advertisers">${res.getDetailOrderList[item].ad_type}</td>
                                     <td scope="row" data-th="業務" cal="salesperson">${res.getDetailOrderList[item].salesperson}</td>
                                     <td scope="row" data-th="備註" cal="memo">${res.getDetailOrderList[item].memo}</td>
+                                    <td scope="row" data-th="建立者" cal="create_by">${res.getDetailOrderList[item].create_by}</td>
                                 </tr>
                             `;
                         }

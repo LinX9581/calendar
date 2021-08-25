@@ -38,7 +38,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link userType" value='<%= userType %>' href="#">
                         <%= userName %>
                             <i class="fas fa-user-circle"></i>
                     </a>
@@ -234,6 +234,7 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
+        let userType = $('.userType').attr('value')
         let delId = ''
         let isDel = ''
 
@@ -292,6 +293,12 @@
 
                 editCustomerTable.init()
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                //使用者 == User 禁止編輯
+                if(userType == 'User'){
+                    console.log('sdfsdfsdfsdfsdf');
+                    $('.bEdit').remove()
+                    $('.bDel').remove()
+                }
 
                 $('.bDetail').click(async function () {
                     innerDetailCustomerHTML = ''

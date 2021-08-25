@@ -1,4 +1,4 @@
-import query from './mysqlConnect';
+import mysql from './mysqlConnect';
 import express from 'express';
 import moment from 'moment';
 
@@ -10,10 +10,9 @@ router.get('/:url', async function (req, res) {
     let url = req.params.url
     let getChannelNameSql = "select link,name from sale_booking.channel where link = ? "
     let getChannelNameData = [url]
-    let getChannel = await query(getChannelNameSql, getChannelNameData)
-
-    let channel = getChannel[0].link
-    let channelName = getChannel[0].name
+    let getChannel = await mysql.query(getChannelNameSql, getChannelNameData)
+    let channel = getChannel[0][0].link
+    let channelName = getChannel[0][0].name
     req.session.channel = 'www';
     let user = {
         account: 'linx',
@@ -43,9 +42,9 @@ router.get('/', async function (req, res) {
 
 router.post('/renderChannel', async function (req, res) {
     let beforeCreateChannelSql = "select link,name from sale_booking.channel"
-    let allChannel = await query(beforeCreateChannelSql)
+    let allChannel = await mysql.query(beforeCreateChannelSql)
     res.send(JSON.stringify({
-        'channel': allChannel,
+        'channel': allChannel[0],
         'render channel': 'succeed',
     }));
 })
@@ -60,9 +59,9 @@ router.post('/renderSchedule', async function (req, res) {
     let channel = req.body.channel;
     let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1" + renderScheduleCondition + ""
     let beforeCreateScheduleData = [channel]
-    let allSchedule = await query(beforeCreateScheduleSql, beforeCreateScheduleData)
+    let allSchedule = await mysql.query(beforeCreateScheduleSql, beforeCreateScheduleData)
     res.send(JSON.stringify({
-        'schedule': allSchedule,
+        'schedule': allSchedule[0],
         'render schedule': 'succeed',
     }));
 })
@@ -70,9 +69,9 @@ router.post('/renderCalendar', async function (req, res) {
     let channel = req.body.channel;
     let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channelId = ? AND status = 1 order by orderKey"
     let beforeCreateCalendarData = [channel]
-    let allCalendar = await query(beforeCreateCalendarSql, beforeCreateCalendarData)
+    let allCalendar = await mysql.query(beforeCreateCalendarSql, beforeCreateCalendarData)
     res.send(JSON.stringify({
-        'calendar': allCalendar,
+        'calendar': allCalendar[0],
         'render Calendar': 'succeed',
     }));
 })
@@ -82,19 +81,19 @@ router.post('/deleteCalendar', async function (req, res) {
     //停用cal
     let delCalSql = 'UPDATE sale_booking.calendar_list SET status=0 WHERE id = ?'
     let delCalData = [delCalId]
-    await query(delCalSql, delCalData)
+    await mysql.query(delCalSql, delCalData)
     
     //停用該cal相關的schedule
     let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=0 WHERE calendarId=?'
     let updateScheduleData = [delCalId]
-    await query(updateScheduleSql, updateScheduleData)
+    await mysql.query(updateScheduleSql, updateScheduleData)
 
     //把相關的schedule 傳給前端停止顯示
     let delCalScheduleIdSql = 'SELECT id FROM sale_booking.schedule_event WHERE calendarId = ?'
     let delCalSqlData = [delCalId]
-    let delScheduleId = await query(delCalScheduleIdSql, delCalSqlData)
+    let delScheduleId = await mysql.query(delCalScheduleIdSql, delCalSqlData)
     
-    for (const delId of delScheduleId) {
+    for (const delId of delScheduleId[0]) {
         delIdArray.push(delId)
     }
 
@@ -115,7 +114,7 @@ router.post('/createCalendarList', async function (req, res) {
     let channel = req.body.channel;
     let calendarListSql = 'insert into sale_booking.calendar_list (id,name,color,bgcolor,dragbgcolor,bordercolor,channel,create_date,create_by,update_date,update_by) values (?,?,?,?,?,?,?,?,?,?,?)'
     let calendarListData = [calendarId, calendarName, calendarColor, calendarBgColor, calendarDragBgColor, calendarBorderColor, channel, createTime, userName, createTime, userName]
-    let createCalendarResult = await query(calendarListSql, calendarListData)
+    let createCalendarResult = await mysql.query(calendarListSql, calendarListData)
 
     res.send(JSON.stringify({
         'calendarId': calendarId,
@@ -129,11 +128,11 @@ router.post('/checkPositionRotation', async function (req, res) {
     let calendarId = req.body.calendarId
     let getPositionNumbersSql = "SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE calendarId = ?"
     let getPositionNumbersData = [calendarId]
-    let getPositionNumbers = await query(getPositionNumbersSql, getPositionNumbersData)
+    let getPositionNumbers = await mysql.query(getPositionNumbersSql, getPositionNumbersData)
 
     let getPositionRotationSql = "SELECT rotation FROM sale_booking.`calendar_list` WHERE id = ?"
     let getPositionRotationData = [calendarId]
-    let getPositionRotation = await query(getPositionRotationSql, getPositionRotationData)
+    let getPositionRotation = await mysql.query(getPositionRotationSql, getPositionRotationData)
 
     if (getPositionRotation[0].rotation <= getPositionNumbers[0].adNumbers) {
         rotationOverflow = '-1';
@@ -159,7 +158,7 @@ router.post('/beforeCreateSchedule', async function (req, res) {
 
     let beforeCreateScheduleSql = "INSERT INTO sale_booking.schedule_event(`id`,`orderId`,`channelId`,`calendarId`,`title`,`body`,`isAllDay`,`start`,`end`,`category`,`status`,`create_date`,`create_by`,`update_date`,`update_by`)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
     let newScheduleData = [id, orderId, channelId, calendarId, title, JSON.stringify(scheduleBody), isAllDay, start, end, category, state, nowDate, user, nowDate, user]
-    await query(beforeCreateScheduleSql, newScheduleData)
+    await mysql.query(beforeCreateScheduleSql, newScheduleData)
 
     res.send(JSON.stringify({
         'beforeCreateSchedule': 'succeed',
@@ -169,7 +168,7 @@ router.post('/beforeDeleteSchedule', async function (req, res) {
     let deleteId = req.body.deleteId
     let beforeDeleteScheduleSql = "delete from sale_booking.schedule_event where id = ?"
     let deleteScheduleData = [deleteId]
-    await query(beforeDeleteScheduleSql, deleteScheduleData)
+    await mysql.query(beforeDeleteScheduleSql, deleteScheduleData)
     res.send(JSON.stringify({
         'beforeDeleteSchedule': 'succeed',
     }));
@@ -184,7 +183,7 @@ router.post('/beforeUpdateScheduleTime', async function (req, res) {
 
     let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET start = ?, end = ? WHERE id = ?"
     let updateScheduleData = [updateStart, updateEnd, scheduleId]
-    await query(beforeUpdateScheduleSql, updateScheduleData)
+    await mysql.query(beforeUpdateScheduleSql, updateScheduleData)
     // }
 
     res.send(JSON.stringify({
@@ -202,7 +201,7 @@ router.post('/beforeUpdateSchedule', async function (req, res) {
 
         let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ? WHERE id = ?"
         let updateScheduleData = [updateCalendarId, updateTitle, scheduleId]
-        await query(beforeUpdateScheduleSql, updateScheduleData)
+        await mysql.query(beforeUpdateScheduleSql, updateScheduleData)
     }
 
     res.send(JSON.stringify({

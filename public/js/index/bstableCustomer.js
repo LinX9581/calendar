@@ -31,10 +31,10 @@ class BSTable {
             advanced: { // Do not override advanced unless you know what youre doing
                 columnLabel: 'Actions',
                 buttonHTML: `<div class="btn-group pull-right">
-                <button id="bEdit" type="button" class="btn btn-sm btn-default">
+                <button id="bEdit" type="button" class="btn btn-sm btn-default bEdit">
                     <span class="fa fa-edit" > </span>
                 </button>
-                <button id="bDel" type="button" class="btn btn-sm btn-default">
+                <button id="bDel" type="button" class="btn btn-sm btn-default bDel">
                     <span class="fa fa-trash" > </span>
                 </button>
                 <button id="bDetail" type="button" class="btn btn-sm btn-default bDetail">

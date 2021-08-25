@@ -39,7 +39,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link userType" value='<%= userType %>' href="#">
                         <%= userName %>
                             <i class="fas fa-user-circle"></i>
                     </a>
@@ -65,7 +65,8 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -151,7 +152,8 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋客戶</button>
@@ -164,7 +166,8 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table rwdtb-scroll nowrap hover order-table" id="editTable" style="width: 100%;">
+                                                    <table class="table rwdtb-scroll nowrap hover order-table"
+                                                        id="editTable" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -212,9 +215,10 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        $(function() {
+        $(function () {
             $(".datepicker").datepicker();
         });
+        let userType = $('.userType').attr('value')
         let delId = ''
         let isDel = ''
 
@@ -259,7 +263,7 @@
                 $('.table').html(innerHTML)
 
                 var editChannelTable = new BSTable("editTable", {
-                    onDelete: async function(button) {
+                    onDelete: async function (button) {
                         await fetch('/delete_channel', {
                             method: 'POST',
                             headers: {
@@ -277,6 +281,11 @@
 
                 //動態新增完後讓功能欄上色
                 $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                //使用者 == User 禁止編輯
+                if (userType == 'User') {
+                    $('.renderTable tr').find('td:last').remove()
+                }
+
                 let channelId = '',
                     name = '',
                     domain = '',
@@ -284,9 +293,9 @@
                     status = '';
 
                 //動態監聽按下acep新增欄位
-                $('.btn-group').delegate("#bAcep", "click", async function() {
+                $('.btn-group').delegate("#bAcep", "click", async function () {
                     let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function() {
+                    currentRow.find('td').each(function () {
                         channelId = $(this).parent().find("td").attr('channelId')
                         name = $(this).parent().find("td[cal=name]").text()
                         domain = $(this).parent().find("td[cal=domain]").text()
