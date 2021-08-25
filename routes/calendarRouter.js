@@ -51,15 +51,18 @@ router.post('/renderChannel', async function (req, res) {
 
 router.post('/renderSchedule', async function (req, res) {
     let renderScheduleCondition = ''
+    let channel = req.body.channel;
+
     //判斷權限是user 就多一個 where條件
     if (req.session.user.type == 'User') {
         let user = req.session.user.account;
         renderScheduleCondition = ' AND create_by = "' + user + '"'
     }
-    let channel = req.body.channel;
+
     let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1" + renderScheduleCondition + ""
     let beforeCreateScheduleData = [channel]
     let allSchedule = await mysql.query(beforeCreateScheduleSql, beforeCreateScheduleData)
+
     res.send(JSON.stringify({
         'schedule': allSchedule[0],
         'render schedule': 'succeed',
@@ -67,9 +70,11 @@ router.post('/renderSchedule', async function (req, res) {
 })
 router.post('/renderCalendar', async function (req, res) {
     let channel = req.body.channel;
+
     let beforeCreateCalendarSql = "select * from sale_booking.calendar_list where channelId = ? AND status = 1 order by orderKey"
     let beforeCreateCalendarData = [channel]
     let allCalendar = await mysql.query(beforeCreateCalendarSql, beforeCreateCalendarData)
+
     res.send(JSON.stringify({
         'calendar': allCalendar[0],
         'render Calendar': 'succeed',
@@ -112,9 +117,10 @@ router.post('/createCalendarList', async function (req, res) {
     let calendarDragBgColor = req.body.calendarDragBgColor;
     let calendarBorderColor = req.body.calendarBorderColor;
     let channel = req.body.channel;
+
     let calendarListSql = 'insert into sale_booking.calendar_list (id,name,color,bgcolor,dragbgcolor,bordercolor,channel,create_date,create_by,update_date,update_by) values (?,?,?,?,?,?,?,?,?,?,?)'
     let calendarListData = [calendarId, calendarName, calendarColor, calendarBgColor, calendarDragBgColor, calendarBorderColor, channel, createTime, userName, createTime, userName]
-    let createCalendarResult = await mysql.query(calendarListSql, calendarListData)
+    await mysql.query(calendarListSql, calendarListData)
 
     res.send(JSON.stringify({
         'calendarId': calendarId,
@@ -166,9 +172,11 @@ router.post('/beforeCreateSchedule', async function (req, res) {
 })
 router.post('/beforeDeleteSchedule', async function (req, res) {
     let deleteId = req.body.deleteId
+
     let beforeDeleteScheduleSql = "delete from sale_booking.schedule_event where id = ?"
     let deleteScheduleData = [deleteId]
     await mysql.query(beforeDeleteScheduleSql, deleteScheduleData)
+
     res.send(JSON.stringify({
         'beforeDeleteSchedule': 'succeed',
     }));
@@ -176,7 +184,6 @@ router.post('/beforeDeleteSchedule', async function (req, res) {
 //原套件即時同步更新時間有BUG 另外建一支API
 router.post('/beforeUpdateScheduleTime', async function (req, res) {
     // update 會莫名觸發兩次 但不影響運作 推測是在套件監聽事件裡面 再次觸發update導致兩次 相關code 在 app.js  'clickSchedule' & $('.schedule_edit_btn').click() 這兩個分別會觸發一次
-    // if (req.body.changes != undefined) {
     let scheduleId = req.body.scheduleId
     let updateStart = req.body.updateStart
     let updateEnd = req.body.updateEnd
@@ -184,7 +191,6 @@ router.post('/beforeUpdateScheduleTime', async function (req, res) {
     let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET start = ?, end = ? WHERE id = ?"
     let updateScheduleData = [updateStart, updateEnd, scheduleId]
     await mysql.query(beforeUpdateScheduleSql, updateScheduleData)
-    // }
 
     res.send(JSON.stringify({
         'beforeUpdateSchedule': 'succeed',
