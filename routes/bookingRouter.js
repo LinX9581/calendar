@@ -58,7 +58,7 @@ router.post('/', async function (req, res) {
             type: userType,
         }
         req.session.user = user;
-        
+
         res.render('channel', {
             title,
             userName,
@@ -119,7 +119,7 @@ router.post('/getPosition', async function (req, res) {
         let calendarId = getCalendarId[0].map(e => {
             return e.calendarId
         })
-        
+
         //加總重複calendarId個數 ex. calA:1 calB:3 calC:4
         let eachCalendarIdNumbers = {};
         calendarId.forEach(function (item) {
@@ -254,7 +254,12 @@ router.post('/delete_position', async function (req, res) {
 });
 
 router.get('/order', function (req, res) {
-    //req.session.user = user;
+    let user = {
+        account: 'linx',
+        name: 'linx',
+        type: 'admin',
+    }
+    req.session.user = user;
     if (req.session.user != undefined) {
         let userType = req.session.user.type
         let title = 'NOW Booking '
@@ -276,7 +281,12 @@ router.get('/order', function (req, res) {
 });
 
 router.get('/order-add', function (req, res) {
-    //req.session.user = user;
+    let user = {
+        account: 'linx',
+        name: 'linx',
+        type: 'admin',
+    }
+    req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -333,6 +343,7 @@ router.post('/getReserveOrder', async function (req, res) {
     }
 });
 
+//在後台 委刊單 停用、啟用都會顯示
 router.post('/getOrder', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
@@ -356,21 +367,54 @@ router.post('/getOrder', async function (req, res) {
     }
 });
 
+//在calendar 不顯示停用的Order
+router.post('/getCalendarOrder', async function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let renderOrderCondition = ''
+        //判斷權限是user 就多一個 where條件
+        if (req.session.user.type == 'User') {
+            let account = req.session.user.account;
+            renderOrderCondition = 'AND create_by = "' + account + '"'
+        }
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE status = 1 ' + renderOrderCondition + ' ORDER BY advertisers'
+        let allOrder = await mysql.query(getOrderSql)
+
+        res.send(JSON.stringify({
+            'allOrder': allOrder[0],
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
 router.post('/detail_order', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
         let delId = req.body.delId;
 
-        let getDetailOrderSql = 'SELECT `calendar_list`.`name`,`start`,`end` FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`calendar_list` ON `calendar_list`.`id` = `schedule_event`.`calendarId` WHERE orderId = ?'
-        let getDetailOrderData = [delId]
-        let getDetailData = await mysql.query(getDetailOrderSql, getDetailOrderData)
+        //撈出該委刊單被哪些廣告版位使用
+        let getDetailOrderPositionSql = 'SELECT `calendar_list`.`name`,`start`,`end` FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`calendar_list` ON `calendar_list`.`id` = `schedule_event`.`calendarId` WHERE orderId = ?'
+        let getDetailOrderPositionData = [delId]
+        let getDetailPositionData = await mysql.query(getDetailOrderPositionSql, getDetailOrderPositionData)
 
+        //撈出該委刊單的客戶詳細資料
+        let getOrderCustomerId = await mysql.query('SELECT `customerId` FROM sale_booking.order_list WHERE id = ?', delId)
+        let getDetailOrderCustomerSql = 'SELECT `code`,`name`,`contacts`,`phone`,`email`,`postal_code`,`address`,`tax_id`,`payment_terms`,`sale_name`,`memo` FROM sale_booking.`customer` WHERE id = ?'
+        let getDetailOrderCustomerData = [getOrderCustomerId[0][0].customerId]
+        let getDetailCustomerData = await mysql.query(getDetailOrderCustomerSql, getDetailOrderCustomerData)
+
+        //撈出委刊單詳細資料
         let getDetailOrderListSql = 'SELECT id, title, advertisers, customer_company, customer_company, ad_type, salesperson, memo, create_by FROM sale_booking.order_list WHERE id = ?'
         let getDetailOrderListData = [delId]
         let getDetailOrderList = await mysql.query(getDetailOrderListSql, getDetailOrderListData)
 
         res.send(JSON.stringify({
-            'getDetailData': getDetailData[0],
+            'getDetailCustomerData': getDetailCustomerData[0],
+            'getDetailPositionData': getDetailPositionData[0],
             'getDetailOrderList': getDetailOrderList[0]
         }));
     } else {
@@ -390,11 +434,12 @@ router.post('/update_order', async function (req, res) {
             ad_type = req.body.ad_type,
             salesperson = req.body.salesperson,
             memo = req.body.memo,
+            status = req.body.status,
             update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
             update_by = req.session.user.account;
 
-        let updateOrderSql = 'UPDATE sale_booking.order_list SET advertisers=?, title=?, ad_type=?, salesperson=?, memo=?, update_date=?, update_by=? WHERE id=?'
-        let updateOrderData = [advertisers, title, ad_type, salesperson, memo, update_date, update_by, orderId]
+        let updateOrderSql = 'UPDATE sale_booking.order_list SET advertisers=?, title=?, ad_type=?, salesperson=?, memo=?, status=?, update_date=?, update_by=? WHERE id=?'
+        let updateOrderData = [advertisers, title, ad_type, salesperson, memo, status, update_date, update_by, orderId]
         await mysql.query(updateOrderSql, updateOrderData)
 
         //當委刊單活動名稱改變時，schedule的title跟著改變
@@ -428,21 +473,25 @@ router.post('/create_order', async function (req, res) {
             customer_company = req.body.customer_company,
             salesperson = req.body.salesperson,
             ad_type = req.body.ad_type,
-            memo = req.body.memo
+            memo = req.body.memo,
+            customer = req.body.customer;
         let schedule_time = req.body.schedule_time.split('-');
+        let schedule_start = schedule_time[0].replace(' ', '')
+        let schedule_end = schedule_time[1].replace(' ', '')
 
         let userName = req.session.user.name
         let account = req.session.user.account
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?)'
-        let createOrderData = [name, advertisers, customer_company, salesperson, moment(schedule_time[0]).format('YYYY-MM-DD'), moment(schedule_time[1]).format('YYYY-MM-DD'), ad_type, memo, createTime, account, createTime, account]
 
+        let createOrderSql = 'INSERT INTO sale_booking.`order_list` (`customerId`,`title`, `advertisers`, `customer_company`, `salesperson`, `start_time`, `end_time`, `ad_type`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        let createOrderData = [customer.split('&&')[0], name, advertisers, customer_company, salesperson, moment(schedule_start, 'MM-DD-YYYY').format('YYYY-MM-DD'), moment(schedule_end, 'MM-DD-YYYY').format('YYYY-MM-DD'), ad_type, memo, createTime, account, createTime, account]
+        await mysql.query(createOrderSql, createOrderData)
+
+        console.log(req.session.user.name + ' create name ' + name);
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name + '\n', function (error) {
             if (error) console.log(error)
         })
-        console.log(req.session.user.name + ' create name ' + name);
 
-        await mysql.query(createOrderSql, createOrderData)
         res.render('order', {
             userName
         });
@@ -493,6 +542,24 @@ router.get('/customer', function (req, res) {
             userName,
             userType
         });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/renderCustomer', async function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let renderCustomerSql = "select id,name from sale_booking.customer"
+        let allCustomer = await mysql.query(renderCustomerSql)
+
+        res.send(JSON.stringify({
+            'customer': allCustomer[0],
+            'render customer': 'succeed',
+        }));
     } else {
         let title = 'NOW Booking '
         res.render('login', {

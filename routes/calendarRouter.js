@@ -6,31 +6,31 @@ let router = express.Router();
 router.get('/:url', async function (req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    // if (req.session.user != undefined) {
-    let url = req.params.url
-    let getChannelNameSql = "select link,name from sale_booking.channel where link = ? "
-    let getChannelNameData = [url]
-    let getChannel = await mysql.query(getChannelNameSql, getChannelNameData)
-    let channel = getChannel[0][0].link
-    let channelName = getChannel[0][0].name
-    req.session.channel = 'www';
-    let user = {
-        account: 'linx',
-        name: 'linx',
-        type: 'admin',
+    if (req.session.user != undefined) {
+        let url = req.params.url
+        let getChannelNameSql = "select link,name from sale_booking.channel where link = ? "
+        let getChannelNameData = [url]
+        let getChannel = await mysql.query(getChannelNameSql, getChannelNameData)
+        let channel = getChannel[0][0].link
+        let channelName = getChannel[0][0].name
+        // req.session.channel = 'www';
+        // let user = {
+        //     account: 'linx',
+        //     name: 'linx',
+        //     type: 'admin',
+        // }
+        // req.session.user = user;
+        res.render(url, {
+            today,
+            channel,
+            channelName
+        });
+    } else {
+        res.render('login', {
+            today,
+            title
+        });
     }
-    req.session.user = user;
-    res.render(url, {
-        today,
-        channel,
-        channelName
-    });
-    // } else {
-    //     res.render('login', {
-    //         today,
-    //         title
-    //     });
-    // }
 });
 
 router.get('/', async function (req, res) {
@@ -87,7 +87,7 @@ router.post('/deleteCalendar', async function (req, res) {
     let delCalSql = 'UPDATE sale_booking.calendar_list SET status=0 WHERE id = ?'
     let delCalData = [delCalId]
     await mysql.query(delCalSql, delCalData)
-    
+
     //停用該cal相關的schedule
     let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=0 WHERE calendarId=?'
     let updateScheduleData = [delCalId]
@@ -97,7 +97,7 @@ router.post('/deleteCalendar', async function (req, res) {
     let delCalScheduleIdSql = 'SELECT id FROM sale_booking.schedule_event WHERE calendarId = ?'
     let delCalSqlData = [delCalId]
     let delScheduleId = await mysql.query(delCalScheduleIdSql, delCalSqlData)
-    
+
     for (const delId of delScheduleId[0]) {
         delIdArray.push(delId)
     }

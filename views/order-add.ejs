@@ -65,7 +65,8 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="true">
                         <li class="nav-item  menu-open">
                             <a href="#" class="nav-link active">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -152,33 +153,48 @@
                                         <i class="fas fa-edit"></i> 新增委刊單
                                     </h3>
                                 </div>
-                                <form class="form-horizontal" role="form" action="/create_order" method="post" onsubmit="" id="form">
+                                <form class="form-horizontal" role="form" action="/create_order" method="post"
+                                    onsubmit="" id="form">
                                     <div class="card-body">
                                         <div class="tab-content">
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="">活動名稱</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入活動名稱" name="name" id="name">
+                                                    <input type="text" class="form-control" placeholder="請輸入活動名稱"
+                                                        name="name" id="name">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="">客戶資料</label>
+                                                    <div class="dropdown">
+                                                        <select class="form-control dropdown-toggle customerName"
+                                                            name="customer" id="customer"
+                                                            data-toggle="dropdown"></select>
+                                                        <ul class="dropdown-menu"></ul>
+                                                    </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">廣告主</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入廣告主" name="advertisers" id="advertisers">
+                                                    <input type="text" class="form-control" placeholder="請輸入廣告主"
+                                                        name="advertisers" id="advertisers">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">委刊公司</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入委刊公司" name="customer_company" id="customer_company">
+                                                    <input type="text" class="form-control" placeholder="請輸入委刊公司"
+                                                        name="customer_company" id="customer_company">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">聯絡人</label>
                                                     <span></span>
-                                                    <input type="text" class="form-control" placeholder="請輸入聯絡人" name="salesperson" id="salesperson">
+                                                    <input type="text" class="form-control" placeholder="請輸入聯絡人"
+                                                        name="salesperson" id="salesperson">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>走期 </label>
-                                                    <input type="text" class="form-control" name="schedule_time" id="schedule_time">
+                                                    <input type="text" class="form-control" name="schedule_time"
+                                                        id="schedule_time">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="">類型</label>
@@ -246,19 +262,42 @@
     <script src="./js/index/daterangepicker.js"></script>
 
     <script>
-        $(function() {
+        renderChannel()
+        async function renderChannel() {
+            $('.customerName').append(
+                `
+                    <option class="dropdown-item"></option>
+                `
+            );
 
+            await fetch('/renderCustomer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            }).then(res => res.json()).then((allCustomer) => {
+                $.each(allCustomer.customer, function (index, val) {
+                    $('.customerName').append(
+                        `
+                            <option class="dropdown-item" value=` + val.id + "&&" + val.name + `>` + val.name + `</option>
+                        `
+                    );
+                })
+            })
+        }
+        $(function () {
             // jQuery Validation Plugin 的Twitter BootStrap 3 支援
             $.validator.setDefaults({
-                highlight: function(element) {
+                highlight: function (element) {
                     $(element).closest('.form-group').addClass('has-error');
                 },
-                unhighlight: function(element) {
+                unhighlight: function (element) {
                     $(element).closest('.form-group').removeClass('has-error');
                 },
                 errorElement: 'span',
                 errorClass: 'help-block',
-                errorPlacement: function(error, element) {
+                errorPlacement: function (error, element) {
                     if (element.parent('.controls').length) {
                         error.insertAfter(element.parent());
                     } else {
@@ -270,6 +309,7 @@
             $('#form').validate({
                 rules: {
                     name: "required",
+                    customer: "required",
                     // advertisers: "required",
                     // customer_company: "required",
                     // salesperson: "required",
@@ -278,6 +318,7 @@
                 },
                 messages: {
                     name: "請輸入活動名稱",
+                    customer: "請選擇客戶資料",
                     // advertisers: "請輸入廣告主",
                     // customer_company: "請輸入委刊公司",
                     // salesperson: "請輸入聯絡人",
@@ -299,9 +340,9 @@
                 "endDate": pickerYesterday,
                 "minDate": "01/01/2021",
                 "maxDate": pickerYesterday
-            }, function(start, end, label) {});
+            }, function (start, end, label) { });
         }
-        $(function() {
+        $(function () {
             $(".datepicker").datepicker();
         });
     </script>

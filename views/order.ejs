@@ -22,6 +22,11 @@
     <link rel="stylesheet" href="css/index/style.css">
     <!-- rwd table -->
     <link rel="stylesheet" href="css/index/rwd.css">
+    <style>
+        .tr-title{
+            background-color: #E8FAFF;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -204,6 +209,7 @@
                     <div class="modal-body">
                         <table class="table detailTable rwdtb-scroll nowrap hover order-table"></table>
                         <table class="table detailTablePosition rwdtb-scroll nowrap hover order-table"></table>
+                        <table class="table detailTableCustomer rwdtb-scroll nowrap hover order-table"></table>
                     </div>
                 </div>
             </div>
@@ -308,6 +314,7 @@
                 $('.bDetail').click(async function () {
                     innerDetailOrderHTML = ''
                     innerDetailOrderPositionHTML = ''
+                    innerDetailOrderCustomerHTML = ''
 
                     $('#orderDetailModal').modal('show');
                     await fetch('/detail_order', {
@@ -320,9 +327,10 @@
                         })
                     }).then(res => res.json()).then(res => {
                         console.log(res);
+                        //顯示該委刊單詳細資料
                         innerDetailOrderHTML +=
                             `<thead>
-                                <tr class="tr-main">
+                                <tr class="tr-title">
                                     <th scope="col">委刊單</th>
                                     <th scope="col">活動名稱</th>
                                     <th scope="col">客戶名稱</th>
@@ -353,9 +361,10 @@
                         innerDetailOrderHTML += `</tbody>`
                         $('.detailTable').html(innerDetailOrderHTML)
 
+                        //顯示該委刊單被廣告版位使用狀況
                         innerDetailOrderPositionHTML +=
                             `<thead>
-                                <tr class="tr-main">
+                                <tr class="tr-title">
                                     <th scope="col">廣告版位</th>
                                     <th scope="col">刊登方式</th>
                                     <th scope="col">刊登時間</th>
@@ -363,19 +372,59 @@
                             </thead>
                             <tbody class="renderTable">
                             `;
-                        for (let item = 0; item < res.getDetailData.length; item++) {
+                        for (let item = 0; item < res.getDetailPositionData.length; item++) {
                             innerDetailOrderPositionHTML +=
                                 ` 
                                 <tr>
-                                    <td scope="row" data-th="廣告版位" cal="orderId">${res.getDetailData[item].name}</td>
+                                    <td scope="row" data-th="廣告版位" cal="orderId">${res.getDetailPositionData[item].name}</td>
                                     <td data-th="刊登方式" cal="advertisers">${res.getDetailOrderList[0].ad_type}</td>
-                                    <td data-th="時間" cal="time">${moment(res.getDetailData[item].start).format('YYYY-MM-DD')} ~ ${moment(res.getDetailData[item].end).format('YYYY-MM-DD')}</td>
+                                    <td data-th="時間" cal="time">${moment(res.getDetailPositionData[item].start).format('YYYY-MM-DD')} ~ ${moment(res.getDetailPositionData[item].end).format('YYYY-MM-DD')}</td>
                                 </tr>
                             `;
                         }
                         innerDetailOrderPositionHTML += `</tbody>`
-
                         $('.detailTablePosition').html(innerDetailOrderPositionHTML)
+
+                        //顯示該委刊單的客戶詳細資料
+                        innerDetailOrderCustomerHTML +=
+                            `<thead>
+                                <tr class="tr-title">
+                                    <th scope="col">客戶代號</th>
+                                    <th scope="col">客戶全名</th>
+                                    <th scope="col">聯絡人</th>
+                                    <th scope="col">聯絡電話</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">郵遞區號</th>
+                                    <th scope="col">發票地址</th>
+                                    <th scope="col">統一編號</th>
+                                    <th scope="col">付款條件</th>
+                                    <th scope="col">服務業務</th>
+                                    <th scope="col">備註</th>
+                                </tr>
+                            </thead>
+                            <tbody class="renderTable">
+                            `;
+                        for (let item = 0; item < res.getDetailCustomerData.length; item++) {
+                            innerDetailOrderCustomerHTML +=
+                                ` 
+                                <tr>
+                                    <td scope="row" data-th="客戶代號" cal="orderId">${res.getDetailCustomerData[item].code}</td>
+                                    <td scope="row" data-th="客戶全名" cal="orderId">${res.getDetailCustomerData[item].name}</td>
+                                    <td scope="row" data-th="聯絡人" cal="orderId">${res.getDetailCustomerData[item].contacts}</td>
+                                    <td scope="row" data-th="聯絡電話" cal="orderId">${res.getDetailCustomerData[item].phone}</td>
+                                    <td scope="row" data-th="Email" cal="orderId">${res.getDetailCustomerData[item].email}</td>
+                                    <td scope="row" data-th="郵遞區號" cal="orderId">${res.getDetailCustomerData[item].postal_code}</td>
+                                    <td scope="row" data-th="發票地址" cal="orderId">${res.getDetailCustomerData[item].address}</td>
+                                    <td scope="row" data-th="統一編號" cal="orderId">${res.getDetailCustomerData[item].tax_id}</td>
+                                    <td scope="row" data-th="付款條件" cal="orderId">${res.getDetailCustomerData[item].payment_terms}</td>
+                                    <td scope="row" data-th="服務業務" cal="orderId">${res.getDetailCustomerData[item].sale_name}</td>
+                                    <td scope="row" data-th="備註" cal="orderId">${res.getDetailCustomerData[item].memo}</td>
+                                </tr>
+                            `;
+                        }
+                        innerDetailOrderCustomerHTML += `</tbody>`
+
+                        $('.detailTableCustomer').html(innerDetailOrderCustomerHTML)
                     })
                 })
 
@@ -395,6 +444,7 @@
                         ad_type = $(this).parent().find("td[cal=ad_type]").text()
                         salesperson = $(this).parent().find("td[cal=salesperson]").text()
                         memo = $(this).parent().find("td[cal=memo]").text()
+                        status = $(this).parent().find("td[cal=status]").text()
                     })
                     await fetch('/update_order', {
                         method: 'POST',
@@ -408,6 +458,7 @@
                             "ad_type": ad_type,
                             "salesperson": salesperson,
                             "memo": memo,
+                            "status": status,
                         })
                     }).then(res => res.json()).then(res => {
                         console.log(res);
