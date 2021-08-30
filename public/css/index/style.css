@@ -10,6 +10,10 @@ body {
     margin-bottom: 0;
 }
 
+.tr-title{
+    background-color: #E8FAFF;
+}
+
 input[type=checkbox] {
     width: 16px;
     height: 16px;
@@ -106,10 +110,6 @@ input[type=checkbox] {
 
 .date-group .datepicker {
     width: 46.7%;
-}
-.content .nav {
-   /* flex-wrap: initial;
-    display: initial;*/
 }
 .content .nav-tabs {
     padding-bottom: 13px;

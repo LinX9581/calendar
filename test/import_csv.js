@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const csv = require('fast-csv');
+const fetch = require('node-fetch')
 import mysql from '../routes/mysqlConnect';
 
 let code = [];
@@ -17,6 +18,23 @@ async function insertCustomer() {
         )
         .on('end', rowCount => console.log(`Parsed ${rowCount} rows`));
 }
+fetch('http://lff-production.linxnote.club/api_login', { 
+    method: 'POST',
+    headers: {
+       'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+       account: 'linxlinx',
+       password: 'linxlinx'
+    })
+
+ }).then(res => res.json())
+    .then((jsonData) => {
+       console.log(jsonData);
+     })   
+    .catch((err) => {
+       console.log('錯誤:', err);
+    })     
 
 //test.js
 // test()
