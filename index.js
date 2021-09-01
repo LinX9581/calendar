@@ -28,12 +28,9 @@ app.use(express.static('public'));
 app.use('/ch', express.static('public'));
 app.use('/ch', calendarRouter);
 app.use('/', bookingRouter);
-// app.get('/ch', async function (req, res) {
-//     let today = '123'
-//     res.render('test', {
-//         today
-//     });
-// });
+app.use(async function (req, res) {
+    res.status(404).render('404')
+});
 io.on('connection', function (socket) {
     socket.on('create schedule', function (schedule, channel) {
         socket.broadcast.emit(channel + 'create schedule', schedule);
