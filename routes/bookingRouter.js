@@ -592,7 +592,7 @@ router.post('/renderCustomer', async function (req, res) {
 router.post('/getCustomer', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
-        let getCustomerSql = 'SELECT code,name,contacts,phone,memo FROM sale_booking.customer ORDER BY code'
+        let getCustomerSql = 'SELECT code,name,contacts,phone,email,sale_name,tax_id,postal_code,address,payment_terms,memo FROM sale_booking.customer ORDER BY code'
         let allCustomer = await mysql.query(getCustomerSql)
         res.send(JSON.stringify({
             'allCustomer': allCustomer[0],
@@ -651,12 +651,18 @@ router.post('/update_customer', async function (req, res) {
             name = req.body.name,
             contacts = req.body.contacts,
             phone = req.body.phone,
+            email = req.body.email,
+            sale_name = req.body.sale_name,
+            tax_id = req.body.tax_id,
+            postal_code = req.body.postal_code,
+            address = req.body.address,
+            payment_terms = req.body.payment_terms,
             memo = req.body.memo,
             update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
             update_by = req.session.user.account;
 
-        let updateCustomerSql = 'UPDATE sale_booking.customer SET name=?, contacts=?, phone=?, memo=?, update_date=?, update_by=? WHERE code=?'
-        let updateCustomerData = [name, contacts, phone, memo, update_date, update_by, code]
+        let updateCustomerSql = 'UPDATE sale_booking.customer SET name=?, contacts=?, phone=?, email=?, sale_name=?, tax_id=?, postal_code=?, address=?, payment_terms=?, memo=?, update_date=?, update_by=? WHERE code=?'
+        let updateCustomerData = [name, contacts, phone, email, sale_name, tax_id, postal_code, address, payment_terms, memo, update_date, update_by, code]
         await mysql.query(updateCustomerSql, updateCustomerData)
 
         console.log(update_date + " " + req.session.user.account + " updateCustomer: " + updateCustomerData)
@@ -665,9 +671,13 @@ router.post('/update_customer', async function (req, res) {
             if (error) console.log(error)
         })
 
-        res.send(JSON.stringify({
-            'update_customer': '成功',
-        }));
+        let userType = req.session.user.type
+        let userName = req.session.user.name
+
+        res.render('customer', {
+            userName,
+            userType
+        });
     } else {
         let title = 'NOW Booking '
         res.render('login', {

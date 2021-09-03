@@ -209,14 +209,110 @@
                 </div>
             </div>
         </div>
+
+        <!-- 客戶資料編輯頁面 -->
+        <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog"
+            id="customerEditModal">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 客戶資料編輯頁面
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" action="/update_customer" method="post" onsubmit=""
+                            id="form">
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="">客戶代號</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入客戶代號" name="code"
+                                                id="code">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">客戶全名</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入客戶全名" name="name"
+                                                id="name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">聯絡人</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入聯絡人" name="contacts"
+                                                id="contacts">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">聯絡電話</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入聯絡電話" name="phone"
+                                                id="phone">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">聯絡E-Mail</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入聯絡E-Mail"
+                                                name="email" id="email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">業務人員名稱</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入業務人員名稱"
+                                                name="sale_name" id="sale_name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">統一編號</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入統一編號" name="tax_id"
+                                                id="tax_id">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">郵遞區號</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入郵遞區號"
+                                                name="postal_code" id="postal_code">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">發票地址</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入發票地址" name="address"
+                                                id="address">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">付款條件</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入付款條件"
+                                                name="payment_terms" id="payment_terms">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">備註</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" name="memo" id="memo">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block">編輯</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- ./wrapper -->
 
     <!-- jQuery -->
     <script src="js/common/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
-    <!-- bstable -->
-    <script src="js/index/bstableCustomer.js"></script>
     <!-- tableSearch -->
     <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
@@ -257,6 +353,7 @@
                             <th scope="col">連絡人</th>
                             <th scope="col">連絡電話</th>
                             <th scope="col">備註</th>
+                            <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="renderTable">
@@ -265,42 +362,68 @@
                     innerHTML +=
                         ` 
                         <tr delId="${res.allCustomer[item].code}">
+                            <td scope="row" data-th="信箱" class="d-none" cal="email">${res.allCustomer[item].email}</td>
+                            <td scope="row" data-th="業務" class="d-none" cal="sale_name">${res.allCustomer[item].sale_name}</td>
+                            <td scope="row" data-th="統一編號" class="d-none" cal="tax_id">${res.allCustomer[item].tax_id}</td>
+                            <td scope="row" data-th="郵遞區號" class="d-none" cal="postal_code">${res.allCustomer[item].postal_code}</td>
+                            <td scope="row" data-th="發票地址" class="d-none" cal="address">${res.allCustomer[item].address}</td>
+                            <td scope="row" data-th="付款條件" class="d-none" cal="payment_terms">${res.allCustomer[item].payment_terms}</td>
                             <td scope="row" data-th="客戶代號" cal="code">${res.allCustomer[item].code}</td>
                             <td data-th="客戶全名" cal="name">${res.allCustomer[item].name}</td>
                             <td data-th="連絡人" cal="contacts">${res.allCustomer[item].contacts}</td>
                             <td data-th="連絡電話" cal="phone">${res.allCustomer[item].phone}</td>
                             <td data-th="備註" cal="memo">${res.allCustomer[item].memo}</td>
+                            <th editId="${res.allCustomer[item].code}">
+                                <button type="button" class="btn btn-sm btn-default customerEditBtn"><span class="fa fa-edit"></span></button>
+                                <button type="button" class="btn btn-sm btn-default customerDelBtn"><span class="fa fa-trash-alt"></span></button>
+                                <button type="button" class="btn btn-sm btn-default customerDetailBtn"><span class="fa fa-eye" aria-hidden="true"> </span></button>
+                            </th>
                         </tr>
                     `;
                 }
                 innerHTML += `</tbody>`
                 $('.customerInfo').html(innerHTML)
-                var editCustomerTable = new BSTable("editTable", {
-                    onDelete: async function (button) {
+
+                let editId = ''
+                $('.customerDelBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
+                    let isDel = confirm('確定刪除 ' + delId + ' ?')
+                    if (isDel) {
+                        $(this).parent().parent().parent().remove()
                         await fetch('/delete_customer', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "delId": delId,
+                                "delId": editId,
                             })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
                         })
-                    },
-                });
+                    }
+                })
 
-                editCustomerTable.init()
-                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
-                //使用者 == User 禁止編輯
-                if(userType == 'User'){
-                    console.log('sdfsdfsdfsdfsdf');
-                    $('.bEdit').remove()
-                    $('.bDel').remove()
-                }
+                $('.customerEditBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
+                    $('#calId').val(editId)
+                    $('#code').val($(this).parents('tr').find("td[cal=code]").text())
+                    $('#name').val($(this).parents('tr').find("td[cal=name]").text())
+                    $('#contacts').val($(this).parents('tr').find("td[cal=contacts]").text())
+                    $('#phone').val($(this).parents('tr').find("td[cal=phone]").text())
+                    $('#email').val($(this).parents('tr').find("td[cal=email]").text())
+                    $('#sale_name').val($(this).parents('tr').find("td[cal=sale_name]").text())
+                    $('#tax_id').val($(this).parents('tr').find("td[cal=tax_id]").text())
+                    $('#postal_code').val($(this).parents('tr').find("td[cal=postal_code]").text())
+                    $('#address').val($(this).parents('tr').find("td[cal=address]").text())
+                    $('#payment_terms').val($(this).parents('tr').find("td[cal=payment_terms]").text())
+                    $('#memo').val($(this).parents('tr').find("td[cal=memo]").text())
 
-                $('.bDetail').click(async function () {
+                    //顯示編輯table
+                    $('#customerEditModal').modal('show');
+                })
+
+
+                $('.customerDetailBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
                     innerDetailCustomerHTML = ''
                     $('#customerDetailModal').modal('show');
 
@@ -310,7 +433,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            "delId": delId,
+                            "delId": editId,
                         })
                     }).then(res => res.json()).then(res => {
                         innerDetailCustomerHTML +=
@@ -350,43 +473,13 @@
                         }
                         innerDetailCustomerHTML += `</tbody>`
                         $('.detailTable').html(innerDetailCustomerHTML)
-                        console.log(res);
                     })
                 })
-
-                let code = '',
-                    name = '',
-                    contacts = '',
-                    phone = '',
-                    salesperson = '',
-                    memo = ''
-
-                $('.btn-group').delegate("#bAcep", "click", async function () {
-                    let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function () {
-                        code = $(this).parent().find("td[cal=code]").text()
-                        name = $(this).parent().find("td[cal=name]").text()
-                        contacts = $(this).parent().find("td[cal=contacts]").text()
-                        phone = $(this).parent().find("td[cal=phone]").text()
-                        memo = $(this).parent().find("td[cal=memo]").text()
-                    })
-                    await fetch('/update_customer', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            "code": code,
-                            "name": name,
-                            "contacts": contacts,
-                            "phone": phone,
-                            "memo": memo,
-                        })
-                    }).then(res => res.json()).then(res => {
-                        console.log(res);
-                    })
-                })
-
+                //使用者 == User 禁止編輯
+                if (userType == 'User') {
+                    $('.customerEditBtn').addClass('d-none')
+                    $('.customerDelBtn').addClass('d-none')
+                }
             })
         }
     </script>

@@ -338,6 +338,7 @@
                 innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
 
+                let editId = ''
                 $('.positionDelBtn').click(async function () {
                     editId = $(this).parents('th').attr('editId')
                     let isDel = confirm('確定刪除 ' + delId + ' ?')
@@ -354,8 +355,6 @@
                         })
                     }
                 })
-
-                let editId = ''
 
                 $('.positionEditBtn').click(async function () {
                     editId = $(this).parents('th').attr('editId')
