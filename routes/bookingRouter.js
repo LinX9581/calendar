@@ -74,6 +74,12 @@ router.post('/', async function (req, res) {
 
 router.get('/position', function (req, res) {
     // //req.session.user = user;
+    // let user = {
+    //     account: 'linx',
+    //     name: 'linx',
+    //     type: 'Admin',
+    // }
+    // req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
         let userType = req.session.user.type
@@ -127,7 +133,7 @@ router.post('/getPosition', async function (req, res) {
         });
 
         //先撈出 channelId 再去要該channel的名稱
-        let getPositionSql = 'SELECT id,name,channelId,channelName,rotation,memo,status FROM sale_booking.calendar_list ORDER BY orderKey'
+        let getPositionSql = 'SELECT id,name,channelId,channelName,channelDomain,bgColor,rotation,memo,status FROM sale_booking.calendar_list ORDER BY orderKey'
         let allPosition = await mysql.query(getPositionSql)
 
         //如果該頻道沒廣告怎該索引=0
@@ -153,6 +159,10 @@ router.post('/update_position', async function (req, res) {
     if (req.session.user != undefined) {
         let calId = req.body.calId,
             name = req.body.name,
+            channel = req.body.channel,
+            calendarBgColor = req.body.color,
+            calendarDragBgColor = req.body.color,
+            calendarBorderColor = req.body.color,
             rotation = req.body.rotation,
             memo = req.body.memo,
             status = req.body.status,
@@ -170,9 +180,14 @@ router.post('/update_position', async function (req, res) {
             await mysql.query(updateScheduleSql, updateScheduleData)
         }
 
-        let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?, rotation=?, memo=?, status=?, update_date=?, update_by=? WHERE id=?'
-        let updatePositionData = [name, rotation, memo, status, update_date, update_by, calId]
+        let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?,channelId=?,channelName=?,channelDomain=?,bgcolor=?,dragbgcolor=?,bordercolor=?,rotation=?, memo=?, status=?, update_date=?, update_by=? WHERE id=?'
+        let updatePositionData = [name, channel.split('&&')[0], channel.split('&&')[1], channel.split('&&')[2], calendarBgColor, calendarDragBgColor, calendarBorderColor, rotation, memo, status, update_date, update_by, calId]
         await mysql.query(updatePositionSql, updatePositionData)
+
+        // 如果position更換頻道，相對應的calendar也要更換頻道
+        let updateScheduleChannelIdSql = 'UPDATE sale_booking.schedule_event SET channelId=? WHERE calendarId=?'
+        let updateScheduleChannelIdData = [channel.split('&&')[0], calId]
+        await mysql.query(updateScheduleChannelIdSql, updateScheduleChannelIdData)
 
         console.log(update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData)
         let userLoginTrace = update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData + "\n"
@@ -180,9 +195,13 @@ router.post('/update_position', async function (req, res) {
             if (error) console.log(error)
         })
 
-        res.send(JSON.stringify({
-            'update_position': '成功',
-        }));
+        let userType = req.session.user.type
+        let userName = req.session.user.name
+
+        res.render('position', {
+            userName,
+            userType
+        });
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -381,8 +400,8 @@ router.post('/detail_order', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
         let delId = req.body.delId;
-        let getDetailOrderChannelArray = ''
-        //撈出該委刊單被哪些頻道使用
+        //撈出該委刊單被哪些頻道使用  ## 這邊直接把 channel的schema複製到calendar_list
+        // let getDetailOrderChannelArray = ''
         // let getOrderChannelIdSql = 'SELECT channelId FROM sale_booking.schedule_event WHERE orderId=?'
         // let getOrderChannelIdData = [delId]
         // let getOrderChannelId = await mysql.query(getOrderChannelIdSql, getOrderChannelIdData)
@@ -398,7 +417,7 @@ router.post('/detail_order', async function (req, res) {
         //     getDetailOrderChannelArray = getDetailChannelData[0].filter(item => !set.has(item.name) ? set.add(item.name) : false);
         // }
 
-        //撈出該委刊單被哪些廣告版位使用
+        //撈出該委刊單被哪些廣告版位和頻道使用
         let getDetailOrderPositionSql = 'SELECT `calendar_list`.`name`,channelName,channelDomain,start,end FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`calendar_list` ON `calendar_list`.`id` = `schedule_event`.`calendarId` WHERE orderId = ?'
         let getDetailOrderPositionData = [delId]
         let getDetailPositionData = await mysql.query(getDetailOrderPositionSql, getDetailOrderPositionData)
@@ -415,7 +434,6 @@ router.post('/detail_order', async function (req, res) {
         let getDetailOrderList = await mysql.query(getDetailOrderListSql, getDetailOrderListData)
 
         res.send(JSON.stringify({
-            'getDetailOrderChannelArray': getDetailOrderChannelArray,
             'getDetailCustomerData': getDetailCustomerData[0],
             'getDetailPositionData': getDetailPositionData[0],
             'getDetailOrderList': getDetailOrderList[0]
@@ -725,7 +743,12 @@ router.post('/delete_customer', async function (req, res) {
 });
 
 router.get('/channel', function (req, res) {
-    //req.session.user = user;
+    // req.session.user = user;
+    // let user = {
+    //     account: 'linx',
+    //     name: 'linx',
+    //     type: 'Admin',
+    // }
     if (req.session.user != undefined) {
         let userType = req.session.user.type
         let title = 'NOW Booking '

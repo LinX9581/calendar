@@ -140,7 +140,7 @@ router.post('/checkPositionRotation', async function (req, res) {
     let getPositionRotationData = [calendarId]
     let getPositionRotation = await mysql.query(getPositionRotationSql, getPositionRotationData)
 
-    if (getPositionRotation[0].rotation <= getPositionNumbers[0].adNumbers) {
+    if (getPositionRotation[0][0].rotation <= getPositionNumbers[0][0].adNumbers) {
         rotationOverflow = '-1';
     }
     res.send(JSON.stringify({

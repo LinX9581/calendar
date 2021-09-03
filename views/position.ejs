@@ -64,7 +64,8 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -150,7 +151,8 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋版位</button>
@@ -163,7 +165,8 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table rwdtb-scroll nowrap hover order-table dataTable" id="editTable" style="width: 100%;">
+                                                    <table class="table rwdtb-scroll nowrap hover order-table dataTable"
+                                                        id="editTable" style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -186,14 +189,90 @@
         <b>Version</b> 3.0.5
       </div>-->
         </footer>
+        <!-- 廣告版位編輯頁面 -->
+        <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog"
+            id="positionEditModal">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 廣告版位編輯頁面
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" action="/update_position" method="post" onsubmit=""
+                            id="form">
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="card-body">
+                                        <div class="form-group d-none">
+                                            <input type="text" class="form-control" name='calId' id='calId'></input>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">版位名稱</label>
+                                            <input type="text" class="form-control" placeholder="請輸入版位名稱" name="name"
+                                                id="name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">頻道名稱</label>
+                                            <div class="dropdown">
+                                                <select class="form-control dropdown-toggle channelName"
+                                                    name="channel" id="channel" data-toggle="dropdown"></select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">版位顏色</label>
+                                            <select class="form-control bgColor" name="color" id="color">
+                                                <option>purple</option>
+                                                <option>blue</option>
+                                                <option>green</option>
+                                                <option>gray</option>
+                                                <option>orange</option>
+                                                <option>red</option>
+                                                <option>yellow</option>
+                                                <option>black</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">輪替數</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入輪替數" name="rotation"
+                                                id="rotation">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">備註</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" name="memo" id="memo">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">狀態</label>
+                                            <select class="form-control" name="status" id="status">
+                                                <option value="1">正常</option>
+                                                <option value="0">停用</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block">編輯</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- ./wrapper -->
 
     <!-- jQuery -->
     <script src="js/common/jquery-3.2.1.min.js"></script>
     <script src="js/index/jquery-ui.min.js"></script>
-    <!-- bstable -->
-    <script src="js/index/bstable.js"></script>
     <!-- tableSearch -->
     <script src="js/index/tableSearch.js"></script>
     <!-- Bootstrap 4 -->
@@ -214,7 +293,7 @@
         let userType = $('.userType').attr('value')
         let delId = ''
         let isDel = ''
-        
+
         getPosition()
         async function getPosition() {
             let innerHTML = ''
@@ -224,7 +303,6 @@
                     'Content-Type': 'application/json'
                 },
             }).then(res => res.json()).then(res => {
-                console.log(res);
                 innerHTML +=
                     `<thead>
                         <tr class="tr-main">
@@ -234,6 +312,7 @@
                             <th scope="col">委刊數</th>
                             <th scope="col">備註</th>
                             <th scope="col">狀態</th>
+                            <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="renderTable">
@@ -243,80 +322,90 @@
                         ` 
                         <tr delId="${res.allPosition[item].id}">
                             <td scope="row" data-th="名稱" cal="name" calId="${res.allPosition[item].id}">${res.allPosition[item].name}</td>
-                            <td data-th="頻道" cal="channel">${res.allPosition[item].channelName}</td>
+                            <td data-th="頻道" cal="channel" channelId="${res.allPosition[item].channelId}" channelDomain="${res.allPosition[item].channelDomain}">${res.allPosition[item].channelName}</td>
                             <td data-th="輪替數" cal="rotation">${res.allPosition[item].rotation}</td>
-                            <td data-th="委刊數">${res.allCalendarIdNumbers[item]}</td>
+                            <td data-th="委刊數" cal="calNumbers">${res.allCalendarIdNumbers[item]}</td>
                             <td data-th="備註" cal="memo">${res.allPosition[item].memo}</td>
                             <td data-th="狀態" cal="status">${res.allPosition[item].status}</td>
+                            <td class="d-none" data-th="顏色" cal="bgColor">${res.allPosition[item].bgColor}</td>
+                            <th editId="${res.allPosition[item].id}">
+                                <button type="button" class="btn btn-sm btn-default"><span class="fa fa-edit positionEditBtn"></span></button>
+                                <button type="button" class="btn btn-sm btn-default"><span class="fa fa-trash-alt positionDelBtn"></span></button>
+                            </th>
                         </tr>
                     `;
-
                 }
                 innerHTML += `</tbody>`
                 $('.table').html(innerHTML)
-                var editPositionTable = new BSTable("editTable", {
-                    onDelete: async function(button) {
+
+                $('.positionDelBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
+                    let isDel = confirm('確定刪除 ' + delId + ' ?')
+                    if (isDel) {
+                        $(this).parent().parent().parent().remove()
                         await fetch('/delete_position', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "delId": delId,
+                                "delId": editId,
                             })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
                         })
-                    },
-                });
-                editPositionTable.init()
+                    }
+                })
 
-                //動態新增完後讓功能欄上色
-                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                let editId = ''
+
+                $('.positionEditBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
+                    $('#calId').val(editId)
+
+                    //編輯時 render 預設channel 包含欄位(id,name,domain)
+                    let channelName = $(this).parents('tr').find("td[cal=channel]").text()
+                    let channelId = $(this).parents('tr').find("td[cal=channel]").attr('channelId')
+                    let channelDomain = $(this).parents('tr').find("td[cal=channel]").attr('channelDomain')
+                    $('.channelName').append(`<option class="dropdown-item" value=` + channelId + "&&" + channelName + "&&" + channelDomain + `>` + channelName + `</option>`);
+                    await renderChannel() 
+
+                    //編輯時 render 其他預設欄位
+                    let bgColor = $(this).parents('tr').find("td[cal=bgColor]").text()
+                    $('.bgColor').append(`<option class="dropdown-item" value=` + bgColor + `>` + bgColor + `</option>`);
+                    $('#name').val($(this).parents('tr').find("td[cal=name]").text())
+                    $('#rotation').val($(this).parents('tr').find("td[cal=rotation]").text())
+                    $('#memo').val($(this).parents('tr').find("td[cal=memo]").text())
+                    $('#status').val($(this).parents('tr').find("td[cal=status]").text())
+
+                    //顯示編輯table
+                    $('#positionEditModal').modal('show');
+                })
+
                 //使用者 == User 禁止編輯
-                if(userType == 'User'){
-                    $('.renderTable tr').find('td:last').remove()
+                if (userType == 'User') {
+                    $('.renderTable tr').find('th').remove()
                 }
 
-                let calId = '',
-                    name = '',
-                    rotation = '',
-                    memo = '',
-                    status = '';
-
-                //動態監聽按下acep新增欄位
-                $('.btn-group').delegate("#bAcep", "click", async function() {
-                    let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function() {
-                        calId = $(this).parent().find("td").attr('calId')
-                        name = $(this).parent().find("td[cal=name]").text()
-                        rotation = $(this).parent().find("td[cal=rotation]").text()
-                        memo = $(this).parent().find("td[cal=memo]").text()
-                        status = $(this).parent().find("td[cal=status]").text()
-                    })
-                    await fetch('/update_position', {
+                async function renderChannel() {
+                    await fetch('/renderChannel', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            "calId": calId,
-                            "name": name,
-                            "rotation": rotation,
-                            "memo": memo,
-                            "status":status
+                        body: JSON.stringify({})
+                    }).then(res => res.json()).then((allChannel) => {
+                        console.log(allChannel.channel);
+                        $.each(allChannel.channel, function (index, val) {
+                            console.log(val.name);
+                            $('.channelName').append(
+                                `
+                            <option class="dropdown-item" value=` + val.link + "&&" + val.name + "&&" + val.domain + `>` + val.name + `</option>
+                        `
+                            );
                         })
-                    }).then(res => res.json()).then(res => {
-                        console.log(res);
                     })
-                })
-
+                }
             })
         }
-
-        $(function() {
-            $(".datepicker").datepicker();
-        });
     </script>
 </body>
 
