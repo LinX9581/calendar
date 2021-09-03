@@ -203,7 +203,6 @@
                     </div>
                     <div class="modal-body">
                         <table class="table detailTable rwdtb-scroll nowrap hover order-table"></table>
-                        <table class="table detailTableChannel rwdtb-scroll nowrap hover order-table"></table>
                         <table class="table detailTablePosition rwdtb-scroll nowrap hover order-table"></table>
                         <table class="table detailTableCustomer rwdtb-scroll nowrap hover order-table"></table>
                     </div>
@@ -358,32 +357,12 @@
                         innerDetailOrderHTML += `</tbody>`
                         $('.detailTable').html(innerDetailOrderHTML)
 
-                        //顯示該委刊單被頻道使用狀況
-                        innerDetailOrderChannelHTML +=
-                            `<thead>
-                                <tr class="tr-title">
-                                    <th scope="col">頻道名稱</th>
-                                    <th scope="col">網域</th>
-                                </tr>
-                            </thead>
-                            <tbody class="renderTable">
-                            `;
-                        for (let item = 0; item < res.getDetailOrderChannelArray.length; item++) {
-                            innerDetailOrderChannelHTML +=
-                                ` 
-                                <tr>
-                                    <td scope="row" data-th="頻道名稱" cal="orderId">${res.getDetailOrderChannelArray[item].name}</td>
-                                    <td data-th="網域" cal="advertisers">${res.getDetailOrderChannelArray[item].domain}</td>
-                                </tr>
-                            `;
-                        }
-                        innerDetailOrderChannelHTML += `</tbody>`
-                        $('.detailTableChannel').html(innerDetailOrderChannelHTML)
-
                         //顯示該委刊單被廣告版位使用狀況
                         innerDetailOrderPositionHTML +=
                             `<thead>
                                 <tr class="tr-title">
+                                    <th scope="col">頻道名稱</th>
+                                    <th scope="col">頻道網域</th>
                                     <th scope="col">廣告版位</th>
                                     <th scope="col">刊登方式</th>
                                     <th scope="col">刊登時間</th>
@@ -395,6 +374,8 @@
                             innerDetailOrderPositionHTML +=
                                 ` 
                                 <tr>
+                                    <td scope="row" data-th="頻道名稱" cal="channelName">${res.getDetailPositionData[item].channelName}</td>
+                                    <td scope="row" data-th="頻道網域" cal="channelName">${res.getDetailPositionData[item].channelDomain}</td>
                                     <td scope="row" data-th="廣告版位" cal="orderId">${res.getDetailPositionData[item].name}</td>
                                     <td data-th="刊登方式" cal="advertisers">${res.getDetailOrderList[0].ad_type}</td>
                                     <td data-th="時間" cal="time">${moment(res.getDetailPositionData[item].start).format('YYYY-MM-DD')} ~ ${moment(res.getDetailPositionData[item].end).format('YYYY-MM-DD')}</td>

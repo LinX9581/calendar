@@ -66,7 +66,8 @@
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                        data-accordion="true">
                         <li class="nav-item">
                             <a href="order" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
@@ -152,12 +153,13 @@
                                         <div class="tab-content">
                                             <div class="row">
                                                 <div class="col-md-4 col-xl-3 form-group">
-                                                    <input class="form-control bg-search light-table-filter" data-table="order-table" type="text" placeholder="搜尋">
+                                                    <input class="form-control bg-search light-table-filter"
+                                                        data-table="order-table" type="text" placeholder="搜尋">
                                                 </div>
                                                 <div class="col-md-4 col-xl-2 form-group">
                                                     <button class="btn btn-primary" type="button">搜尋帳號</button>
                                                 </div>
-                                                <div class="col-md-4 col-xl-2 form-group">
+                                                <div class="col-md-4 col-xl-2 form-group createAccount">
                                                     <a href="privilege-add">
                                                         <button class="btn btn-primary" type="button">新增帳號</button>
                                                     </a>
@@ -165,7 +167,8 @@
                                             </div>
                                             <div class="tab-pane fade show active" id="tab1">
                                                 <div class="data-table">
-                                                    <table class="table rwdtb-scroll nowrap hover order-table dataTable" style="width: 100%;">
+                                                    <table class="table rwdtb-scroll nowrap hover order-table dataTable"
+                                                        style="width: 100%;">
                                                     </table>
                                                 </div>
                                             </div>
@@ -214,7 +217,8 @@
         let userType = $('.userType').attr('value')
         let userVisible = ''
         if (userType == 'User' || userType == 'SuperUser') {
-            userVisible = 'd-none'
+            userVisible = 'd-none';
+            $('.createAccount').addClass(userVisible)
         }
 
         getAccount()
@@ -270,7 +274,7 @@
                 }
                 $('.table').html(innerHTML)
 
-                $('.delBtn').click(async function() {
+                $('.delBtn').click(async function () {
                     let delId = $(this).attr('delId')
                     console.log(delId);
                     let isDel = confirm('確定刪除 ' + delId + ' ?')

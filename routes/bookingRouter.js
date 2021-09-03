@@ -208,8 +208,8 @@ router.post('/create_position', async function (req, res) {
         let userType = req.session.user.type
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
 
-        let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`,`channelId`,`channelName`,`color`,`bgcolor`,`dragbgcolor`,`bordercolor`,`name`,`rotation`,`memo`,`status`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-        let createPositionData = [id, channelId.split('&&')[0], channelId.split('&&')[1], color, calendarBgColor, calendarDragBgColor, calendarBorderColor, name, rotation, memo, status, createTime, userName, createTime, userName]
+        let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`,`channelId`,`channelName`,`channelDomain`,`color`,`bgcolor`,`dragbgcolor`,`bordercolor`,`name`,`rotation`,`memo`,`status`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        let createPositionData = [id, channelId.split('&&')[0], channelId.split('&&')[1], channelId.split('&&')[2], color, calendarBgColor, calendarDragBgColor, calendarBorderColor, name, rotation, memo, status, createTime, userName, createTime, userName]
         await mysql.query(createPositionSql, createPositionData)
 
         console.log(req.session.user.name + ' create position : ' + name);
@@ -315,7 +315,7 @@ router.post('/getReserveOrder', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
         //取得個頻道的廣告數
-        let getChannelSql = 'SELECT link,name,memo FROM sale_booking.channel where status = 1 ORDER BY link'
+        let getChannelSql = 'SELECT link,name,memo,domain FROM sale_booking.channel where status = 1 ORDER BY link'
         let allChannel = await mysql.query(getChannelSql)
 
         res.send(JSON.stringify({
@@ -383,23 +383,23 @@ router.post('/detail_order', async function (req, res) {
         let delId = req.body.delId;
         let getDetailOrderChannelArray = ''
         //撈出該委刊單被哪些頻道使用
-        let getOrderChannelIdSql = 'SELECT channelId FROM sale_booking.schedule_event WHERE orderId=?'
-        let getOrderChannelIdData = [delId]
-        let getOrderChannelId = await mysql.query(getOrderChannelIdSql, getOrderChannelIdData)
-        let getOrderChannel = getOrderChannelId[0].map(e => {
-            return e.channelId
-        })
-        let getOrderChannelArray = [...new Set(getOrderChannel)];
-        if (getOrderChannelId[0] != '') {
-            let getDetailOrderChannelSql = 'SELECT `channel`.`name`,`channel`.`domain` FROM sale_booking.`channel` INNER JOIN sale_booking.`schedule_event` ON `channel`.`link` = `schedule_event`.`channelId` WHERE channelId in (?)'
-            let getDetailOrderChannelData = [getOrderChannelArray]
-            let getDetailChannelData = await mysql.query(getDetailOrderChannelSql, getDetailOrderChannelData)
-            let set = new Set();
-            getDetailOrderChannelArray = getDetailChannelData[0].filter(item => !set.has(item.name) ? set.add(item.name) : false);
-        }
+        // let getOrderChannelIdSql = 'SELECT channelId FROM sale_booking.schedule_event WHERE orderId=?'
+        // let getOrderChannelIdData = [delId]
+        // let getOrderChannelId = await mysql.query(getOrderChannelIdSql, getOrderChannelIdData)
+        // let getOrderChannel = getOrderChannelId[0].map(e => {
+        //     return e.channelId
+        // })
+        // let getOrderChannelArray = [...new Set(getOrderChannel)];
+        // if (getOrderChannelId[0] != '') {
+        //     let getDetailOrderChannelSql = 'SELECT `channel`.`name`,`channel`.`domain` FROM sale_booking.`channel` INNER JOIN sale_booking.`schedule_event` ON `channel`.`link` = `schedule_event`.`channelId` WHERE channelId in (?)'
+        //     let getDetailOrderChannelData = [getOrderChannelArray]
+        //     let getDetailChannelData = await mysql.query(getDetailOrderChannelSql, getDetailOrderChannelData)
+        //     let set = new Set();
+        //     getDetailOrderChannelArray = getDetailChannelData[0].filter(item => !set.has(item.name) ? set.add(item.name) : false);
+        // }
 
         //撈出該委刊單被哪些廣告版位使用
-        let getDetailOrderPositionSql = 'SELECT `calendar_list`.`name`,`start`,`end` FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`calendar_list` ON `calendar_list`.`id` = `schedule_event`.`calendarId` WHERE orderId = ?'
+        let getDetailOrderPositionSql = 'SELECT `calendar_list`.`name`,channelName,channelDomain,start,end FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`calendar_list` ON `calendar_list`.`id` = `schedule_event`.`calendarId` WHERE orderId = ?'
         let getDetailOrderPositionData = [delId]
         let getDetailPositionData = await mysql.query(getDetailOrderPositionSql, getDetailOrderPositionData)
 
@@ -748,7 +748,7 @@ router.get('/channel', function (req, res) {
 router.post('/renderChannel', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
-        let renderChannelSql = "select link,name from sale_booking.channel where status = 1 order by link"
+        let renderChannelSql = "select link,name,domain from sale_booking.channel where status = 1 order by link"
         let allChannel = await mysql.query(renderChannelSql)
 
         res.send(JSON.stringify({
@@ -1010,13 +1010,23 @@ router.get('/privilege-add', function (req, res) {
     //req.session.user = user;
     console.log(req.session.user);
     if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let userName = req.session.user.name
+        if (req.session.user.type != 'Admin') {
+            let userType = req.session.user.type
+            let userName = req.session.user.name
 
-        res.render('privilege-add', {
-            title,
-            userName
-        });
+            res.render('privilege', {
+                userType,
+                userName
+            });
+        } else {
+            let title = 'NOW Booking '
+            let userName = req.session.user.name
+
+            res.render('privilege-add', {
+                title,
+                userName
+            });
+        }
     } else {
         let title = 'NOW Booking '
         res.render('login', {

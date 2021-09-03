@@ -223,6 +223,7 @@
                     `<thead>
                         <tr class="tr-main">
                             <th scope="col">頻道名稱</th>
+                            <th scope="col">網域</th>
                             <th scope="col">備註</th>
                         </tr>
                     </thead>
@@ -233,6 +234,7 @@
                         ` 
                         <tr delId="${res.allChannel[item].id}">
                             <td scope="row" data-th="頻道名稱"><a href="/ch/${res.allChannel[item].link}" target=_blank>${res.allChannel[item].name}</a></td>
+                            <td data-th="網域" cal="domain">${res.allChannel[item].domain}</td>
                             <td data-th="備註" cal="memo">${res.allChannel[item].memo}</td>
                         </tr>
                     `;
