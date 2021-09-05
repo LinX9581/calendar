@@ -189,8 +189,9 @@
         <b>Version</b> 3.0.5
       </div>-->
         </footer>
-        <!-- 委託單內容 -->
-        <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog" id="orderDetailModal">
+        <!-- 詳細委託單內容 -->
+        <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog"
+            id="orderDetailModal">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -205,6 +206,96 @@
                         <table class="table detailTable rwdtb-scroll nowrap hover order-table"></table>
                         <table class="table detailTablePosition rwdtb-scroll nowrap hover order-table"></table>
                         <table class="table detailTableCustomer rwdtb-scroll nowrap hover order-table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 委刊單資料編輯頁面 -->
+        <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog"
+            id="orderEditModal">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 委刊單資料編輯頁面
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form" action="/update_order" method="post" onsubmit=""
+                            id="form">
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="card-body">
+                                        <div class="form-group d-none">
+                                            <input type="text" class="form-control" name='orderId' id='orderId'></input>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">活動名稱</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入活動名稱" name="name"
+                                                id="name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">客戶資料</label>
+                                            <div class="dropdown">
+                                                <select class="form-control orderCustomerName" name="customer"
+                                                    id="customer exampleFormControlSelect1">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">廣告主</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入廣告主"
+                                                name="advertisers" id="advertisers">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">委刊公司</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入委刊公司"
+                                                name="customer_company" id="customer_company">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">聯絡人</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" placeholder="請輸入聯絡人"
+                                                name="salesperson" id="salesperson">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>走期 </label>
+                                            <input type="text" class="form-control" name="schedule_time"
+                                                id="schedule_time">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">類型</label>
+                                            <select class="form-control orderAdType" name="ad_type" id="ad_type">
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">備註</label>
+                                            <span></span>
+                                            <input type="text" class="form-control" name="memo" id="memo">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">狀態</label>
+                                            <select class="form-control" name="status" id="status">
+                                                <option value="1">正常</option>
+                                                <option value="0">停用</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block">編輯</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -240,6 +331,7 @@
             $(".datepicker").datepicker();
         });
         let delId = ''
+        let editId = ''
         let isDel = ''
 
         getOrder()
@@ -264,6 +356,7 @@
                             <th scope="col">業務</th>
                             <th scope="col">備註</th>
                             <th scope="col">狀態</th>
+                            <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="renderTable">
@@ -272,6 +365,9 @@
                     innerHTML +=
                         ` 
                         <tr delId="${res.allOrder[item].id}">
+                            <td scope="row" data-th="客戶資料" class="d-none" cal="customerInfo">${res.allOrder[item].customerName}</td>
+                            <td scope="row" data-th="委刊公司" class="d-none" cal="customer_company">${res.allOrder[item].customer_company}</td>
+                            <td scope="row" data-th="委刊時間" class="d-none" cal="schedule_time">${moment(res.allOrder[item].start_time).format('YYYY-MM-DD') + "~" + moment(res.allOrder[item].end_time).format('YYYY-MM-DD')}</td>
                             <td scope="row" data-th="委刊單" cal="orderId">${res.allOrder[item].id}</td>
                             <td data-th="客戶名稱" cal="advertisers">${res.allOrder[item].advertisers}</td>
                             <td data-th="活動名稱" cal="title">${res.allOrder[item].title}</td>
@@ -279,6 +375,11 @@
                             <td data-th="業務" cal="salesperson">${res.allOrder[item].salesperson}</td>
                             <td data-th="備註" cal="memo">${res.allOrder[item].memo}</td>
                             <td data-th="狀態" cal="status">${res.allOrder[item].status}</td>
+                            <th editId="${res.allOrder[item].id}">
+                                <button type="button" class="btn btn-sm btn-default orderEditBtn"><span class="fa fa-edit"></span></button>
+                                <button type="button" class="btn btn-sm btn-default orderDelBtn"><span class="fa fa-trash-alt"></span></button>
+                                <button type="button" class="btn btn-sm btn-default orderDetailBtn"><span class="fa fa-eye" aria-hidden="true"> </span></button>
+                            </th>
                         </tr>
                     `;
 
@@ -286,27 +387,55 @@
                 innerHTML += `</tbody>`
                 $('.orderInfo').html(innerHTML)
 
-                var editOrderTable = new BSTable("editTable", {
-                    onDelete: async function (button) {
-                        console.log('testset');
+                
+                $('.orderDelBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
+                    let isDel = confirm('確定刪除 ' + editId + ' ?')
+                    if (isDel) {
+                        $(this).parent().parent().remove()
                         await fetch('/delete_order', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "delId": delId,
+                                "delId": editId,
                             })
-                        }).then(res => res.json()).then(res => {
-                            console.log(res);
                         })
+                    }
+                })
 
-                    },
-                });
-                editOrderTable.init()
-                $(".renderTable>tr").find('td:last').css("background-color", "#ffce2d");
+                $('.orderEditBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
+                    let customerInfo = $(this).parents('tr').find("td[cal=customerInfo]").text()
+                    $('.orderCustomerName').find('option').remove()
+                    $('.orderCustomerName').append(`<option class="dropdown-item" value=` + customerInfo + `>` + customerInfo + `</option>`);
+                    await renderCustomer()
 
-                $('.bDetail').click(async function () {
+                    $('#orderId').val(editId)
+                    $('#advertisers').val($(this).parents('tr').find("td[cal=advertisers]").text())
+                    $('#name').val($(this).parents('tr').find("td[cal=title]").text())
+                    $('#customer').val($(this).parents('tr').find("td[cal=customer]").text())
+                    $('#customer_company').val($(this).parents('tr').find("td[cal=customer_company]").text())
+                    $('#salesperson').val($(this).parents('tr').find("td[cal=salesperson]").text())
+                    $('#schedule_time').val($(this).parents('tr').find("td[cal=schedule_time]").text())
+                    $('#memo').val($(this).parents('tr').find("td[cal=memo]").text())
+
+                    let ad_type = $(this).parents('tr').find("td[cal=ad_type]").text();
+                    let ad_typeArray = [ad_type, 'CPM', 'CPC', 'CPL']
+                    $.each(ad_typeArray, function (index, val) {
+                        $('.orderAdType').append(
+                            `
+                            <option class="dropdown-item" value=` + val + `>` + val + `</option>
+                        `)
+                    })
+
+                    //顯示編輯table
+                    $('#orderEditModal').modal('show');
+                })
+
+                $('.orderDetailBtn').click(async function () {
+                    editId = $(this).parents('th').attr('editId')
                     innerDetailOrderHTML = ''
                     innerDetailOrderChannelHTML = ''
                     innerDetailOrderPositionHTML = ''
@@ -319,7 +448,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            "delId": delId,
+                            "editId": editId,
                         })
                     }).then(res => res.json()).then(res => {
                         console.log(res);
@@ -428,42 +557,23 @@
                     })
                 })
 
-                let orderId = '',
-                    advertisers = '',
-                    title = '',
-                    ad_type = '',
-                    salesperson = '',
-                    memo = '';
-
-                $('.btn-group').delegate("#bAcep", "click", async function () {
-                    let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function () {
-                        orderId = $(this).parent().find("td[cal=orderId]").text()
-                        advertisers = $(this).parent().find("td[cal=advertisers]").text()
-                        title = $(this).parent().find("td[cal=title]").text()
-                        ad_type = $(this).parent().find("td[cal=ad_type]").text()
-                        salesperson = $(this).parent().find("td[cal=salesperson]").text()
-                        memo = $(this).parent().find("td[cal=memo]").text()
-                        status = $(this).parent().find("td[cal=status]").text()
-                    })
-                    await fetch('/update_order', {
+                async function renderCustomer() {
+                    await fetch('/renderCustomer', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            "orderId": orderId,
-                            "advertisers": advertisers,
-                            "title": title,
-                            "ad_type": ad_type,
-                            "salesperson": salesperson,
-                            "memo": memo,
-                            "status": status,
+                        body: JSON.stringify({})
+                    }).then(res => res.json()).then((allCustomer) => {
+                        $.each(allCustomer.customer, function (index, val) {
+                            $('.orderCustomerName').append(
+                                `
+                            <option class="dropdown-item" value=` + val.id + "&&" + val.name + `>` + val.name + `</option>
+                        `
+                            );
                         })
-                    }).then(res => res.json()).then(res => {
-                        console.log(res);
                     })
-                })
+                }
             })
         }
 

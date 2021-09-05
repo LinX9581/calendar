@@ -219,21 +219,14 @@
                                         <div class="form-group">
                                             <label for="">頻道名稱</label>
                                             <div class="dropdown">
-                                                <select class="form-control dropdown-toggle channelName"
-                                                    name="channel" id="channel" data-toggle="dropdown"></select>
+                                                <select class="form-control dropdown-toggle channelName" name="channel"
+                                                    id="channel" data-toggle="dropdown"></select>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="">版位顏色</label>
                                             <select class="form-control bgColor" name="color" id="color">
-                                                <option>purple</option>
-                                                <option>blue</option>
-                                                <option>green</option>
-                                                <option>gray</option>
-                                                <option>orange</option>
-                                                <option>red</option>
-                                                <option>yellow</option>
-                                                <option>black</option>
+
                                             </select>
                                         </div>
                                         <div class="form-group">
@@ -364,12 +357,20 @@
                     let channelName = $(this).parents('tr').find("td[cal=channel]").text()
                     let channelId = $(this).parents('tr').find("td[cal=channel]").attr('channelId')
                     let channelDomain = $(this).parents('tr').find("td[cal=channel]").attr('channelDomain')
+                    $('.channelName').find('option').remove()
                     $('.channelName').append(`<option class="dropdown-item" value=` + channelId + "&&" + channelName + "&&" + channelDomain + `>` + channelName + `</option>`);
-                    await renderChannel() 
+                    await renderChannel()
 
                     //編輯時 render 其他預設欄位
+                    $('.bgColor').find('option').remove()
                     let bgColor = $(this).parents('tr').find("td[cal=bgColor]").text()
-                    $('.bgColor').append(`<option class="dropdown-item" value=` + bgColor + `>` + bgColor + `</option>`);
+                    let colorArray = [bgColor, 'purple', 'blue', 'green', 'gray', 'orange', 'red', 'yellow', 'black']
+                    $.each(colorArray, function (index, val) {
+                        $('.bgColor').append(
+                            `
+                            <option class="dropdown-item" value=` + val + `>` + val + `</option>
+                        `)
+                    })
                     $('#name').val($(this).parents('tr').find("td[cal=name]").text())
                     $('#rotation').val($(this).parents('tr').find("td[cal=rotation]").text())
                     $('#memo').val($(this).parents('tr').find("td[cal=memo]").text())
@@ -392,9 +393,7 @@
                         },
                         body: JSON.stringify({})
                     }).then(res => res.json()).then((allChannel) => {
-                        console.log(allChannel.channel);
                         $.each(allChannel.channel, function (index, val) {
-                            console.log(val.name);
                             $('.channelName').append(
                                 `
                             <option class="dropdown-item" value=` + val.link + "&&" + val.name + "&&" + val.domain + `>` + val.name + `</option>

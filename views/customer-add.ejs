@@ -88,7 +88,7 @@
                         <li class="nav-item">
                             <a href="customer" class="nav-link active">
                                 <i class="nav-icon fas fa-user"></i>
-                                <p>客戶資料</p>
+                                <p>客戶資料</p>   <span class="idExist d-none"><%= idExist %></span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -124,7 +124,7 @@
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index"><i class="fa fa-home"></i> 客戶資料</a>
+                                <li class="breadcrumb-item"><a href="/customer"><i class="fa fa-home"></i> 客戶資料</a>
                                 </li>
                                 <li class="breadcrumb-item">新增客戶</li>
                             </ol>
@@ -257,7 +257,11 @@
     <script src="js/common/fontawesome.js"></script>
     <script>
         $(function() {
-
+            let idExist = $('.idExist').text()
+            console.log(idExist);
+            if(idExist == '-1'){
+                alert('客戶代碼已存在')
+            }
             // jQuery Validation Plugin 的Twitter BootStrap 3 支援
             $.validator.setDefaults({
                 highlight: function(element) {
