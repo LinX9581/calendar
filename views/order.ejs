@@ -282,9 +282,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="">狀態</label>
-                                            <select class="form-control" name="status" id="status">
-                                                <option value="1">正常</option>
-                                                <option value="0">停用</option>
+                                            <select class="form-control orderStatus" name="status" id="status">
                                             </select>
                                         </div>
                                     </div>
@@ -362,6 +360,7 @@
                     <tbody class="renderTable">
                     `;
                 for (let item = 0; item < res.allOrder.length; item++) {
+                    if (res.allOrder[item].status == '1') { res.allOrder[item].status = '啟用' } else res.allOrder[item].status = '停用'
                     innerHTML +=
                         ` 
                         <tr delId="${res.allOrder[item].id}">
@@ -387,7 +386,7 @@
                 innerHTML += `</tbody>`
                 $('.orderInfo').html(innerHTML)
 
-                
+
                 $('.orderDelBtn').click(async function () {
                     editId = $(this).parents('th').attr('editId')
                     let isDel = confirm('確定刪除 ' + editId + ' ?')
@@ -427,6 +426,19 @@
                         $('.orderAdType').append(
                             `
                             <option class="dropdown-item" value=` + val + `>` + val + `</option>
+                        `)
+                    })
+
+                    let status = $(this).parents('tr').find("td[cal=status]").text()
+                    let statusArray = [status, '停用', '啟用']
+                    let orderStatus = ''
+                    $('#status').val(status)
+                    $('.orderStatus').find('option').remove()
+                    $.each(statusArray, function (index, val) {
+                        if (val == '啟用') { orderStatus = '1' } else orderStatus = '0'
+                        $('.orderStatus').append(
+                            `
+                            <option class="dropdown-item" value=` + orderStatus + `>` + val + `</option>
                         `)
                     })
 

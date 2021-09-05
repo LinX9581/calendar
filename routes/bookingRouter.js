@@ -688,7 +688,7 @@ router.post('/create_customer', async function (req, res) {
 
         let idExist = await mysql.query('SELECT code FROM sale_booking.customer WHERE code = ?', code)
         console.log(idExist[0]);
-        if(idExist[0] == ''){
+        if (idExist[0] == '') {
             let createCustomerSql = 'INSERT INTO sale_booking.`customer` (`code`, `name`, `contacts`, `phone`, `email`, `sale_name`,`tax_id`,`postal_code`,`address`,`payment_terms`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             let createCustomerData = [code, name, contacts, phone, email, sale_name, tax_id, postal_code, address, payment_terms, memo, createTime, userName, createTime, userName]
             await mysql.query(createCustomerSql, createCustomerData)
@@ -858,6 +858,11 @@ router.post('/update_channel', async function (req, res) {
         let updateChannelData = [name, domain, memo, status, update_date, update_by, channelId]
         await mysql.query(updateChannelSql, updateChannelData)
 
+        // 頻道名稱改變時，calendar_list 的頻道名也要跟著改變
+        let updatePositionChannelNameSql = 'UPDATE sale_booking.calendar_list SET channelName=?, channelDomain=?, update_date=?, update_by=? WHERE channelId=?'
+        let updatePositionChannelNameData = [name, domain, update_date, update_by, channelId]
+        await mysql.query(updatePositionChannelNameSql, updatePositionChannelNameData)
+
         //頻道停用啟用、相對應的廣告版位、schedule跟著停用啟用
         if (status == '0') {
             let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? WHERE channelId=?'
@@ -921,10 +926,7 @@ router.post('/create_channel', async function (req, res) {
         })
         console.log(req.session.user.name + ' create channel ' + name);
 
-        res.render('channel', {
-            userType,
-            userName,
-        });
+        res.redirect('/channel')
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -1090,7 +1092,6 @@ router.post('/create_account', async function (req, res) {
             email = req.body.email,
             memo = req.body.memo
         let userName = req.session.user.name
-        let userType = req.session.user.type
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
         let createAccountSql = 'INSERT INTO sale_booking.`user` (`account`, `password`, `type`, `name`, `email`, `memo`, `create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?)'
         let createAccountData = [account, md5(password), type, name, email, memo, createTime, userName, createTime, userName]
@@ -1101,10 +1102,7 @@ router.post('/create_account', async function (req, res) {
         })
         console.log(req.session.user.name + ' create account : ' + account);
 
-        res.render('privilege', {
-            userName,
-            userType
-        });
+        res.redirect('/privilege')
     } else {
         let title = 'NOW Booking '
         res.render('login', {
