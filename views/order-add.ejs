@@ -333,13 +333,9 @@
             let pickerYesterday = moment(new Date()).add(-1, 'days').format('MM-DD-YYYY');
             let defaultYesterday = moment(new Date()).add(-1, 'days').format('YYYY-MM-DD');
             await $('#schedule_time').daterangepicker({
-                "dateLimit": {
-                    "days": 32
-                },
                 "startDate": pickerYesterday,
                 "endDate": pickerYesterday,
                 "minDate": "01/01/2021",
-                "maxDate": pickerYesterday
             }, function (start, end, label) { });
         }
         $(function () {

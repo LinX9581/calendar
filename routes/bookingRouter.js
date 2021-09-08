@@ -59,7 +59,7 @@ router.post('/', async function (req, res) {
         }
         req.session.user = user;
 
-        res.render('channel', {
+        res.render('order', {
             title,
             userName,
             userType

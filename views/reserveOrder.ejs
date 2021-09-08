@@ -208,6 +208,8 @@
         let userType = $('.userType').attr('value')
         if (userType == 'User') {
             $('.renderTable tr').find('th').remove()
+            $('nav > ul > li:nth-child(3)').addClass('d-none')
+            $('nav > ul > li:nth-child(4)').addClass('d-none')
             $('nav > ul > li:nth-child(5)').addClass('d-none')
         } else if (userType == 'SuperUser') {
             $('nav > ul > li:nth-child(5)').addClass('d-none')

@@ -328,6 +328,8 @@
         let userType = $('.userType').attr('value')
         if (userType == 'User') {
             $('.renderTable tr').find('th').remove()
+            $('nav > ul > li:nth-child(3)').addClass('d-none')
+            $('nav > ul > li:nth-child(4)').addClass('d-none')
             $('nav > ul > li:nth-child(5)').addClass('d-none')
         } else if (userType == 'SuperUser') {
             $('nav > ul > li:nth-child(5)').addClass('d-none')
@@ -434,7 +436,8 @@
                     })
 
                     let status = $(this).parents('tr').find("td[cal=status]").text()
-                    let statusArray = [status, '停用', '啟用']
+                    let statusArray = []
+                    if (status == '啟用') { statusArray = [status, '停用'] } else if (status == '停用') { statusArray = [status, '啟用'] }
                     let orderStatus = ''
                     $('#status').val(status)
                     $('.orderStatus').find('option').remove()
