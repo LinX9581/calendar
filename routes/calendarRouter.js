@@ -129,6 +129,7 @@ router.post('/createCalendarList', async function (req, res) {
         'add Calendar': 'succeed',
     }));
 })
+// 等委刊單確定頁面出來後才檢查輪替數是否超過
 router.post('/checkPositionRotation', async function (req, res) {
     let rotationOverflow = ''
     let calendarId = req.body.calendarId
@@ -141,7 +142,7 @@ router.post('/checkPositionRotation', async function (req, res) {
     let getPositionRotation = await mysql.query(getPositionRotationSql, getPositionRotationData)
 
     if (getPositionRotation[0][0].rotation <= getPositionNumbers[0][0].adNumbers) {
-        rotationOverflow = '-1';
+        rotationOverflow = '0';
     }
     res.send(JSON.stringify({
         'rotationOverflow': rotationOverflow,

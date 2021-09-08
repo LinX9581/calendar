@@ -38,7 +38,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link userType" value='<%= userType %>' href="#">
                         <%= userName %>
                             <i class="fas fa-user-circle"></i>
                     </a>
@@ -325,9 +325,13 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        $(function () {
-            $(".datepicker").datepicker();
-        });
+        let userType = $('.userType').attr('value')
+        if (userType == 'User') {
+            $('.renderTable tr').find('th').remove()
+            $('nav > ul > li:nth-child(5)').addClass('d-none')
+        } else if (userType == 'SuperUser') {
+            $('nav > ul > li:nth-child(5)').addClass('d-none')
+        }
         let delId = ''
         let editId = ''
         let isDel = ''

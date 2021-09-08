@@ -306,11 +306,13 @@ router.get('/reserveOrder', async function (req, res) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
+        let userType = req.session.user.type
 
         res.render('reserveOrder', {
             today,
             title,
-            userName
+            userName,
+            userType
         });
     } else {
         let title = 'NOW Booking '

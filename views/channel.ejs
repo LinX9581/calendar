@@ -211,8 +211,8 @@
                                 <div class="tab-content">
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <input type="text" class="form-control d-none" placeholder="請輸入名稱" name="channelId"
-                                                id="channelId">
+                                            <input type="text" class="form-control d-none" placeholder="請輸入名稱"
+                                                name="channelId" id="channelId">
                                         </div>
                                         <div class="form-group">
                                             <label for="">名稱</label>
@@ -272,13 +272,18 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        $(function () {
-            $(".datepicker").datepicker();
-        });
-        let userType = $('.userType').attr('value')
         let editId = ''
         let delId = ''
         let isDel = ''
+
+        //使用者 == User 禁止編輯
+        let userType = $('.userType').attr('value')
+        if (userType == 'User') {
+            $('.renderTable tr').find('td:last').remove()
+            $('nav > ul > li:nth-child(5)').addClass('d-none')
+        } else if (userType == 'SuperUser') {
+            $('nav > ul > li:nth-child(5)').addClass('d-none')
+        }
 
         getChannel()
         async function getChannel() {
@@ -369,11 +374,6 @@
                     $('#channelEditModal').modal('show');
                 })
 
-
-                //使用者 == User 禁止編輯
-                if (userType == 'User') {
-                    $('.renderTable tr').find('td:last').remove()
-                }
 
                 let channelId = '',
                     name = '',

@@ -281,7 +281,15 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
+        //使用者 == User 禁止編輯
         let userType = $('.userType').attr('value')
+        if (userType == 'User') {
+            $('.renderTable tr').find('th').remove()
+            $('nav > ul > li:nth-child(5)').addClass('d-none')
+        } else if (userType == 'SuperUser') {
+            $('nav > ul > li:nth-child(5)').addClass('d-none')
+        }
+
         let delId = ''
         let isDel = ''
 
@@ -391,11 +399,6 @@
                     //顯示編輯table
                     $('#positionEditModal').modal('show');
                 })
-
-                //使用者 == User 禁止編輯
-                if (userType == 'User') {
-                    $('.renderTable tr').find('th').remove()
-                }
 
                 async function renderChannel() {
                     await fetch('/renderChannel', {
