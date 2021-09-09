@@ -366,7 +366,18 @@
                     <tbody class="renderTable">
                     `;
                 for (let item = 0; item < res.allOrder.length; item++) {
-                    if (res.allOrder[item].status == '1') { res.allOrder[item].status = '啟用' } else res.allOrder[item].status = '停用'
+                    switch (res.allOrder[item].status) {
+                        case '0':
+                            res.allOrder[item].status = '停用'
+                            break;
+                        case 1:
+                            res.allOrder[item].status = '啟用'
+                            break;
+                        case 2:
+                            res.allOrder[item].status = '確定'
+                            break;
+                    }
+                    // console.log(res.allOrder[item].status);
                     innerHTML +=
                         ` 
                         <tr delId="${res.allOrder[item].id}">
@@ -436,13 +447,14 @@
                     })
 
                     let status = $(this).parents('tr').find("td[cal=status]").text()
+                    console.log(status);
                     let statusArray = []
-                    if (status == '啟用') { statusArray = [status, '停用' ] } else if (status == '停用') { statusArray = [status, '啟用'] }
+                    if (status == '啟用') { statusArray = [status, '停用', '確定'] } else if (status == '停用') { statusArray = [status, '啟用', '確定'] } else if (status == '確定') { statusArray = [status, '啟用', '停用'] }
                     let orderStatus = ''
-                    $('#status').val(status)
+                    // $('#status').val(status)
                     $('.orderStatus').find('option').remove()
                     $.each(statusArray, function (index, val) {
-                        if (val == '啟用') { orderStatus = '1' } else orderStatus = '0'
+                        if (val == '啟用') { orderStatus = '1' } else if (val == '停用') { orderStatus = '0' } else if (val == '確定') { orderStatus = '2' }
                         $('.orderStatus').append(
                             `
                             <option class="dropdown-item" value=` + orderStatus + `>` + val + `</option>

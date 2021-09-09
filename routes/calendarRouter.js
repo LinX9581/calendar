@@ -64,7 +64,7 @@ router.post('/renderSchedule', async function (req, res) {
         exceptUserAllSchedule = await mysql.query(beforeCreateScheduleExceptUserSql, beforeCreateScheduleExceptUserData)
     }
 
-    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1" + renderScheduleCondition + ""
+    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1 OR status = 2" + renderScheduleCondition + ""
     let beforeCreateScheduleData = [channel]
     let allSchedule = await mysql.query(beforeCreateScheduleSql, beforeCreateScheduleData)
 
@@ -139,7 +139,7 @@ router.post('/createCalendarList', async function (req, res) {
 router.post('/checkPositionRotation', async function (req, res) {
     let rotationOverflow = ''
     let calendarId = req.body.calendarId
-    let getPositionNumbersSql = "SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE calendarId = ?"
+    let getPositionNumbersSql = "SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE calendarId = ? AND status = 2"
     let getPositionNumbersData = [calendarId]
     let getPositionNumbers = await mysql.query(getPositionNumbersSql, getPositionNumbersData)
 
@@ -148,7 +148,7 @@ router.post('/checkPositionRotation', async function (req, res) {
     let getPositionRotation = await mysql.query(getPositionRotationSql, getPositionRotationData)
 
     if (getPositionRotation[0][0].rotation <= getPositionNumbers[0][0].adNumbers) {
-        rotationOverflow = '0';
+        rotationOverflow = '-1';
     }
     res.send(JSON.stringify({
         'rotationOverflow': rotationOverflow,

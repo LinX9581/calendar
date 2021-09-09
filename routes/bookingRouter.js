@@ -136,7 +136,7 @@ router.post('/getPosition', async function (req, res) {
         let getPositionSql = 'SELECT id,name,channelId,channelName,channelDomain,bgColor,rotation,memo,status FROM sale_booking.calendar_list ORDER BY orderKey'
         let allPosition = await mysql.query(getPositionSql)
 
-        //如果該頻道沒廣告怎該索引=0
+        //如果該頻道沒廣告則該索引=0
         let eachCalendarIdNumbersArray = allPosition[0].map(e => {
             if (eachCalendarIdNumbers[e.id] == undefined) eachCalendarIdNumbers[e.id] = 0;
             return eachCalendarIdNumbers[e.id]
@@ -374,7 +374,7 @@ router.post('/getCalendarOrder', async function (req, res) {
             let account = req.session.user.account;
             renderOrderCondition = 'AND create_by = "' + account + '"'
         }
-        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE status = 1 ' + renderOrderCondition + ' ORDER BY advertisers'
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE status = 1 or status = 2 ' + renderOrderCondition + ' ORDER BY advertisers'
         let allOrder = await mysql.query(getOrderSql)
 
         res.send(JSON.stringify({
