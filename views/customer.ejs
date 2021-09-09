@@ -335,6 +335,8 @@
         if (userType == 'User') {
             $('.customerEditBtn').addClass('d-none')
             $('.customerDelBtn').addClass('d-none')
+            $('nav > ul > li:nth-child(3)').addClass('d-none')
+            $('nav > ul > li:nth-child(4)').addClass('d-none')
             $('nav > ul > li:nth-child(5)').addClass('d-none')
         } else if (userType == 'SuperUser') {
             $('nav > ul > li:nth-child(5)').addClass('d-none')

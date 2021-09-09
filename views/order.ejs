@@ -377,7 +377,7 @@
                             <td data-th="客戶名稱" cal="advertisers">${res.allOrder[item].advertisers}</td>
                             <td data-th="活動名稱" cal="title">${res.allOrder[item].title}</td>
                             <td data-th="類型" cal="ad_type">${res.allOrder[item].ad_type} </td>
-                            <td data-th="業務" cal="salesperson">${res.allOrder[item].salesperson}</td>
+                            <td data-th="業務" cal="salesperson">${res.allOrder[item].create_by}</td>
                             <td data-th="備註" cal="memo">${res.allOrder[item].memo}</td>
                             <td data-th="狀態" cal="status">${res.allOrder[item].status}</td>
                             <th editId="${res.allOrder[item].id}">
@@ -437,7 +437,7 @@
 
                     let status = $(this).parents('tr').find("td[cal=status]").text()
                     let statusArray = []
-                    if (status == '啟用') { statusArray = [status, '停用'] } else if (status == '停用') { statusArray = [status, '啟用'] }
+                    if (status == '啟用') { statusArray = [status, '停用' ] } else if (status == '停用') { statusArray = [status, '啟用'] }
                     let orderStatus = ''
                     $('#status').val(status)
                     $('.orderStatus').find('option').remove()
@@ -482,7 +482,6 @@
                                     <th scope="col">刊登方式</th>
                                     <th scope="col">業務</th>
                                     <th scope="col">備註</th>
-                                    <th scope="col">建立者</th>
                                 </tr>
                             </thead>
                             <tbody class="renderTable">
@@ -496,9 +495,8 @@
                                     <td scope="row" data-th="客戶名稱" cal="advertisers">${res.getDetailOrderList[item].advertisers}</td>
                                     <td scope="row" data-th="客戶公司" cal="customer_company">${res.getDetailOrderList[item].customer_company}</td>
                                     <td data-th="刊登方式" cal="advertisers">${res.getDetailOrderList[item].ad_type}</td>
-                                    <td scope="row" data-th="業務" cal="salesperson">${res.getDetailOrderList[item].salesperson}</td>
+                                    <td scope="row" data-th="業務" cal="salesperson">${res.getDetailOrderList[item].create_by}</td>
                                     <td scope="row" data-th="備註" cal="memo">${res.getDetailOrderList[item].memo}</td>
-                                    <td scope="row" data-th="建立者" cal="create_by">${res.getDetailOrderList[item].create_by}</td>
                                 </tr>
                             `;
                         }

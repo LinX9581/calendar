@@ -27,7 +27,7 @@ async function serverRenderInit() {
     await renderSchedule()
     await renderOrderList()
     await renderChannel()
-    await sleep(1000)
+    await sleep(500)
     await afterAllEventRender()
     await calendarDel()
 }
@@ -35,6 +35,8 @@ async function serverRenderInit() {
 async function afterAllEventRender() {
     console.log("afterAllEventReadyRerender");
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
+    await sleep(500)
+    $('.ic-readonly-b').addClass('fas fa-ban')
 }
 
 async function renderCalendar() {
@@ -48,15 +50,15 @@ async function renderCalendar() {
         })
     }).then(res => res.json()).then((jsonData) => {
         //讓編輯委刊單和新增委刊單的table顯示calendar
-        $.each(jsonData.calendar, function(index, val) {
-                $('.dropdown_getCalUl').append(
-                    `
+        $.each(jsonData.calendar, function (index, val) {
+            $('.dropdown_getCalUl').append(
+                `
                     <li getChooseCalId=${val.id} value=${val.name}> <span class="calListStyle" style="background-color:${val.bgcolor}; color:${val.bgcolor};"></span> &nbsp; ${val.name}
                 `
-                );
-            })
-            //委刊單下拉選單
-        $(".dropdown_getCalBtn").click(function() {
+            );
+        })
+        //委刊單下拉選單
+        $(".dropdown_getCalBtn").click(function () {
             console.log('dropdown_getCalendarList_button click');
             var val = $(this).attr('id');
             if (val == 1) {
@@ -68,7 +70,7 @@ async function renderCalendar() {
             }
 
         });
-        $(".dropdown_getCalUl").delegate("li", "click", function() {
+        $(".dropdown_getCalUl").delegate("li", "click", function () {
             console.log('dropdown calendar li click');
             //將原來的cal改成選擇的 cal.text() & cal.style
             $('.dropdown_getCalBtn').html(`<span class="calListStyle"></span>  ` + $(this).text() + `<i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>`)
@@ -78,11 +80,11 @@ async function renderCalendar() {
             $(".dropdown_getCalBtn").attr('id', '0');
         });
 
-        $(".dropdown_getCalUl, .dropdown_getCalBtn").mouseup(function() {
+        $(".dropdown_getCalUl, .dropdown_getCalBtn").mouseup(function () {
             return false;
         });
 
-        $(document).mouseup(function() {
+        $(document).mouseup(function () {
             $(".dropdown_getCalUl").hide();
             $(".dropdown_getCalBtn").attr('id', '0');
         });
@@ -99,7 +101,7 @@ async function renderCalendar() {
             addCalendar(calendar);
         }
 
-        CalendarList.forEach(function(calendar) {
+        CalendarList.forEach(function (calendar) {
             html.push('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
                 '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
                 '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
@@ -121,7 +123,7 @@ async function renderOrderList() {
             "channel": channel,
         })
     }).then(res => res.json()).then((jsonData) => {
-        $.each(jsonData.allOrder, function(index, val) {
+        $.each(jsonData.allOrder, function (index, val) {
             $('.dropdown_getOrderUl').append(
                 `
                     <li getChooseOrderId=${val.id} value=${val.title} >${val.title}
@@ -129,7 +131,7 @@ async function renderOrderList() {
             );
         })
 
-        $(".dropdown_getOrderBtn").click(function() {
+        $(".dropdown_getOrderBtn").click(function () {
             console.log('dropdown_getCalendarList_button click');
             var val = $(this).attr('id');
             if (val == 1) {
@@ -143,7 +145,7 @@ async function renderOrderList() {
         });
 
         //選擇委託單時 給定所選 orderId calId 再讓 app.js去抓ID給後端
-        $(".dropdown_getOrderUl").delegate("li", "click", function() {
+        $(".dropdown_getOrderUl").delegate("li", "click", function () {
             //將原來的order改成選擇的 order.text() & order.style
             $('.dropdown_getOrderBtn').html($(this).text() + '<i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>')
             $('.dropdown_getOrderBtn').attr('thisOrderId', $(this).attr('getChooseOrderId'))
@@ -152,11 +154,11 @@ async function renderOrderList() {
             $(".dropdown_getOrderBtn").attr('id', '0');
         });
 
-        $(".dropdown_getOrderUl, .dropdown_getOrderBtn").mouseup(function() {
+        $(".dropdown_getOrderUl, .dropdown_getOrderBtn").mouseup(function () {
             return false;
         });
 
-        $(document).mouseup(function() {
+        $(document).mouseup(function () {
             $(".dropdown_getOrderUl").hide();
             $(".dropdown_getOrderBtn").attr('id', '0');
         });
@@ -164,6 +166,7 @@ async function renderOrderList() {
 }
 
 async function renderSchedule() {
+    console.log('render schedule');
     await fetch('/ch/renderSchedule', {
         method: 'POST',
         headers: {
@@ -173,6 +176,13 @@ async function renderSchedule() {
             "channel": channel,
         })
     }).then(res => res.json()).then((jsonData) => {
+        for (const key in jsonData.exceptUserSchedule) {
+            jsonData.exceptUserSchedule[key].isReadOnly = '1'
+        }
+
+        console.log(jsonData.schedule);
+        console.log(jsonData.exceptUserSchedule);
+        cal.createSchedules(jsonData.exceptUserSchedule)
         cal.createSchedules(jsonData.schedule)
     })
 }
@@ -186,7 +196,7 @@ async function renderChannel() {
         },
         body: JSON.stringify({})
     }).then(res => res.json()).then((allChannel) => {
-        $.each(allChannel.channel, function(index, val) {
+        $.each(allChannel.channel, function (index, val) {
             $('.dropdown-menu').append(
                 `
                 <a class="dropdown-item" href="/ch/` + val.link + `">` + val.name + `</a>
@@ -197,7 +207,7 @@ async function renderChannel() {
 }
 
 //新增的 calendar list , 讓 del btn 可以偵測新增的calendar list
-$('#addListBtn').click(async function() {
+$('#addListBtn').click(async function () {
     await addCalendarInfo()
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
     $('#addListInput').val('')
@@ -256,7 +266,7 @@ async function calendarInfo(calendarName, calendarColor, channel) {
 }
 
 async function calendarDel() {
-    $('.delBtn').on('click', async function() {
+    $('.delBtn').on('click', async function () {
         let delCalId = $(this).attr('delId')
         console.log(delCalId + 'deleteid');
         let delCalName = $(this).attr('delName')
@@ -301,7 +311,7 @@ function addCalendar(calendar) {
 function findCalendar(id) {
     var found;
 
-    CalendarList.forEach(function(calendar) {
+    CalendarList.forEach(function (calendar) {
         if (calendar.id === id) {
             found = calendar;
         }

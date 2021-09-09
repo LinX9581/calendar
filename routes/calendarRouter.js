@@ -6,6 +6,12 @@ let router = express.Router();
 router.get('/:url', async function (req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    // let user = {
+    //     account: 'sp',
+    //     name: 'sp',
+    //     type: 'User',
+    // }
+    // req.session.user = user;
     if (req.session.user != undefined) {
         let url = req.params.url
         let getChannelNameSql = "select link,name from sale_booking.channel where link = ? "
@@ -14,12 +20,7 @@ router.get('/:url', async function (req, res) {
         let channel = getChannel[0][0].link
         let channelName = getChannel[0][0].name
         // req.session.channel = 'www';
-        // let user = {
-        //     account: 'linx',
-        //     name: 'linx',
-        //     type: 'admin',
-        // }
-        // req.session.user = user;
+
         res.render(url, {
             today,
             channel,
@@ -52,11 +53,15 @@ router.post('/renderChannel', async function (req, res) {
 router.post('/renderSchedule', async function (req, res) {
     let renderScheduleCondition = ''
     let channel = req.body.channel;
+    let user = req.session.user.account;
+    let exceptUserAllSchedule = ''
 
     //判斷權限是user 就多一個 where條件
     if (req.session.user.type == 'User') {
-        let user = req.session.user.account;
         renderScheduleCondition = ' AND create_by = "' + user + '"'
+        let beforeCreateScheduleExceptUserSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1 AND create_by != ?"
+        let beforeCreateScheduleExceptUserData = [channel, user]
+        exceptUserAllSchedule = await mysql.query(beforeCreateScheduleExceptUserSql, beforeCreateScheduleExceptUserData)
     }
 
     let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1" + renderScheduleCondition + ""
@@ -65,6 +70,7 @@ router.post('/renderSchedule', async function (req, res) {
 
     res.send(JSON.stringify({
         'schedule': allSchedule[0],
+        'exceptUserSchedule': exceptUserAllSchedule[0],
         'render schedule': 'succeed',
     }));
 })

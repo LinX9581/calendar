@@ -141,6 +141,7 @@ function setSchedules() {
   generateSchedule(cal.getViewName(), cal.getDateRangeStart(), cal.getDateRangeEnd());
   cal.createSchedules(ScheduleList);
   refreshScheduleVisibility();
+  $('.ic-readonly-b').addClass('fas fa-ban')
 }
 
 
@@ -157,6 +158,7 @@ function refreshScheduleVisibility() {
     var span = input.nextElementSibling;
     span.style.backgroundColor = input.checked ? span.style.borderColor : 'transparent';
   });
+  console.log('refreshScheduleVisibility');
 }
 
 resizeThrottled = tui.util.throttle(function() {

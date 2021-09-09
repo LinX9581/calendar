@@ -9,6 +9,7 @@ socket.on(channel + 'create schedule', function (schedule) {
             location: schedule[0].location,
             category: 'time',
             dueDateClass: '',
+            isReadOnly: 1,
             start: schedule[0].start._date,
             end: schedule[0].end._date,
         }

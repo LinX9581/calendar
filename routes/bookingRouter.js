@@ -350,7 +350,7 @@ router.post('/getOrder', async function (req, res) {
             let account = req.session.user.account;
             renderOrderCondition = ' WHERE create_by = "' + account + '"'
         }
-        let getOrderSql = 'SELECT id,advertisers,customerName,customer_company,title,ad_type,salesperson,start_time,end_time,memo,status FROM sale_booking.order_list ' + renderOrderCondition + ' ORDER BY id'
+        let getOrderSql = 'SELECT id,advertisers,customerName,customer_company,title,ad_type,salesperson,start_time,end_time,memo,status,create_by FROM sale_booking.order_list ' + renderOrderCondition + ' ORDER BY id'
         let allOrder = await mysql.query(getOrderSql)
 
         res.send(JSON.stringify({
