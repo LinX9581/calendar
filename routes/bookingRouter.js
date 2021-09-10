@@ -62,7 +62,9 @@ router.post('/', async function (req, res) {
         res.render('order', {
             title,
             userName,
-            userType
+            userType,
+            userInvisible,
+            superuserInvisible
         });
     } else {
         title = '密碼錯誤，請重新輸入。'
@@ -73,7 +75,7 @@ router.post('/', async function (req, res) {
 })
 
 router.get('/position', function (req, res) {
-    // //req.session.user = user;
+    //req.session.user = user;
     // let user = {
     //     account: 'linx',
     //     name: 'linx',
@@ -117,10 +119,17 @@ router.get('/position-add', function (req, res) {
 });
 
 router.post('/getPosition', async function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        //取得頻道組成陣列
-        let getCalendarIdNumbersSql = 'SELECT calendarId FROM sale_booking.`schedule_event` ORDER BY id'
+    // let user = {
+    //     account: 'linx',
+    //     name: 'linx',
+    //     type: 'Admin',
+    // }
+    // req.session.user = user;
+    if (req.session.user != undefined && (req.session.user.type == 'Admin' || req.session.user.type == 'SuperUser')) {
+        //要取得該廣告版位的確定委刊數
+        //取得每個schedule關聯order的status=2的總個數組成陣列.
+
+        let getCalendarIdNumbersSql = 'SELECT * FROM sale_booking.`order_list` INNER JOIN sale_booking.`schedule_event` ON `order_list`.`id` = `schedule_event`.`orderId` WHERE `order_list`.status = 2'
         let getCalendarId = await mysql.query(getCalendarIdNumbersSql)
         let calendarId = getCalendarId[0].map(e => {
             return e.calendarId
@@ -133,7 +142,7 @@ router.post('/getPosition', async function (req, res) {
         });
 
         //先撈出 channelId 再去要該channel的名稱
-        let getPositionSql = 'SELECT id,name,channelId,channelName,channelDomain,bgColor,rotation,memo,status FROM sale_booking.calendar_list ORDER BY orderKey'
+        let getPositionSql = 'SELECT id,name,channelId,channelName,channelDomain,bgColor,rotation,memo,status FROM sale_booking.calendar_list ORDER BY channelName'
         let allPosition = await mysql.query(getPositionSql)
 
         //如果該頻道沒廣告則該索引=0
@@ -248,6 +257,11 @@ router.post('/delete_position', async function (req, res) {
         let deletePostionData = [delId]
         await mysql.query(deletePostionSql, deletePostionData)
 
+        //停用該cal相關的schedule
+        let updateScheduleSql = 'DELETE FROM sale_booking.schedule_event WHERE calendarId=?'
+        let updateScheduleData = [delId]
+        await mysql.query(updateScheduleSql, updateScheduleData)
+
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
@@ -269,11 +283,24 @@ router.get('/order', function (req, res) {
         let title = 'NOW Booking '
         let userType = req.session.user.type
         let userName = req.session.user.name
+        let userInvisible = ''
+        let superuserInvisible = ''
+        //不同權限的隱藏屬性
+        switch (userType.toString()) {
+            case 'SuperUser':
+                superuserInvisible = 'd-none'
+                break;
+            case 'User':
+                userInvisible = 'd-none'
+                break;
+        }
 
         res.render('order', {
             title,
             userName,
-            userType
+            userType,
+            userInvisible,
+            superuserInvisible
         });
     } else {
         let title = 'NOW Booking '
@@ -307,12 +334,15 @@ router.get('/reserveOrder', async function (req, res) {
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
         let userType = req.session.user.type
+        let userInvisible = ''
+        if (userType == 'User') userInvisible = 'd-none'
 
         res.render('reserveOrder', {
             today,
             title,
             userName,
-            userType
+            userType,
+            userInvisible
         });
     } else {
         let title = 'NOW Booking '
@@ -372,11 +402,12 @@ router.post('/getCalendarOrder', async function (req, res) {
         //判斷權限是user 就多一個 where條件
         if (req.session.user.type == 'User') {
             let account = req.session.user.account;
-            renderOrderCondition = 'AND create_by = "' + account + '"'
+            renderOrderCondition = 'create_by = "' + account + '"'
         }
-        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE status = 1 or status = 2 ' + renderOrderCondition + ' ORDER BY advertisers'
+        console.log(renderOrderCondition);
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE ' + renderOrderCondition + ' AND (status = 1 or status = 2) ORDER BY advertisers'
         let allOrder = await mysql.query(getOrderSql)
-
+        console.log(allOrder[0]);
         res.send(JSON.stringify({
             'allOrder': allOrder[0],
         }));
@@ -465,6 +496,11 @@ router.post('/update_order', async function (req, res) {
         let updateScheduleTitleData = [title, orderId]
         await mysql.query(updateScheduleTitleSql, updateScheduleTitleData)
 
+        //當委刊單停用時 schedule跟著停用
+        let updateOrderScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? where orderId=?'
+        let updateOrderScheduleData = [status, orderId]
+        await mysql.query(updateOrderScheduleSql, updateOrderScheduleData)
+
         console.log(update_date + " " + req.session.user.account + " updateOrder: " + updateOrderData)
         let userLoginTrace = update_date + " " + req.session.user.account + " updateOrder: " + updateOrderData + "\n"
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
@@ -524,6 +560,12 @@ router.post('/delete_order', async function (req, res) {
         let deleteOrderData = [delId]
         await mysql.query(deleteOrderSql, deleteOrderData)
 
+        //刪除相關的 schedule
+        // let deleteOrderScheduleSql = 'DELETE sale_booking.schedule_event FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`order_list` ON `order_list`.`id` = `schedule_event`.`orderId` WHERE schedule_event.orderId = ?'
+        let deleteOrderScheduleSql = 'DELETE FROM sale_booking.schedule_event WHERE orderId = ?'
+        let deleteOrderScheduleData = [delId]
+        await mysql.query(deleteOrderScheduleSql, deleteOrderScheduleData)
+
         fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete order ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
@@ -545,14 +587,18 @@ router.get('/customer', function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
         let userType = req.session.user.type
+        let userInvisible = ''
+        if (userType == 'User') userInvisible = 'd-none'
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
+
         res.render('customer', {
             today,
             title,
             userName,
-            userType
+            userType,
+            userInvisible
         });
     } else {
         let title = 'NOW Booking '
@@ -689,7 +735,6 @@ router.post('/create_customer', async function (req, res) {
         let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
 
         let idExist = await mysql.query('SELECT code FROM sale_booking.customer WHERE code = ?', code)
-        console.log(idExist[0]);
         if (idExist[0] == '') {
             let createCustomerSql = 'INSERT INTO sale_booking.`customer` (`code`, `name`, `contacts`, `phone`, `email`, `sale_name`,`tax_id`,`postal_code`,`address`,`payment_terms`,`memo`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             let createCustomerData = [code, name, contacts, phone, email, sale_name, tax_id, postal_code, address, payment_terms, memo, createTime, userName, createTime, userName]
@@ -810,7 +855,7 @@ router.get('/channel-add', function (req, res) {
 
 router.post('/getChannel', async function (req, res) {
     //req.session.user = user;
-    if (req.session.user != undefined) {
+    if (req.session.user != undefined && (req.session.user.type == 'Admin' || req.session.user.type == 'SuperUser')) {
         //取得頻道組成陣列
         let getAdNumbersSql = 'SELECT channelId FROM sale_booking.`calendar_list` where status = 1 ORDER BY channelId'
         let getChannel = await mysql.query(getAdNumbersSql)
@@ -946,11 +991,11 @@ router.post('/delete_channel', async function (req, res) {
         let deleteChannelData = [delId]
         await mysql.query(deleteChannelSql, deleteChannelData)
 
-        let deletecalendarListFromThisChannelSql = 'DELETE FROM sale_booking.`calendar_list` WHERE channel = ?'
+        let deletecalendarListFromThisChannelSql = 'DELETE FROM sale_booking.`calendar_list` WHERE channelId = ?'
         let deletecalendarListFromThisChannelData = [delId]
         await mysql.query(deletecalendarListFromThisChannelSql, deletecalendarListFromThisChannelData)
 
-        let deleteScheduleListFromThisChannelSql = 'DELETE FROM sale_booking.`schedule_event` WHERE channel = ?'
+        let deleteScheduleListFromThisChannelSql = 'DELETE FROM sale_booking.`schedule_event` WHERE channelId = ?'
         let deleteScheduleListFromThisChannelData = [delId]
         await mysql.query(deleteScheduleListFromThisChannelSql, deleteScheduleListFromThisChannelData)
 
@@ -977,7 +1022,7 @@ router.post('/delete_channel', async function (req, res) {
 
 router.get('/privilege', function (req, res) {
     //req.session.user = user;
-    if (req.session.user != undefined) {
+    if (req.session.user != undefined && (req.session.user.type == 'Admin' || req.session.user.type == 'SuperUser')) {
         let title = 'NOW Booking '
         let userType = req.session.user.type
         let userName = req.session.user.name
@@ -1032,7 +1077,6 @@ router.post('/getPrivilege', async function (req, res) {
 
 router.get('/privilege-add', function (req, res) {
     //req.session.user = user;
-    console.log(req.session.user);
     if (req.session.user != undefined) {
         if (req.session.user.type != 'Admin') {
             let userType = req.session.user.type

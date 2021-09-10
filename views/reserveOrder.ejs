@@ -91,19 +91,19 @@
                                 <p>客戶資料</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item <%= userInvisible %>">
                             <a href="position" class="nav-link">
                                 <i class="nav-icon far fa-eye"></i>
                                 <p>廣告版面</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item <%= userInvisible %>">
                             <a href="channel" class="nav-link">
                                 <i class="nav-icon fas fa-photo-video"></i>
                                 <p>頻道管理</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item <%= userInvisible %>">
                             <a href="privilege" class="nav-link">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p>帳號管理</p>
@@ -208,9 +208,6 @@
         let userType = $('.userType').attr('value')
         if (userType == 'User') {
             $('.renderTable tr').find('th').remove()
-            $('nav > ul > li:nth-child(3)').addClass('d-none')
-            $('nav > ul > li:nth-child(4)').addClass('d-none')
-            $('nav > ul > li:nth-child(5)').addClass('d-none')
         } else if (userType == 'SuperUser') {
             $('nav > ul > li:nth-child(5)').addClass('d-none')
         }

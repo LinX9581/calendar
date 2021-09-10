@@ -64,7 +64,7 @@ router.post('/renderSchedule', async function (req, res) {
         exceptUserAllSchedule = await mysql.query(beforeCreateScheduleExceptUserSql, beforeCreateScheduleExceptUserData)
     }
 
-    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? AND status = 1 OR status = 2" + renderScheduleCondition + ""
+    let beforeCreateScheduleSql = "select * from sale_booking.schedule_event where channelId = ? " + renderScheduleCondition + " AND status = 1 OR status = 2"
     let beforeCreateScheduleData = [channel]
     let allSchedule = await mysql.query(beforeCreateScheduleSql, beforeCreateScheduleData)
 
@@ -139,7 +139,8 @@ router.post('/createCalendarList', async function (req, res) {
 router.post('/checkPositionRotation', async function (req, res) {
     let rotationOverflow = ''
     let calendarId = req.body.calendarId
-    let getPositionNumbersSql = "SELECT count(*) AS adNumbers FROM sale_booking.`schedule_event` WHERE calendarId = ? AND status = 2"
+
+    let getPositionNumbersSql = "SELECT count(*) AS adNumbers FROM sale_booking.`order_list` INNER JOIN sale_booking.`schedule_event` ON `order_list`.`id` = `schedule_event`.`orderId` WHERE calendarId = ? AND `order_list`.status = 2"
     let getPositionNumbersData = [calendarId]
     let getPositionNumbers = await mysql.query(getPositionNumbersSql, getPositionNumbersData)
 
