@@ -192,8 +192,6 @@ var socket = io();
         let customTime = $('#customer_schedule_time').val()
         let startTime = moment(customTime.split(' - ')[0]).valueOf()
         let endTime = moment(customTime.split(' - ')[1]).valueOf()
-        console.log(moment(startTime).format());
-        console.log(moment(endTime).format());
         customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(startTime).format(), moment(endTime).format())
     })
     //createScheduleEvent
@@ -201,7 +199,9 @@ var socket = io();
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
         let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
         let orderTitle = $('.dropdown_getOrderBtn').attr('thisOrderTitle')
-        customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, createScheduleEvent.start, createScheduleEvent.end)
+        console.log(moment(createScheduleEvent.start._date).format());
+        console.log(moment(createScheduleEvent.end._date).format());
+        customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(createScheduleEvent.start._date).format(), moment(createScheduleEvent.end._date).format())
     })
     async function customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, start, end) {
         var schedule = {
@@ -258,8 +258,6 @@ var socket = io();
         }).then(res => res.json()).then((beforeCreateScheduleRes) => {
             console.log(beforeCreateScheduleRes);
             $('.ic-readonly-b').addClass('fas fa-ban')
-            console.log(schedule.start);
-            console.log(schedule.end);
         })
     }
 

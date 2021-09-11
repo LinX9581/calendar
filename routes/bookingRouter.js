@@ -328,6 +328,12 @@ router.get('/order-add', function (req, res) {
 });
 
 router.get('/reserveOrder', async function (req, res) {
+    // let user = {
+    //     account: 'linx',
+    //     name: 'linx',
+    //     type: 'User',
+    // }
+    // req.session.user = user;
     //req.session.user = user;
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
@@ -406,7 +412,7 @@ router.post('/getCalendarOrder', async function (req, res) {
         }
         let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE (status = 1 or status = 2) ' + renderOrderCondition + ' ORDER BY advertisers'
         let allOrder = await mysql.query(getOrderSql)
-        
+
         res.send(JSON.stringify({
             'allOrder': allOrder[0],
         }));
