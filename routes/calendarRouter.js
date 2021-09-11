@@ -7,8 +7,8 @@ router.get('/:url', async function (req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
     // let user = {
-    //     account: 'sp',
-    //     name: 'sp',
+    //     account: 'linx',
+    //     name: 'linx',
     //     type: 'User',
     // }
     // req.session.user = user;
@@ -162,8 +162,8 @@ router.post('/beforeCreateSchedule', async function (req, res) {
     let calendarId = req.body.calendarId
     let title = req.body.title
     let isAllDay = req.body.isAllDay
-    let start = moment(req.body.start._date).format('YYYY-MM-DD HH:mm:ss')
-    let end = moment(req.body.end._date).format('YYYY-MM-DD HH:mm:ss')
+    let start = moment(req.body.start).format('YYYY-MM-DD HH:mm:ss')
+    let end = moment(req.body.end).format('YYYY-MM-DD HH:mm:ss')
     let category = req.body.category
     let state = '1'
     let channelId = req.body.channel;

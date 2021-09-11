@@ -47,7 +47,7 @@ var socket = io();
         },
         'clickSchedule': async function (e) {
             console.log('clickSchedule', e);
-            
+
             //body 會跑版 暫時清空
             $('div > div.tui-full-calendar-popup-container > div.tui-full-calendar-section-detail > div.tui-full-calendar-popup-detail-item.tui-full-calendar-popup-detail-item-separate > span').text('')
             updateScheduleEvent = e.schedule;
@@ -181,24 +181,40 @@ var socket = io();
         $('.ic-readonly-b').addClass('fas fa-ban')
     })
 
+    //客製化時間
+    $('#btn-new-schedule').click(function () {
+        $('#customerTime_create_schedule_dropdown').modal('show');
+    })
+    $('#create_customTime_scedule').click(function () {
+        let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
+        let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
+        let orderTitle = $('.dropdown_getOrderBtn').attr('thisOrderTitle')
+        let customTime = $('#customer_schedule_time').val()
+        let startTime = moment(customTime.split(' - ')[0]).valueOf()
+        let endTime = moment(customTime.split(' - ')[1]).valueOf()
+        console.log(moment(startTime).format());
+        console.log(moment(endTime).format());
+        customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(startTime).format(), moment(endTime).format())
+    })
     //createScheduleEvent
     $('#create_scedule').click(function () {
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
         let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
         let orderTitle = $('.dropdown_getOrderBtn').attr('thisOrderTitle')
-        customerSaveNewSchedule(createScheduleEvent, calId, orderId, orderTitle)
+        customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, createScheduleEvent.start, createScheduleEvent.end)
     })
-    async function customerSaveNewSchedule(e, calId, orderId, orderTitle) {
+    async function customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, start, end) {
         var schedule = {
             id: String(Date.now()),
             calendarId: String(calId),
             title: orderTitle,
             isAllDay: true,
-            start: e.start,
-            end: e.end,
-            category: 'allday'
+            start: start,
+            end: end,
+            category: 'allday',
+            orderId: orderId
         };
-
+        console.log(schedule);
         await fetch('/ch/checkPositionRotation', {
             method: 'POST',
             headers: {
@@ -214,36 +230,39 @@ var socket = io();
             } else {
                 socket.emit('create schedule', [schedule], channel);
                 cal.createSchedules([schedule]);
-                beforeCreateSchedule()
+                beforeCreateSchedule(createScheduleEvent, schedule)
             }
             $('.ic-readonly-b').addClass('fas fa-ban')
         })
-
-        async function beforeCreateSchedule() {
-            await fetch('/ch/beforeCreateSchedule', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "id": schedule.id,
-                    "calendarId": schedule.calendarId,
-                    "title": orderTitle,
-                    "isAllDay": e.isAllDay,
-                    "start": schedule.start,
-                    "end": schedule.end,
-                    "category": schedule.category,
-                    "dueDateClass": e.dueDateClass,
-                    "state": e.state,
-                    "channel": channel,
-                    "orderId": orderId
-                })
-            }).then(res => res.json()).then((beforeCreateScheduleRes) => {
-                console.log(beforeCreateScheduleRes);
-            })
-            $('.ic-readonly-b').addClass('fas fa-ban')
-        }
     }
+
+    async function beforeCreateSchedule(e, schedule) {
+        await fetch('/ch/beforeCreateSchedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "id": schedule.id,
+                "calendarId": schedule.calendarId,
+                "title": schedule.title,
+                "isAllDay": 1,
+                "start": schedule.start,
+                "end": schedule.end,
+                "category": schedule.category,
+                "dueDateClass": e.dueDateClass,
+                "state": 1,
+                "channel": channel,
+                "orderId": schedule.orderId
+            })
+        }).then(res => res.json()).then((beforeCreateScheduleRes) => {
+            console.log(beforeCreateScheduleRes);
+            $('.ic-readonly-b').addClass('fas fa-ban')
+            console.log(schedule.start);
+            console.log(schedule.end);
+        })
+    }
+
 
     //底下都是原套件 devault function
 

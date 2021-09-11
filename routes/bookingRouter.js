@@ -402,12 +402,11 @@ router.post('/getCalendarOrder', async function (req, res) {
         //判斷權限是user 就多一個 where條件
         if (req.session.user.type == 'User') {
             let account = req.session.user.account;
-            renderOrderCondition = 'create_by = "' + account + '"'
+            renderOrderCondition = 'AND create_by = "' + account + '"'
         }
-        console.log(renderOrderCondition);
-        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE ' + renderOrderCondition + ' AND (status = 1 or status = 2) ORDER BY advertisers'
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE (status = 1 or status = 2) ' + renderOrderCondition + ' ORDER BY advertisers'
         let allOrder = await mysql.query(getOrderSql)
-        console.log(allOrder[0]);
+        
         res.send(JSON.stringify({
             'allOrder': allOrder[0],
         }));

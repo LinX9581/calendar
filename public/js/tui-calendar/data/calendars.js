@@ -179,9 +179,6 @@ async function renderSchedule() {
         for (const key in jsonData.exceptUserSchedule) {
             jsonData.exceptUserSchedule[key].isReadOnly = '1'
         }
-
-        console.log(jsonData.schedule);
-        console.log(jsonData.exceptUserSchedule);
         cal.createSchedules(jsonData.exceptUserSchedule)
         cal.createSchedules(jsonData.schedule)
     })
@@ -203,65 +200,6 @@ async function renderChannel() {
             `
             );
         })
-    })
-}
-
-//新增的 calendar list , 讓 del btn 可以偵測新增的calendar list
-$('#addListBtn').click(async function () {
-    await addCalendarInfo()
-    $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
-    $('#addListInput').val('')
-    $('#addListColorInput').val('')
-    await calendarDel()
-})
-
-async function addCalendarInfo() {
-    let calendarName = $('#addListInput').val()
-    let calendarColor = $('#addListColorInput').val()
-    if (calendarName != '' && calendarColor != '') {
-        calendarInfo(calendarName, calendarColor, channel)
-    } else {
-        alert('name、color 不得為空')
-    }
-}
-
-async function calendarInfo(calendarName, calendarColor, channel) {
-    calendar = new CalendarInfo();
-    calendar.id = String(Date.now());
-    calendar.name = calendarName;
-    calendar.color = '#ffffff';
-    calendar.bgColor = calendarColor;
-    calendar.dragBgColor = calendarColor;
-    calendar.borderColor = calendarColor;
-    addCalendar(calendar);
-    socket.emit('create calendar', calendar.id, calendarName, calendarColor, channel);
-    $('#calendarList').append('<div class="row"><div class="lnb-calendars-item col-9"><label>' +
-        '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
-        '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
-        '<span>' + calendar.name + '</span> ' +
-        '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fas fa-backspace"></i></div></div>')
-
-    await fetch('/ch/createCalendarList', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "calendarList": CalendarList,
-            "calendarId": calendar.id,
-            "calendarName": calendarName,
-            "calendarColor": '#ffffff',
-            "calendarBgColor": calendarColor,
-            "calendarDragBgColor": calendarColor,
-            "calendarBorderColor": calendarColor,
-            "channel": channel
-        })
-    }).then(res => res.json()).then((createCalendarListRes) => {
-        $('.dropdown_getCalUl').append(
-            `
-                <li getChooseCalId=${createCalendarListRes.calendarId}> <span class="calListStyle" style="background-color:${createCalendarListRes.calendarColor}; color:${createCalendarListRes.calendarColor};"></span> &nbsp; ${calendarName}
-            `
-        );
     })
 }
 
@@ -292,6 +230,16 @@ async function calendarDel() {
             })
         }
     })
+}
+
+dateRangePicker()
+async function dateRangePicker() {
+    let pickerDate = moment(new Date()).format('MM-DD-YYYY');
+    await $('#customer_schedule_time').daterangepicker({
+        "startDate": pickerDate,
+        "endDate": pickerDate,
+        "minDate": "01/01/2021",
+    }, function (start, end, label) { });
 }
 
 function CalendarInfo() {
