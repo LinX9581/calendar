@@ -238,7 +238,7 @@ async function dateRangePicker() {
     await $('#customer_schedule_time').daterangepicker({
         "startDate": pickerDate,
         "endDate": pickerDate,
-        "minDate": "01/01/2021",
+        "minDate": pickerDate,
     }, function (start, end, label) { });
 }
 

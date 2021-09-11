@@ -192,16 +192,22 @@ var socket = io();
         let customTime = $('#customer_schedule_time').val()
         let startTime = moment(customTime.split(' - ')[0]).valueOf()
         let endTime = moment(customTime.split(' - ')[1]).valueOf()
-        customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(startTime).format(), moment(endTime).format())
+        if (moment(startTime).isBefore(moment(new Date()))) {
+            alert('不能預約今天以前的委刊單')
+        } else {
+            customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(startTime).format(), moment(endTime).format())
+        }
     })
     //createScheduleEvent
     $('#create_scedule').click(function () {
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
         let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
         let orderTitle = $('.dropdown_getOrderBtn').attr('thisOrderTitle')
-        console.log(moment(createScheduleEvent.start._date).format());
-        console.log(moment(createScheduleEvent.end._date).format());
-        customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(createScheduleEvent.start._date).format(), moment(createScheduleEvent.end._date).format())
+        if (moment(moment(createScheduleEvent.start._date).format()).isBefore(moment(new Date()))) {
+            alert('不能預約今天以前的委刊單')
+        }else{
+            customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(createScheduleEvent.start._date).format(), moment(createScheduleEvent.end._date).format())
+        }
     })
     async function customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, start, end) {
         var schedule = {
