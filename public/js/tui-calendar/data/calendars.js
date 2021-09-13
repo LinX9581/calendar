@@ -35,8 +35,6 @@ async function serverRenderInit() {
 async function afterAllEventRender() {
     console.log("afterAllEventReadyRerender");
     $('.dropdown-menu-title[data-action="toggle-monthly"]').click()
-    await sleep(500)
-    $('.ic-readonly-b').addClass('fas fa-ban')
 }
 
 async function renderCalendar() {

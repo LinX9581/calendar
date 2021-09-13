@@ -67,20 +67,18 @@ var socket = io();
                 editScheduleId = updateScheduleEvent.id
                 editCalendarId = updateScheduleEvent.calendarId
             })
-            $('.ic-readonly-b').addClass('fas fa-ban')
+            
         },
         'beforeCreateSchedule': function (e) {       //建立新的scedule
-            $('.ic-readonly-b').addClass('fas fa-ban')
             console.log('beforeCreateSchedule', e);
             $('#create_schedule_dropdown').modal('show');
             createScheduleEvent = e;
             e.guide.clearGuideElement();
-            $('.ic-readonly-b').addClass('fas fa-ban')
+            
             // saveNewSchedule(e);
         },
         //目前只有更新時間會觸發，及時同步會卡套件時區BUG
         'beforeUpdateSchedule': async function (e) {
-            $('.ic-readonly-b').addClass('fas fa-ban')
             var schedule = e.schedule;
             var changes = e.changes;
             updateChangeTime = e.changes;
@@ -113,13 +111,12 @@ var socket = io();
                 return 0;
             })
             refreshScheduleVisibility();
-            $('.ic-readonly-b').addClass('fas fa-ban')
         },
         'beforeDeleteSchedule': async function (e) {
             console.log('beforeDeleteSchedule', e);
             let isDel = confirm('確定刪除?')
             if (isDel) {
-                $('.ic-readonly-b').addClass('fas fa-ban')
+                
                 await fetch('/ch/beforeDeleteSchedule', {
                     method: 'POST',
                     headers: {
@@ -129,14 +126,12 @@ var socket = io();
                         "deleteId": e.schedule.id,
                     })
                 }).then(res => res.json()).then((jsonData) => {
-                    $('.ic-readonly-b').addClass('fas fa-ban')
+                    
                     return 0;
                 })
                 socket.emit('delete schedule', e.schedule.id, e.schedule.calendarId, channel);
                 cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
-                $('.ic-readonly-b').addClass('fas fa-ban')
             }
-            $('.ic-readonly-b').addClass('fas fa-ban')
         },
         'clickTimezonesCollapseBtn': function (timezonesCollapsed) {
             if (timezonesCollapsed) {
@@ -178,7 +173,6 @@ var socket = io();
         }).then(res => res.json()).then((jsonData) => {
             return 0;
         })
-        $('.ic-readonly-b').addClass('fas fa-ban')
     })
 
     //客製化時間
@@ -238,7 +232,7 @@ var socket = io();
                 cal.createSchedules([schedule]);
                 beforeCreateSchedule(createScheduleEvent, schedule)
             }
-            $('.ic-readonly-b').addClass('fas fa-ban')
+            
         })
     }
 
@@ -263,7 +257,7 @@ var socket = io();
             })
         }).then(res => res.json()).then((beforeCreateScheduleRes) => {
             console.log(beforeCreateScheduleRes);
-            $('.ic-readonly-b').addClass('fas fa-ban')
+            
         })
     }
 
