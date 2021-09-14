@@ -10,6 +10,7 @@ import moment from 'moment';
  * post('/renderChannel')               : rendar channel list 到 calendar左上角的切換頻道選單。
  * post('/renderSchedule')              : render schedule , 如果權限是User就只能看到該User的Schedule。
  * post('/renderCalendar')              : rendar calendar。
+ * post('/getCalendarOrder')            : rendar dropdown orderList。
  * post('/deleteCalendar')              : 停用 calendar ， 包括相關的schedule，並把這些schedule傳給前端刪除 ； position頁也能刪除calenar，是真的刪除而不是停用
  * post('/createCalendarList')          : create calendar
  * post('/checkPositionRotation')       : 判斷確定委刊的委刊單數 是不是超過版位輪替數
@@ -97,6 +98,31 @@ router.post('/renderCalendar', async function (req, res) {
         'render Calendar': 'succeed',
     }));
 })
+
+//在calendar 不顯示停用的Order
+router.post('/getCalendarOrder', async function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let renderOrderCondition = ''
+        //判斷權限是user 就多一個 where條件
+        if (req.session.user.type == 'User') {
+            let account = req.session.user.account;
+            renderOrderCondition = 'AND create_by = "' + account + '"'
+        }
+        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE (status = 1 or status = 2) ' + renderOrderCondition + ' ORDER BY advertisers'
+        let allOrder = await mysql.query(getOrderSql)
+
+        res.send(JSON.stringify({
+            'allOrder': allOrder[0],
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
 router.post('/deleteCalendar', async function (req, res) {
     let delIdArray = []
     let delCalId = req.body.delCalId;

@@ -108,7 +108,7 @@ async function renderCalendar() {
 
 async function renderOrderList() {
     console.log('renderOrderList');
-    await fetch('/getCalendarOrder', {
+    await fetch('/ch/getCalendarOrder', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

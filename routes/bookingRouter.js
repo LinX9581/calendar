@@ -10,17 +10,50 @@ import { exec } from 'child_process';
 // booking.linxnote.club/ch/url  -> 會導到相關的頻道calendar頁面
 
 /**
- * get('/')                             : 登入頁。
+ * get('/')                     : 登入頁。
  * get('/logout')               : 登出。
- * post('/')              : 登入帳密判斷，建立使用者session、根據權限讓初始頁限制瀏覽。
- * get('/order')              : 委刊單頁面、判斷權限限制瀏覽。
- * get('/order-add')              : 新增委刊單頁面。
- * get('/reserveOrder')          : 預約委刊單頁、同時嵌入calendar
- * post('/checkPositionRotation')       : 判斷確定委刊的委刊單數 是不是超過版位輪替數
- * post('/beforeCreateSchedule')        : create schedule
- * post('/beforeDeleteSchedule')        : delete schedule
- * post('/beforeUpdateScheduleTime')    : update schedule time
- * post('/beforeUpdateSchedule')        : update schedule title、calendarId
+ * post('/')                    : 登入帳密判斷，建立使用者session、根據權限讓初始頁限制瀏覽。
+ * get('/order')                : order.ejs、判斷權限限制瀏覽。
+ * get('/order-add')            : order-add.ejs。
+ * get('/orderReserve')         : orderReserve.ejs、同時嵌入calendar。
+ * post('/getOrder')            : 取得委刊單、判斷權限限制瀏覽。
+ * post('/detail_order')        : 會顯示 委刊單被哪些頻道和廣告版位使用，以及委刊單和客戶的詳細資料。
+ * post('/update_order')        : 編輯委刊單，order名稱改變時schedule名稱跟著改變；order停用時schedule跟著停用。
+ * post('/create_order')        : create order.
+ * post('/delete_order')        : delete order & delete schedule.
+ * post('/delete_order')        : update schedule title、calendarId
+ * 
+ * get('/position')             : position.ejs
+ * get('/position-add')         : position-add.ejs
+ * post('/getPosition')         : 取得所有廣告版位，計算廣告被確定委刊綁定的次數。
+ * post('/update_position')     : update position，停用時相關的schedule跟著停用；當廣告被移到別的頻道，schedule跟著移動。
+ * post('/create_position')     : create postion
+ * post('/delete_position')     : delete position ；刪除相關的schedule。
+ * 
+ * get('/customer')            : customer.ejs，判斷權限限制瀏覽。
+ * get('/customer-add')            : customer-add.ejs，判斷權限限制瀏覽。
+ * post('/getCustomer')     : 取得客戶資料
+ * post('/renderCustomer')     : 建立委刊單時會render 客戶資料的select
+ * post('/detail_customer')     : detail customer
+ * post('/update_customer')     : update customer
+ * post('/create_customer')     : create customer
+ * post('/delete_customer')     : delete cusomter
+ * 
+ * get('/channel')     : channel.ejs
+ * get('/channel-add')     : channel-add.ejs
+ * post('/getChannel')     : render channel ，計算頻道下有幾個廣告版位
+ * post('/renderChannel')     : 建立廣告版位時要選擇綁定的頻道
+ * post('/update_channel')     : update channel ，頻道停用相關的廣告、schedule跟著停用；頻道名稱改變時，calendar_list的channelName跟著改變。
+ * post('/create_channel')     : create channel
+ * post('/delete_position')     : delete channel
+ * 
+ * get('/privilege')     : privilege.ejs
+ * get('/privilege-add')     : privilege-add.ejs
+ * post('/getPrivilege')     : render privilege ；計算每個業務的確定委刊數。
+ * post('/delete_account')     : delete account
+ * post('/create_account')     : create account
+ * 
+ * 
  */
 
 let router = express.Router();
@@ -170,24 +203,6 @@ router.get('/orderReserve', async function (req, res) {
     }
 });
 
-router.post('/getReserveOrder', async function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        //取得個頻道的廣告數
-        let getChannelSql = 'SELECT link,name,memo,domain FROM sale_booking.channel where status = 1 ORDER BY link'
-        let allChannel = await mysql.query(getChannelSql)
-
-        res.send(JSON.stringify({
-            'allChannel': allChannel[0],
-        }));
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
 //在後台 委刊單 停用、啟用都會顯示
 router.post('/getOrder', async function (req, res) {
     //req.session.user = user;
@@ -212,50 +227,10 @@ router.post('/getOrder', async function (req, res) {
     }
 });
 
-//在calendar 不顯示停用的Order
-router.post('/getCalendarOrder', async function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        let renderOrderCondition = ''
-        //判斷權限是user 就多一個 where條件
-        if (req.session.user.type == 'User') {
-            let account = req.session.user.account;
-            renderOrderCondition = 'AND create_by = "' + account + '"'
-        }
-        let getOrderSql = 'SELECT id,advertisers,title,ad_type,salesperson,memo,status FROM sale_booking.order_list WHERE (status = 1 or status = 2) ' + renderOrderCondition + ' ORDER BY advertisers'
-        let allOrder = await mysql.query(getOrderSql)
-
-        res.send(JSON.stringify({
-            'allOrder': allOrder[0],
-        }));
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
 router.post('/detail_order', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
         let editId = req.body.editId;
-        //撈出該委刊單被哪些頻道使用  ## 這邊直接把 channel的schema複製到calendar_list
-        // let getDetailOrderChannelArray = ''
-        // let getOrderChannelIdSql = 'SELECT channelId FROM sale_booking.schedule_event WHERE orderId=?'
-        // let getOrderChannelIdData = [editId]
-        // let getOrderChannelId = await mysql.query(getOrderChannelIdSql, getOrderChannelIdData)
-        // let getOrderChannel = getOrderChannelId[0].map(e => {
-        //     return e.channelId
-        // })
-        // let getOrderChannelArray = [...new Set(getOrderChannel)];
-        // if (getOrderChannelId[0] != '') {
-        //     let getDetailOrderChannelSql = 'SELECT `channel`.`name`,`channel`.`domain` FROM sale_booking.`channel` INNER JOIN sale_booking.`schedule_event` ON `channel`.`link` = `schedule_event`.`channelId` WHERE channelId in (?)'
-        //     let getDetailOrderChannelData = [getOrderChannelArray]
-        //     let getDetailChannelData = await mysql.query(getDetailOrderChannelSql, getDetailOrderChannelData)
-        //     let set = new Set();
-        //     getDetailOrderChannelArray = getDetailChannelData[0].filter(item => !set.has(item.name) ? set.add(item.name) : false);
-        // }
 
         //撈出該委刊單被哪些廣告版位和頻道使用
         let getDetailOrderPositionSql = 'SELECT `calendar_list`.`name`,channelName,channelDomain,start,end FROM sale_booking.`schedule_event` INNER JOIN sale_booking.`calendar_list` ON `calendar_list`.`id` = `schedule_event`.`calendarId` WHERE orderId = ?'
@@ -615,16 +590,15 @@ router.get('/customer', function (req, res) {
     }
 });
 
-router.post('/renderCustomer', async function (req, res) {
+router.get('/customer-add', function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
-        let renderCustomerSql = "select id,name from sale_booking.customer"
-        let allCustomer = await mysql.query(renderCustomerSql)
-
-        res.send(JSON.stringify({
-            'customer': allCustomer[0],
-            'render customer': 'succeed',
-        }));
+        let idExist = '0'
+        let userName = req.session.user.name
+        res.render('customer-add', {
+            idExist,
+            userName
+        });
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -649,15 +623,16 @@ router.post('/getCustomer', async function (req, res) {
     }
 });
 
-router.get('/customer-add', function (req, res) {
+router.post('/renderCustomer', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
-        let idExist = '0'
-        let userName = req.session.user.name
-        res.render('customer-add', {
-            idExist,
-            userName
-        });
+        let renderCustomerSql = "select id,name from sale_booking.customer"
+        let allCustomer = await mysql.query(renderCustomerSql)
+
+        res.send(JSON.stringify({
+            'customer': allCustomer[0],
+            'render customer': 'succeed',
+        }));
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -756,10 +731,10 @@ router.post('/create_customer', async function (req, res) {
             });
         }
 
-        // console.log(req.session.user.name + ' create customer ' + code);
-        // fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code + '\n', function (error) {
-        //     if (error) console.log(error)
-        // })
+        console.log(req.session.user.name + ' create customer ' + code);
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code + '\n', function (error) {
+            if (error) console.log(error)
+        })
 
     } else {
         let title = 'NOW Booking '
@@ -796,12 +771,6 @@ router.post('/delete_customer', async function (req, res) {
 });
 
 router.get('/channel', function (req, res) {
-    // req.session.user = user;
-    // let user = {
-    //     account: 'linx',
-    //     name: 'linx',
-    //     type: 'Admin',
-    // }
     if (req.session.user != undefined) {
         let userType = req.session.user.type
         let title = 'NOW Booking '
@@ -821,23 +790,7 @@ router.get('/channel', function (req, res) {
         })
     }
 });
-router.post('/renderChannel', async function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        let renderChannelSql = "select link,name,domain from sale_booking.channel where status = 1 order by link"
-        let allChannel = await mysql.query(renderChannelSql)
 
-        res.send(JSON.stringify({
-            'channel': allChannel[0],
-            'render channel': 'succeed',
-        }));
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
 router.get('/channel-add', function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
@@ -888,6 +841,24 @@ router.post('/getChannel', async function (req, res) {
         res.send(JSON.stringify({
             'allChannel': allChannel[0],
             'allAdNumbers': eachChannelAdNumbersArray,
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/renderChannel', async function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let renderChannelSql = "select link,name,domain from sale_booking.channel where status = 1 order by link"
+        let allChannel = await mysql.query(renderChannelSql)
+
+        res.send(JSON.stringify({
+            'channel': allChannel[0],
+            'render channel': 'succeed',
         }));
     } else {
         let title = 'NOW Booking '
@@ -1047,6 +1018,34 @@ router.get('/privilege', function (req, res) {
     }
 });
 
+router.get('/privilege-add', function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        if (req.session.user.type != 'Admin') {
+            let userType = req.session.user.type
+            let userName = req.session.user.name
+
+            res.render('privilege', {
+                userType,
+                userName
+            });
+        } else {
+            let title = 'NOW Booking '
+            let userName = req.session.user.name
+
+            res.render('privilege-add', {
+                title,
+                userName
+            });
+        }
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
 router.post('/getPrivilege', async function (req, res) {
     //req.session.user = user;
     if (req.session.user != undefined) {
@@ -1074,34 +1073,6 @@ router.post('/getPrivilege', async function (req, res) {
             'allAccount': allAccount[0],
             'allOrderNumbers': eachUserOrderNumbersArray
         }));
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
-router.get('/privilege-add', function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        if (req.session.user.type != 'Admin') {
-            let userType = req.session.user.type
-            let userName = req.session.user.name
-
-            res.render('privilege', {
-                userType,
-                userName
-            });
-        } else {
-            let title = 'NOW Booking '
-            let userName = req.session.user.name
-
-            res.render('privilege-add', {
-                title,
-                userName
-            });
-        }
     } else {
         let title = 'NOW Booking '
         res.render('login', {
@@ -1162,12 +1133,6 @@ router.post('/create_account', async function (req, res) {
             title
         })
     }
-});
-
-router.post('/edit', function (req, res) {
-    let title = 'NOW Booking '
-    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    let userName = 'req.session.user.name'
 });
 
 module.exports = router;
