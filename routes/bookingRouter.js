@@ -379,11 +379,14 @@ router.get('/position', function (req, res) {
         let title = 'NOW Booking '
         let userType = req.session.user.type
         let userName = req.session.user.name
+        let superUserInvisible = ''
+        if (userType == 'SuperUser') superUserInvisible = 'd-none'
 
         res.render('position', {
             title,
             userName,
-            userType
+            userType,
+            superUserInvisible
         });
     } else {
         let title = 'NOW Booking '
@@ -776,12 +779,15 @@ router.get('/channel', function (req, res) {
         let title = 'NOW Booking '
         let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
+        let superUserInvisible = ''
+        if (userType == 'SuperUser') superUserInvisible = 'd-none'
 
         res.render('channel', {
             today,
             title,
             userName,
-            userType
+            userType,
+            superUserInvisible
         });
     } else {
         let title = 'NOW Booking '

@@ -108,7 +108,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="privilege" class="nav-link">
+                            <a href="privilege" class="nav-link <%= superUserInvisible %>">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p>帳號管理</p>
                             </a>
@@ -276,17 +276,6 @@
         let delId = ''
         let isDel = ''
 
-        //使用者 == User 禁止編輯
-        let userType = $('.userType').attr('value')
-        if (userType == 'User') {
-            $('.renderTable tr').find('td:last').remove()
-            $('nav > ul > li:nth-child(3)').addClass('d-none')
-            $('nav > ul > li:nth-child(4)').addClass('d-none')
-            $('nav > ul > li:nth-child(5)').addClass('d-none')
-        } else if (userType == 'SuperUser') {
-            $('nav > ul > li:nth-child(5)').addClass('d-none')
-        }
-
         getChannel()
         async function getChannel() {
             let innerHTML = ''
@@ -351,13 +340,14 @@
                 })
 
                 $('.channelEditBtn').click(async function () {
+                    //讓編輯表單有初始資料
                     editId = $(this).parents('th').attr('editId')
-
                     $('#channelId').val(editId)
                     $('#name').val($(this).parents('tr').find("td[cal=name]").text())
                     $('#domain').val($(this).parents('tr').find("td[cal=domain]").text())
                     $('#memo').val($(this).parents('tr').find("td[cal=memo]").text())
 
+                    //render 頻道狀態
                     let status = $(this).parents('tr').find("td[cal=status]").text()
                     let statusArray = []
                     if (status == '啟用') { statusArray = [status, '停用'] } else if (status == '停用') { statusArray = [status, '啟用'] }
@@ -366,51 +356,13 @@
                     $('.channelStatus').find('option').remove()
                     $.each(statusArray, function (index, val) {
                         if (val == '啟用') { channelStatus = '1' } else channelStatus = '0'
-                        $('.channelStatus').append(
-                            `
-                            <option class="dropdown-item" value=` + channelStatus + `>` + val + `</option>
-                        `)
+                        $('.channelStatus').append(`<option class="dropdown-item" value=` + channelStatus + `>` + val + `</option>`)
                     })
 
                     //顯示編輯table
                     $('#channelEditModal').modal('show');
                 })
-
-
-                let channelId = '',
-                    name = '',
-                    domain = '',
-                    memo = '',
-                    status = '';
-
-                //動態監聽按下acep新增欄位
-                $('.btn-group').delegate("#bAcep", "click", async function () {
-                    let currentRow = $(this).parents('tr');
-                    currentRow.find('td').each(function () {
-                        channelId = $(this).parent().find("td").attr('channelId')
-                        name = $(this).parent().find("td[cal=name]").text()
-                        domain = $(this).parent().find("td[cal=domain]").text()
-                        memo = $(this).parent().find("td[cal=memo]").text()
-                        status = $(this).parent().find("td[cal=status]").text()
-                    })
-                    await fetch('/update_channel', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            "channelId": channelId,
-                            "name": name,
-                            "domain": domain,
-                            "memo": memo,
-                            "status": status,
-                        })
-                    }).then(res => res.json()).then(res => {
-                        console.log(res);
-                    })
-                })
             })
-
         }
     </script>
 </body>

@@ -107,7 +107,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="privilege" class="nav-link">
+                            <a href="privilege" class="nav-link <%= superUserInvisible %>">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p>帳號管理</p>
                             </a>
@@ -281,17 +281,6 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        //使用者 == User 禁止編輯
-        let userType = $('.userType').attr('value')
-        if (userType == 'User') {
-            $('.renderTable tr').find('th').remove()
-            $('nav > ul > li:nth-child(3)').addClass('d-none')
-            $('nav > ul > li:nth-child(4)').addClass('d-none')
-            $('nav > ul > li:nth-child(5)').addClass('d-none')
-        } else if (userType == 'SuperUser') {
-            $('nav > ul > li:nth-child(5)').addClass('d-none')
-        }
-
         let delId = ''
         let isDel = ''
 
@@ -375,10 +364,7 @@
                     let bgColor = $(this).parents('tr').find("td[cal=bgColor]").text()
                     let colorArray = [bgColor, 'purple', 'blue', 'green', 'gray', 'orange', 'red', 'yellow', 'black']
                     $.each(colorArray, function (index, val) {
-                        $('.bgColor').append(
-                            `
-                            <option class="dropdown-item" value=` + val + `>` + val + `</option>
-                        `)
+                        $('.bgColor').append(`<option class="dropdown-item" value=` + val + `>` + val + `</option>`)
                     })
                     $('#name').val($(this).parents('tr').find("td[cal=name]").text())
                     $('#rotation').val($(this).parents('tr').find("td[cal=rotation]").text())
@@ -393,10 +379,7 @@
                     $('.positionStatus').find('option').remove()
                     $.each(statusArray, function (index, val) {
                         if (val == '啟用') { positionStatus = '1' } else positionStatus = '0'
-                        $('.positionStatus').append(
-                            `
-                            <option class="dropdown-item" value=` + positionStatus + `>` + val + `</option>
-                        `)
+                        $('.positionStatus').append(`<option class="dropdown-item" value=` + positionStatus + `>` + val + `</option>`)
                     })
 
                     //顯示編輯table
@@ -412,11 +395,7 @@
                         body: JSON.stringify({})
                     }).then(res => res.json()).then((allChannel) => {
                         $.each(allChannel.channel, function (index, val) {
-                            $('.channelName').append(
-                                `
-                            <option class="dropdown-item" value=` + val.link + "&&" + val.name + "&&" + val.domain + `>` + val.name + `</option>
-                        `
-                            );
+                            $('.channelName').append(`<option class="dropdown-item" value=` + val.link + "&&" + val.name + "&&" + val.domain + `>` + val.name + `</option>`);
                         })
                     })
                 }

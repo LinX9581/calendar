@@ -185,9 +185,6 @@
         <!-- /.content-wrapper -->
         <footer class="main-footer">
             &copy; 2020 <a href="https://www.nownews.com/">NOWnews今日新聞</a>. All rights reserved.
-            <!--<div class="float-right d-none d-sm-inline-block">
-        <b>Version</b> 3.0.5
-      </div>-->
         </footer>
         <!-- 詳細委託單內容 -->
         <div class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" tabindex="-1" role="dialog"
@@ -368,7 +365,6 @@
                             res.allOrder[item].status = '執行'
                             break;
                     }
-                    // console.log(res.allOrder[item].status);
                     innerHTML +=
                         ` 
                         <tr delId="${res.allOrder[item].id}">
@@ -394,7 +390,6 @@
                 innerHTML += `</tbody>`
                 $('.orderInfo').html(innerHTML)
 
-
                 $('.orderDelBtn').click(async function () {
                     editId = $(this).parents('th').attr('editId')
                     let isDel = confirm('確定刪除 ' + editId + ' ?')
@@ -414,6 +409,8 @@
 
                 $('.orderEditBtn').click(async function () {
                     editId = $(this).parents('th').attr('editId')
+
+                    //render 客戶資料
                     let customerInfo = $(this).parents('tr').find("td[cal=customerInfo]").text()
                     $('.orderCustomerName').find('option').remove()
                     $('.orderCustomerName').append(`<option class="dropdown-item" value=` + customerInfo + `>` + customerInfo + `</option>`);
@@ -431,25 +428,17 @@
                     let ad_type = $(this).parents('tr').find("td[cal=ad_type]").text();
                     let ad_typeArray = [ad_type, 'CPM', 'CPC', 'CPL']
                     $.each(ad_typeArray, function (index, val) {
-                        $('.orderAdType').append(
-                            `
-                            <option class="dropdown-item" value=` + val + `>` + val + `</option>
-                        `)
+                        $('.orderAdType').append(`<option class="dropdown-item" value=` + val + `>` + val + `</option>`)
                     })
 
                     let status = $(this).parents('tr').find("td[cal=status]").text()
-                    console.log(status);
                     let statusArray = []
                     if (status == '啟用') { statusArray = [status, '停用', '執行'] } else if (status == '停用') { statusArray = [status, '啟用', '執行'] } else if (status == '執行') { statusArray = [status, '啟用', '停用'] }
                     let orderStatus = ''
-                    // $('#status').val(status)
                     $('.orderStatus').find('option').remove()
                     $.each(statusArray, function (index, val) {
                         if (val == '啟用') { orderStatus = '1' } else if (val == '停用') { orderStatus = '0' } else if (val == '執行') { orderStatus = '2' }
-                        $('.orderStatus').append(
-                            `
-                            <option class="dropdown-item" value=` + orderStatus + `>` + val + `</option>
-                        `)
+                        $('.orderStatus').append(`<option class="dropdown-item" value=` + orderStatus + `>` + val + `</option>`)
                     })
 
                     //顯示編輯table
@@ -473,7 +462,6 @@
                             "editId": editId,
                         })
                     }).then(res => res.json()).then(res => {
-                        console.log(res);
                         //顯示該委刊單詳細資料
                         innerDetailOrderHTML +=
                             `<thead>
@@ -586,11 +574,7 @@
                         body: JSON.stringify({})
                     }).then(res => res.json()).then((allCustomer) => {
                         $.each(allCustomer.customer, function (index, val) {
-                            $('.orderCustomerName').append(
-                                `
-                            <option class="dropdown-item" value=` + val.id + "&&" + val.name + `>` + val.name + `</option>
-                        `
-                            );
+                            $('.orderCustomerName').append(`<option class="dropdown-item" value=` + val.id + "&&" + val.name + `>` + val.name + `</option>`);
                         })
                     })
                 }
