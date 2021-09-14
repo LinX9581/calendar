@@ -6217,7 +6217,6 @@ function createDateWithMultipleArgs(args) {
  */
 function createDateWithUTCTime(arg) {
     var time;
-
     if (arg instanceof Date || arg instanceof TZDate) {
         time = arg.getTime();
     } else if ((typeof arg) === 'string') {

@@ -6,14 +6,14 @@
 /* global findCalendar, CalendarList, ScheduleList */
 
 /**
- * calendar event handlers  : schedule的觸發事件 (新增、移除、更新、)
+ * calendar event handlers  : schedule的觸發事件 (新增、移除、更新)
  * default function         : 套件預設function
  */
 var socket = io();
 
 (async function (window, Calendar) {
     var cal, resizeThrottled;
-    var useCreationPopup = false;
+    var useCreationPopup = false;   //把原本彈開的新增排程改成 bootstrap4的modal
     var useDetailPopup = true;
     var datePicker, selectedCalendar;
     let createScheduleEvent = '';
@@ -47,9 +47,6 @@ var socket = io();
         },
         'clickSchedule': async function (e) {
             console.log('clickSchedule', e);
-
-            //body 會跑版 暫時清空
-            $('div > div.tui-full-calendar-popup-container > div.tui-full-calendar-section-detail > div.tui-full-calendar-popup-detail-item.tui-full-calendar-popup-detail-item-separate > span').text('')
             updateScheduleEvent = e.schedule;
             $('.tui-full-calendar-section-button').delegate(".tui-full-calendar-popup-edit", "click", function () {
                 $('#click_schedule_dropdown').modal('show');
@@ -71,13 +68,11 @@ var socket = io();
         },
         'beforeCreateSchedule': function (e) {       //建立新的scedule
             console.log('beforeCreateSchedule', e);
-            $('#create_schedule_dropdown').modal('show');
+            $('#custom_create_schedule').modal('show');
             createScheduleEvent = e;
             e.guide.clearGuideElement();
-            
-            // saveNewSchedule(e);
         },
-        //目前只有更新時間會觸發，及時同步會卡套件時區BUG
+        //目前只有即時同步更新時間會觸發，會卡套件時區BUG 
         'beforeUpdateSchedule': async function (e) {
             var schedule = e.schedule;
             var changes = e.changes;
@@ -92,7 +87,7 @@ var socket = io();
             let updateStart = moment(changes?.start?._date ?? schedule.start._date).format('YYYY-MM-DD HH:mm:ss')
             let updateEnd = moment(changes?.end?._date ?? schedule.end._date).format('YYYY-MM-DD HH:mm:ss')
 
-            // socket.emit('update schedule', schedule.id, schedule.calendarId, updateChangeTime, channel);
+            socket.emit('update schedule', schedule.id, schedule.calendarId, updateChangeTime, channel);
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
 
             await fetch('/ch/beforeUpdateScheduleTime', {
@@ -175,7 +170,7 @@ var socket = io();
         })
     })
 
-    //客製化時間
+    //customTime-create-schedule
     $('#btn-new-schedule').click(function () {
         $('#customerTime_create_schedule_dropdown').modal('show');
     })
@@ -186,17 +181,19 @@ var socket = io();
         let customTime = $('#customer_schedule_time').val()
         let startTime = moment(customTime.split(' - ')[0]).valueOf()
         let endTime = moment(customTime.split(' - ')[1]).valueOf()
+
         if (moment(startTime).isBefore(moment(new Date()))) {
             alert('不能預約今天以前的委刊單')
         } else {
             customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(startTime).format(), moment(endTime).format())
         }
     })
-    //createScheduleEvent
+    //create-schedule-event
     $('#create_scedule').click(function () {
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
         let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
         let orderTitle = $('.dropdown_getOrderBtn').attr('thisOrderTitle')
+
         if (moment(moment(createScheduleEvent.start._date).format()).isBefore(moment(new Date()))) {
             alert('不能預約今天以前的委刊單')
         }else{
@@ -257,12 +254,11 @@ var socket = io();
             })
         }).then(res => res.json()).then((beforeCreateScheduleRes) => {
             console.log(beforeCreateScheduleRes);
-            
         })
     }
 
 
-    //底下都是原套件 devault function
+    //底下都是原套件 default function
 
     /**
      * Get time template for time and all-day

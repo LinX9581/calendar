@@ -11,13 +11,13 @@ var html = [];
 //再讓calendarDel() 能夠監聽   -> 這部分改成delegate就不用重複呼叫function (待修)
 
 /**
- * renderCalendar()         : 從資料庫傳cal到前端的 編輯委刊單、新增委刊單、calendarList
- * renderSchedule()         : 從資料庫傳schedule到前端
- * renderOrderList()        : 從資料庫傳orderList到前端
+ * renderSchedule()         : 從資料庫傳schedule到前端 
+ * renderCalendar()         : 從資料庫傳cal到前端的 編輯委刊單、新增委刊單、calendarList、處理下拉選單的功能
+ * renderOrderList()        : 從資料庫傳orderList到前端，處理下拉選單的功能
  * afterAllEventRender()    : 初始化套件讓 Schedule 能抓到 Calendar
  * calendarDel()            : 讓新增的cal能夠監聽刪除事件
- * CalendarInfo(),addCalendar : 初始化一開始新增的calendar
- * findCalendar()           : 套件其他js用
+ * CalendarInfo()           : 初始化一開始新增的calendar
+ * findCalendar()           : 套件預設 給套件的JS呼叫
  */
 
 serverRenderInit()
@@ -50,9 +50,7 @@ async function renderCalendar() {
         //讓編輯委刊單和新增委刊單的table顯示calendar
         $.each(jsonData.calendar, function (index, val) {
             $('.dropdown_getCalUl').append(
-                `
-                    <li getChooseCalId=${val.id} value=${val.name}> <span class="calListStyle" style="background-color:${val.bgcolor}; color:${val.bgcolor};"></span> &nbsp; ${val.name}
-                `
+                `<li getChooseCalId=${val.id} value=${val.name}> <span class="calListStyle" style="background-color:${val.bgcolor}; color:${val.bgcolor};"></span> &nbsp; ${val.name}`
             );
         })
         //委刊單下拉選單
@@ -123,9 +121,7 @@ async function renderOrderList() {
     }).then(res => res.json()).then((jsonData) => {
         $.each(jsonData.allOrder, function (index, val) {
             $('.dropdown_getOrderUl').append(
-                `
-                    <li getChooseOrderId=${val.id} value=${val.title} >${val.title}
-                `
+                `<li getChooseOrderId=${val.id} value=${val.title} >${val.title}`
             );
         })
 

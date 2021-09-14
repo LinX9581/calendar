@@ -36,14 +36,6 @@ io.on('connection', function (socket) {
         socket.broadcast.emit(channel + 'create schedule', schedule);
     });
     socket.on('update schedule', function (scheduleId, calId, changes, channel) {
-        // console.log(changes.start._date);
-        // changes.start._date = 'Tue Aug 24 2021 23:59:59 GMT+0800 (台北標準時間)'
-        // changes.end._date = 'Tue Aug 25 2021 23:59:59 GMT+0800 (台北標準時間)'
-        // changes.start._date = moment(changes.start._date).tz("Asia/Taipei").format()
-        // changes.end._date = moment(changes.end._date).tz("Asia/Taipei").format()
-        // console.log(changes.start._date);
-        // console.log(changes);
-        console.log('server update');
         socket.broadcast.emit(channel + 'update schedule', scheduleId, calId, changes);
     });
     socket.on('delete schedule', function (scheduleId, calId, channel) {
