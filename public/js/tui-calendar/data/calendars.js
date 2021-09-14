@@ -55,7 +55,6 @@ async function renderCalendar() {
         })
         //委刊單下拉選單
         $(".dropdown_getCalBtn").click(function () {
-            console.log('dropdown_getCalendarList_button click');
             var val = $(this).attr('id');
             if (val == 1) {
                 $(".dropdown_getCalUl").hide();
@@ -67,7 +66,6 @@ async function renderCalendar() {
 
         });
         $(".dropdown_getCalUl").delegate("li", "click", function () {
-            console.log('dropdown calendar li click');
             //將原來的cal改成選擇的 cal.text() & cal.style
             $('.dropdown_getCalBtn').html(`<span class="calListStyle"></span>  ` + $(this).text() + `<i class="calendar-icon tui-full-calendar-dropdown-arrow"></i>`)
             $('.dropdown_getCalBtn > span').attr('style', $(this).children().attr('style'))
@@ -126,7 +124,6 @@ async function renderOrderList() {
         })
 
         $(".dropdown_getOrderBtn").click(function () {
-            console.log('dropdown_getCalendarList_button click');
             var val = $(this).attr('id');
             if (val == 1) {
                 $(".dropdown_getOrderUl").hide();

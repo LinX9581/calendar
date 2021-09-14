@@ -42,7 +42,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/login">
+                    <a class="nav-link" href="/logout">
                         <i class="fas fa-sign-out-alt"></i> 登出
                     </a>
                 </li>
@@ -78,7 +78,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/reserveOrder" class="nav-link active">
+                                    <a href="/orderReserve" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>預約排程</p>
                                     </a>
@@ -103,7 +103,7 @@
                                 <p>頻道管理</p>
                             </a>
                         </li>
-                        <li class="nav-item <%= userInvisible %>">
+                        <li class="nav-item <%= userInvisible %> <%= superuserInvisible %>">
                             <a href="privilege" class="nav-link">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p>帳號管理</p>
@@ -152,13 +152,6 @@
     <!-- fontawesom -->
     <script src="js/common/fontawesome.js"></script>
     <script>
-        //使用者 == User 禁止編輯
-        let userType = $('.userType').attr('value')
-        if (userType == 'User') {
-            $('.renderTable tr').find('th').remove()
-        } else if (userType == 'SuperUser') {
-            $('nav > ul > li:nth-child(5)').addClass('d-none')
-        }
         let delId = ''
         let isDel = ''
 

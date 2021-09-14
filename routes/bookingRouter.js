@@ -6,8 +6,24 @@ import fs from 'fs';
 import md5 from 'md5';
 import { exec } from 'child_process';
 
-let router = express.Router();
+// calendar的相關API
+// booking.linxnote.club/ch/url  -> 會導到相關的頻道calendar頁面
 
+/**
+ * get('/')                             : 登入頁。
+ * get('/logout')               : 登出。
+ * post('/')              : 登入帳密判斷，建立使用者session、根據權限讓初始頁限制瀏覽。
+ * get('/order')              : 委刊單頁面、判斷權限限制瀏覽。
+ * get('/order-add')              : 新增委刊單頁面。
+ * get('/reserveOrder')          : 預約委刊單頁、同時嵌入calendar
+ * post('/checkPositionRotation')       : 判斷確定委刊的委刊單數 是不是超過版位輪替數
+ * post('/beforeCreateSchedule')        : create schedule
+ * post('/beforeDeleteSchedule')        : delete schedule
+ * post('/beforeUpdateScheduleTime')    : update schedule time
+ * post('/beforeUpdateSchedule')        : update schedule title、calendarId
+ */
+
+let router = express.Router();
 router.get('/', function (req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
@@ -16,7 +32,7 @@ router.get('/', function (req, res) {
         title
     });
 });
-router.get('/login', function (req, res) {
+router.get('/logout', function (req, res) {
     req.session.destroy(function () {
         res.render('logout', {});
     })
@@ -74,210 +90,6 @@ router.post('/', async function (req, res) {
     }
 })
 
-router.get('/position', function (req, res) {
-    //req.session.user = user;
-    // let user = {
-    //     account: 'linx',
-    //     name: 'linx',
-    //     type: 'Admin',
-    // }
-    // req.session.user = user;
-    if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let userType = req.session.user.type
-        let userName = req.session.user.name
-
-        res.render('position', {
-            title,
-            userName,
-            userType
-        });
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
-router.get('/position-add', function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        let title = 'NOW Booking '
-        let userName = req.session.user.name
-
-        res.render('position-add', {
-            title,
-            userName
-        });
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
-router.post('/getPosition', async function (req, res) {
-    // let user = {
-    //     account: 'linx',
-    //     name: 'linx',
-    //     type: 'Admin',
-    // }
-    // req.session.user = user;
-    if (req.session.user != undefined && (req.session.user.type == 'Admin' || req.session.user.type == 'SuperUser')) {
-        //要取得該廣告版位的確定委刊數
-        //取得每個schedule關聯order的status=2的總個數組成陣列.
-
-        let getCalendarIdNumbersSql = 'SELECT * FROM sale_booking.`order_list` INNER JOIN sale_booking.`schedule_event` ON `order_list`.`id` = `schedule_event`.`orderId` WHERE `order_list`.status = 2'
-        let getCalendarId = await mysql.query(getCalendarIdNumbersSql)
-        let calendarId = getCalendarId[0].map(e => {
-            return e.calendarId
-        })
-
-        //加總重複calendarId個數 ex. calA:1 calB:3 calC:4
-        let eachCalendarIdNumbers = {};
-        calendarId.forEach(function (item) {
-            eachCalendarIdNumbers[item] = eachCalendarIdNumbers[item] ? eachCalendarIdNumbers[item] + 1 : 1;
-        });
-
-        //先撈出 channelId 再去要該channel的名稱
-        let getPositionSql = 'SELECT id,name,channelId,channelName,channelDomain,bgColor,rotation,memo,status FROM sale_booking.calendar_list ORDER BY channelName'
-        let allPosition = await mysql.query(getPositionSql)
-
-        //如果該頻道沒廣告則該索引=0
-        let eachCalendarIdNumbersArray = allPosition[0].map(e => {
-            if (eachCalendarIdNumbers[e.id] == undefined) eachCalendarIdNumbers[e.id] = 0;
-            return eachCalendarIdNumbers[e.id]
-        })
-
-        res.send(JSON.stringify({
-            'allPosition': allPosition[0],
-            'allCalendarIdNumbers': eachCalendarIdNumbersArray,
-        }));
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
-router.post('/update_position', async function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        let calId = req.body.calId,
-            name = req.body.name,
-            channel = req.body.channel,
-            calendarBgColor = req.body.color,
-            calendarDragBgColor = req.body.color,
-            calendarBorderColor = req.body.color,
-            rotation = req.body.rotation,
-            memo = req.body.memo,
-            status = req.body.status,
-            update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
-            update_by = req.session.user.account;
-
-        //頻道停用啟用、相對應的schedule跟著停用啟用
-        if (status == '0') {
-            let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? WHERE calendarId=?'
-            let updateScheduleData = [status, calId]
-            await mysql.query(updateScheduleSql, updateScheduleData)
-        } else {
-            let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? WHERE calendarId=?'
-            let updateScheduleData = [status, calId]
-            await mysql.query(updateScheduleSql, updateScheduleData)
-        }
-
-        let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?,channelId=?,channelName=?,channelDomain=?,bgcolor=?,dragbgcolor=?,bordercolor=?,rotation=?, memo=?, status=?, update_date=?, update_by=? WHERE id=?'
-        let updatePositionData = [name, channel.split('&&')[0], channel.split('&&')[1], channel.split('&&')[2], calendarBgColor, calendarDragBgColor, calendarBorderColor, rotation, memo, status, update_date, update_by, calId]
-        await mysql.query(updatePositionSql, updatePositionData)
-
-        // 如果position更換頻道，相對應的calendar也要更換頻道
-        let updateScheduleChannelIdSql = 'UPDATE sale_booking.schedule_event SET channelId=? WHERE calendarId=?'
-        let updateScheduleChannelIdData = [channel.split('&&')[0], calId]
-        await mysql.query(updateScheduleChannelIdSql, updateScheduleChannelIdData)
-
-        console.log(update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData)
-        let userLoginTrace = update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData + "\n"
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
-            if (error) console.log(error)
-        })
-
-        res.redirect('/position')
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
-router.post('/create_position', async function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        let id = String(Date.now()),
-            channelId = req.body.channelId,
-            name = req.body.name,
-            color = '#ffffff',
-            calendarBgColor = req.body.color,
-            calendarDragBgColor = req.body.color,
-            calendarBorderColor = req.body.color,
-            rotation = req.body.rotation,
-            memo = req.body.memo,
-            status = req.body.status;
-        let userName = req.session.user.name
-        let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
-
-        let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`,`channelId`,`channelName`,`channelDomain`,`color`,`bgcolor`,`dragbgcolor`,`bordercolor`,`name`,`rotation`,`memo`,`status`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-        let createPositionData = [id, channelId.split('&&')[0], channelId.split('&&')[1], channelId.split('&&')[2], color, calendarBgColor, calendarDragBgColor, calendarBorderColor, name, rotation, memo, status, createTime, userName, createTime, userName]
-        await mysql.query(createPositionSql, createPositionData)
-
-        console.log(req.session.user.name + ' create position : ' + name);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', createTime + " " + req.session.user.name + ' create position : ' + name + '\n', function (error) {
-            if (error) console.log(error)
-        })
-
-        res.redirect('/position')
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
-router.post('/delete_position', async function (req, res) {
-    //req.session.user = user;
-    if (req.session.user != undefined) {
-        let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
-        let delId = req.body.delId;
-
-        let deletePostionSql = 'DELETE FROM sale_booking.`calendar_list` WHERE id = ?'
-        let deletePostionData = [delId]
-        await mysql.query(deletePostionSql, deletePostionData)
-
-        //停用該cal相關的schedule
-        let updateScheduleSql = 'DELETE FROM sale_booking.schedule_event WHERE calendarId=?'
-        let updateScheduleData = [delId]
-        await mysql.query(updateScheduleSql, updateScheduleData)
-
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId + '\n', function (error) {
-            if (error) console.log(error)
-        })
-        console.log(req.session.user.name + ' delete postion ' + delId);
-
-        res.send(JSON.stringify({
-            'Delete Postion': "成功",
-        }));
-    } else {
-        let title = 'NOW Booking '
-        res.render('login', {
-            title
-        })
-    }
-});
-
 router.get('/order', function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
@@ -327,28 +139,28 @@ router.get('/order-add', function (req, res) {
     }
 });
 
-router.get('/reserveOrder', async function (req, res) {
-    // let user = {
-    //     account: 'linx',
-    //     name: 'linx',
-    //     type: 'User',
-    // }
-    // req.session.user = user;
-    //req.session.user = user;
+router.get('/orderReserve', async function (req, res) {
     if (req.session.user != undefined) {
         let title = 'NOW Booking '
-        let today = new moment().format('YYYY-MM-DD HH:mm:ss')
         let userName = req.session.user.name
         let userType = req.session.user.type
         let userInvisible = ''
-        if (userType == 'User') userInvisible = 'd-none'
-
-        res.render('reserveOrder', {
-            today,
+        let superuserInvisible = ''
+        //不同權限的隱藏屬性
+        switch (userType.toString()) {
+            case 'SuperUser':
+                superuserInvisible = 'd-none'
+                break;
+            case 'User':
+                userInvisible = 'd-none'
+                break;
+        }
+        res.render('orderReserve', {
             title,
             userName,
             userType,
-            userInvisible
+            userInvisible,
+            superuserInvisible
         });
     } else {
         let title = 'NOW Booking '
@@ -587,6 +399,196 @@ router.post('/delete_order', async function (req, res) {
     }
 });
 
+router.get('/position', function (req, res) {
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let userType = req.session.user.type
+        let userName = req.session.user.name
+
+        res.render('position', {
+            title,
+            userName,
+            userType
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.get('/position-add', function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let title = 'NOW Booking '
+        let userName = req.session.user.name
+
+        res.render('position-add', {
+            title,
+            userName
+        });
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/getPosition', async function (req, res) {
+    if (req.session.user != undefined && (req.session.user.type == 'Admin' || req.session.user.type == 'SuperUser')) {
+        //要取得該廣告版位的確定委刊數
+        //取得每個schedule關聯order的status=2的總個數組成陣列.
+
+        let getCalendarIdNumbersSql = 'SELECT * FROM sale_booking.`order_list` INNER JOIN sale_booking.`schedule_event` ON `order_list`.`id` = `schedule_event`.`orderId` WHERE `order_list`.status = 2'
+        let getCalendarId = await mysql.query(getCalendarIdNumbersSql)
+        let calendarId = getCalendarId[0].map(e => {
+            return e.calendarId
+        })
+
+        //加總重複calendarId個數 ex. calA:1 calB:3 calC:4
+        let eachCalendarIdNumbers = {};
+        calendarId.forEach(function (item) {
+            eachCalendarIdNumbers[item] = eachCalendarIdNumbers[item] ? eachCalendarIdNumbers[item] + 1 : 1;
+        });
+
+        //先撈出 channelId 再去要該channel的名稱
+        let getPositionSql = 'SELECT id,name,channelId,channelName,channelDomain,bgColor,rotation,memo,status FROM sale_booking.calendar_list ORDER BY channelName'
+        let allPosition = await mysql.query(getPositionSql)
+
+        //如果該頻道沒廣告則該索引=0
+        let eachCalendarIdNumbersArray = allPosition[0].map(e => {
+            if (eachCalendarIdNumbers[e.id] == undefined) eachCalendarIdNumbers[e.id] = 0;
+            return eachCalendarIdNumbers[e.id]
+        })
+
+        res.send(JSON.stringify({
+            'allPosition': allPosition[0],
+            'allCalendarIdNumbers': eachCalendarIdNumbersArray,
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/update_position', async function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let calId = req.body.calId,
+            name = req.body.name,
+            channel = req.body.channel,
+            calendarBgColor = req.body.color,
+            calendarDragBgColor = req.body.color,
+            calendarBorderColor = req.body.color,
+            rotation = req.body.rotation,
+            memo = req.body.memo,
+            status = req.body.status,
+            update_date = new moment().format('YYYY-MM-DD HH:mm:ss'),
+            update_by = req.session.user.account;
+
+        //頻道停用啟用、相對應的schedule跟著停用啟用
+        if (status == '0') {
+            let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? WHERE calendarId=?'
+            let updateScheduleData = [status, calId]
+            await mysql.query(updateScheduleSql, updateScheduleData)
+        } else {
+            let updateScheduleSql = 'UPDATE sale_booking.schedule_event SET status=? WHERE calendarId=?'
+            let updateScheduleData = [status, calId]
+            await mysql.query(updateScheduleSql, updateScheduleData)
+        }
+
+        let updatePositionSql = 'UPDATE sale_booking.calendar_list SET name=?,channelId=?,channelName=?,channelDomain=?,bgcolor=?,dragbgcolor=?,bordercolor=?,rotation=?, memo=?, status=?, update_date=?, update_by=? WHERE id=?'
+        let updatePositionData = [name, channel.split('&&')[0], channel.split('&&')[1], channel.split('&&')[2], calendarBgColor, calendarDragBgColor, calendarBorderColor, rotation, memo, status, update_date, update_by, calId]
+        await mysql.query(updatePositionSql, updatePositionData)
+
+        // 如果position更換頻道，相對應的calendar也要更換頻道
+        let updateScheduleChannelIdSql = 'UPDATE sale_booking.schedule_event SET channelId=? WHERE calendarId=?'
+        let updateScheduleChannelIdData = [channel.split('&&')[0], calId]
+        await mysql.query(updateScheduleChannelIdSql, updateScheduleChannelIdData)
+
+        console.log(update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData)
+        let userLoginTrace = update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData + "\n"
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+            if (error) console.log(error)
+        })
+
+        res.redirect('/position')
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/create_position', async function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let id = String(Date.now()),
+            channelId = req.body.channelId,
+            name = req.body.name,
+            color = '#ffffff',
+            calendarBgColor = req.body.color,
+            calendarDragBgColor = req.body.color,
+            calendarBorderColor = req.body.color,
+            rotation = req.body.rotation,
+            memo = req.body.memo,
+            status = req.body.status;
+        let userName = req.session.user.name
+        let createTime = new moment().format('YYYY-MM-DD HH:mm:ss')
+
+        let createPositionSql = 'INSERT INTO sale_booking.`calendar_list` (`id`,`channelId`,`channelName`,`channelDomain`,`color`,`bgcolor`,`dragbgcolor`,`bordercolor`,`name`,`rotation`,`memo`,`status`,`create_date`, `create_by`, `update_date`, `update_by`) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        let createPositionData = [id, channelId.split('&&')[0], channelId.split('&&')[1], channelId.split('&&')[2], color, calendarBgColor, calendarDragBgColor, calendarBorderColor, name, rotation, memo, status, createTime, userName, createTime, userName]
+        await mysql.query(createPositionSql, createPositionData)
+
+        console.log(req.session.user.name + ' create position : ' + name);
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', createTime + " " + req.session.user.name + ' create position : ' + name + '\n', function (error) {
+            if (error) console.log(error)
+        })
+
+        res.redirect('/position')
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
+
+router.post('/delete_position', async function (req, res) {
+    //req.session.user = user;
+    if (req.session.user != undefined) {
+        let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
+        let delId = req.body.delId;
+
+        let deletePostionSql = 'DELETE FROM sale_booking.`calendar_list` WHERE id = ?'
+        let deletePostionData = [delId]
+        await mysql.query(deletePostionSql, deletePostionData)
+
+        //刪除該cal相關的schedule
+        let updateScheduleSql = 'DELETE FROM sale_booking.schedule_event WHERE calendarId=?'
+        let updateScheduleData = [delId]
+        await mysql.query(updateScheduleSql, updateScheduleData)
+
+        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId + '\n', function (error) {
+            if (error) console.log(error)
+        })
+        console.log(req.session.user.name + ' delete postion ' + delId);
+
+        res.send(JSON.stringify({
+            'Delete Postion': "成功",
+        }));
+    } else {
+        let title = 'NOW Booking '
+        res.render('login', {
+            title
+        })
+    }
+});
 
 router.get('/customer', function (req, res) {
     //req.session.user = user;

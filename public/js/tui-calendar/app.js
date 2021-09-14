@@ -6,8 +6,11 @@
 /* global findCalendar, CalendarList, ScheduleList */
 
 /**
- * calendar event handlers  : schedule的觸發事件 (新增、移除、更新)
- * default function         : 套件預設function
+ * calendar event handlers      : schedule的觸發事件 (新增、移除、更新)
+ * custom-edit-schedule-event   : 客製化的編輯表單
+ * customTime-create-schedule   : 客製化時間的建立排程表單
+ * custom-create-schedule-event : 課室化的建立排程表單
+ * default function             : 套件預設function
  */
 var socket = io();
 
@@ -19,8 +22,6 @@ var socket = io();
     let createScheduleEvent = '';
     let updateScheduleEvent = '';
     let updateChangeTime = '';
-    let editScheduleId = '';
-    let editCalendarId = '';
 
     cal = new Calendar('#calendar', {
         defaultView: 'month',
@@ -68,11 +69,11 @@ var socket = io();
         },
         'beforeCreateSchedule': function (e) {       //建立新的scedule
             console.log('beforeCreateSchedule', e);
+            //改成客製化的 modal 表單
             $('#custom_create_schedule').modal('show');
             createScheduleEvent = e;
             e.guide.clearGuideElement();
         },
-        //目前只有即時同步更新時間會觸發，會卡套件時區BUG 
         'beforeUpdateSchedule': async function (e) {
             var schedule = e.schedule;
             var changes = e.changes;
@@ -144,7 +145,7 @@ var socket = io();
         }
     });
 
-    //editScheduleEvent
+    //custom-edit-schedule-event
     $('.schedule_edit_btn').click(async function () {
         console.log('click schedule edit btn');
         let changes = {
@@ -166,7 +167,7 @@ var socket = io();
                 "scheduleId": updateScheduleEvent.id,
             })
         }).then(res => res.json()).then((jsonData) => {
-            return 0;
+            console.log(jsonData);
         })
     })
 
@@ -188,7 +189,7 @@ var socket = io();
             customerSaveNewSchedule(createScheduleEvent, calId, orderTitle, orderId, moment(startTime).format(), moment(endTime).format())
         }
     })
-    //create-schedule-event
+    //custom-create-schedule-event
     $('#create_scedule').click(function () {
         let calId = $('.dropdown_getCalendarList_button').attr('thisCalId')
         let orderId = $('.dropdown_getOrderBtn').attr('thisorderid')
@@ -221,7 +222,6 @@ var socket = io();
                 "calendarId": schedule.calendarId,
             })
         }).then(res => res.json()).then((checkPositionRotation) => {
-            console.log(checkPositionRotation);
             if (checkPositionRotation.rotationOverflow == '-1') {
                 alert('輪替數超過')
             } else {
@@ -229,7 +229,6 @@ var socket = io();
                 cal.createSchedules([schedule]);
                 beforeCreateSchedule(createScheduleEvent, schedule)
             }
-            
         })
     }
 

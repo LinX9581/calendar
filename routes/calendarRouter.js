@@ -2,10 +2,28 @@ import mysql from './mysqlConnect';
 import express from 'express';
 import moment from 'moment';
 
+// calendar的相關API
+// booking.linxnote.club/ch/url  -> 會導到相關的頻道calendar頁面
+
+/**
+ * get('/:url')                         : 導到相關的頻道頁。
+ * post('/renderChannel')               : rendar channel list 到 calendar左上角的切換頻道選單。
+ * post('/renderSchedule')              : render schedule , 如果權限是User就只能看到該User的Schedule。
+ * post('/renderCalendar')              : rendar calendar。
+ * post('/deleteCalendar')              : 停用 calendar ， 包括相關的schedule，並把這些schedule傳給前端刪除 ； position頁也能刪除calenar，是真的刪除而不是停用
+ * post('/createCalendarList')          : create calendar
+ * post('/checkPositionRotation')       : 判斷確定委刊的委刊單數 是不是超過版位輪替數
+ * post('/beforeCreateSchedule')        : create schedule
+ * post('/beforeDeleteSchedule')        : delete schedule
+ * post('/beforeUpdateScheduleTime')    : update schedule time
+ * post('/beforeUpdateSchedule')        : update schedule title、calendarId
+ */
+
 let router = express.Router();
 router.get('/:url', async function (req, res) {
     let title = 'NOW Booking '
     let today = new moment().format('YYYY-MM-DD HH:mm:ss')
+    // 測試用偽造身分
     // let user = {
     //     account: 'linx',
     //     name: 'linx',
@@ -19,7 +37,6 @@ router.get('/:url', async function (req, res) {
         let getChannel = await mysql.query(getChannelNameSql, getChannelNameData)
         let channel = getChannel[0][0].link
         let channelName = getChannel[0][0].name
-        // req.session.channel = 'www';
 
         res.render(url, {
             today,
@@ -34,16 +51,10 @@ router.get('/:url', async function (req, res) {
     }
 });
 
-router.get('/', async function (req, res) {
-    let today = new moment().format('YYYY-MM-DD HH:mm:ss')
-    res.render('test', {
-        today
-    });
-});
-
 router.post('/renderChannel', async function (req, res) {
     let beforeCreateChannelSql = "select link,name from sale_booking.channel"
     let allChannel = await mysql.query(beforeCreateChannelSql)
+
     res.send(JSON.stringify({
         'channel': allChannel[0],
         'render channel': 'succeed',
@@ -210,8 +221,6 @@ router.post('/beforeUpdateSchedule', async function (req, res) {
         let scheduleId = req.body.scheduleId
         let updateCalendarId = req.body.changes.calendarId
         let updateTitle = req.body.changes.title
-        // let updateStart = req.body.updateStart
-        // let updateEnd = req.body.updateEnd
 
         let beforeUpdateScheduleSql = "UPDATE sale_booking.schedule_event SET calendarId = ?, title = ? WHERE id = ?"
         let updateScheduleData = [updateCalendarId, updateTitle, scheduleId]
@@ -220,12 +229,6 @@ router.post('/beforeUpdateSchedule', async function (req, res) {
 
     res.send(JSON.stringify({
         'beforeUpdateSchedule': 'succeed',
-    }));
-})
-router.get('/test', async function (req, res) {
-    let centerMember = 'asd'
-    res.send(JSON.stringify({
-        centerMember,
     }));
 })
 
