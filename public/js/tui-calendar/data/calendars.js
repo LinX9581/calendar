@@ -8,7 +8,6 @@ var html = [];
 
 //一開始先 render Calendar Schedule OrderList 
 //之後讓套件 rerender 為了讓 Schedule 能抓到 Calendar
-//再讓calendarDel() 能夠監聽   -> 這部分改成delegate就不用重複呼叫function (待修)
 
 /**
  * renderSchedule()         : 從資料庫傳schedule到前端 
@@ -29,7 +28,6 @@ async function serverRenderInit() {
     await renderChannel()
     await sleep(500)
     await afterAllEventRender()
-    await calendarDel()
 }
 
 async function afterAllEventRender() {
@@ -100,7 +98,7 @@ async function renderCalendar() {
                 '<input type="checkbox" class="tui-full-calendar-checkbox-round" value="' + calendar.id + '" checked>' +
                 '<span style="border-color: ' + calendar.borderColor + '; background-color: ' + calendar.borderColor + ';"></span>' +
                 '<span>' + calendar.name + '</span> ' +
-                '</label></div><div class="col-3 py-2 delBtn ' + calendar.id + '" delName="' + calendar.name + '" delId="' + calendar.id + '"><i class="fa fa-trash"></i></div></div>');
+                '</label></div></div>');
         });
         calendarList.innerHTML = html.join('\n');
     })
@@ -191,35 +189,6 @@ async function renderChannel() {
             `
             );
         })
-    })
-}
-
-async function calendarDel() {
-    $('.delBtn').on('click', async function () {
-        let delCalId = $(this).attr('delId')
-        console.log(delCalId + 'deleteid');
-        let delCalName = $(this).attr('delName')
-        let isDel = confirm('確定刪除 ' + delCalName + ' ?')
-
-        if (isDel) {
-            $(this).parent().remove()
-            socket.emit('delete calendar', delCalId, channel);
-            $('li[getChooseCalId=' + delCalId + ']').remove()
-            await fetch('/ch/deleteCalendar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "delCalId": delCalId
-                })
-            }).then(res => res.json()).then((delScheduleIdRes) => {
-                socket.emit('delete calendar relate to the schedule', delScheduleIdRes, delCalId, channel);
-                for (const delScheduleIdIndex of delScheduleIdRes.delIdArray) {
-                    cal.deleteSchedule(delScheduleIdIndex.id, delCalId);
-                }
-            })
-        }
     })
 }
 
