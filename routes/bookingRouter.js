@@ -1,4 +1,3 @@
-import * as bookingApi from '../api/bookingApi'
 import mysql from './mysqlConnect';
 import express from 'express';
 import moment from 'moment';
@@ -6,10 +5,9 @@ import fs from 'fs';
 import md5 from 'md5';
 import { exec } from 'child_process';
 
-// calendar的相關API
-// booking.linxnote.club/ch/url  -> 會導到相關的頻道calendar頁面
-
 /**
+ * calendar的相關API
+ * booking.linxnote.club/ch/url  -> 會導到相關的頻道calendar頁面
  * get('/')                     : 登入頁。
  * get('/logout')               : 登出。
  * post('/')                    : 登入帳密判斷，建立使用者session、根據權限讓初始頁限制瀏覽。
@@ -30,30 +28,28 @@ import { exec } from 'child_process';
  * post('/create_position')     : create postion
  * post('/delete_position')     : delete position ；刪除相關的schedule。
  * 
- * get('/customer')            : customer.ejs，判斷權限限制瀏覽。
- * get('/customer-add')            : customer-add.ejs，判斷權限限制瀏覽。
- * post('/getCustomer')     : 取得客戶資料
- * post('/renderCustomer')     : 建立委刊單時會render 客戶資料的select
+ * get('/customer')             : customer.ejs，判斷權限限制瀏覽。
+ * get('/customer-add')         : customer-add.ejs，判斷權限限制瀏覽。
+ * post('/getCustomer')         : 取得客戶資料
+ * post('/renderCustomer')      : 建立委刊單時會render 客戶資料的select
  * post('/detail_customer')     : detail customer
  * post('/update_customer')     : update customer
  * post('/create_customer')     : create customer
  * post('/delete_customer')     : delete cusomter
  * 
- * get('/channel')     : channel.ejs
- * get('/channel-add')     : channel-add.ejs
- * post('/getChannel')     : render channel ，計算頻道下有幾個廣告版位
- * post('/renderChannel')     : 建立廣告版位時要選擇綁定的頻道
- * post('/update_channel')     : update channel ，頻道停用相關的廣告、schedule跟著停用；頻道名稱改變時，calendar_list的channelName跟著改變。
- * post('/create_channel')     : create channel
+ * get('/channel')              : channel.ejs
+ * get('/channel-add')          : channel-add.ejs
+ * post('/getChannel')          : render channel ，計算頻道下有幾個廣告版位
+ * post('/renderChannel')       : 建立廣告版位時要選擇綁定的頻道
+ * post('/update_channel')      : update channel ，頻道停用相關的廣告、schedule跟著停用；頻道名稱改變時，calendar_list的channelName跟著改變。
+ * post('/create_channel')      : create channel
  * post('/delete_position')     : delete channel
  * 
- * get('/privilege')     : privilege.ejs
- * get('/privilege-add')     : privilege-add.ejs
- * post('/getPrivilege')     : render privilege ；計算每個業務的確定委刊數。
- * post('/delete_account')     : delete account
- * post('/create_account')     : create account
- * 
- * 
+ * get('/privilege')            : privilege.ejs
+ * get('/privilege-add')        : privilege-add.ejs
+ * post('/getPrivilege')        : render privilege ；計算每個業務的確定委刊數。
+ * post('/delete_account')      : delete account
+ * post('/create_account')      : create account
  */
 
 let router = express.Router();
@@ -934,7 +930,6 @@ router.post('/create_channel', async function (req, res) {
         let nowDate = new moment().format('YYYY-MM-DD HH:mm:ss')
         let link = String(Date.now());
         let userName = req.session.user.name
-        let userType = req.session.user.type
         let domain = req.body.domain;
         let name = req.body.name,
             memo = req.body.memo,
@@ -988,7 +983,7 @@ router.post('/delete_channel', async function (req, res) {
             if (error) console.log(error)
         })
 
-        exec(`rm -rf /var/www/calendar/views/channel/` + delId + `.ejs`, (err, stdout, stderr) => {
+        exec(`rm -rf /var/www/calendar/views/channel/` + delId + `.ejs`, (err) => {
             if (err) {
                 return;
             }
@@ -1141,4 +1136,4 @@ router.post('/create_account', async function (req, res) {
     }
 });
 
-module.exports = router;
+export default router;
