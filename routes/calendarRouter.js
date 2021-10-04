@@ -55,7 +55,7 @@ router.get('/:url', async function (req, res) {
 router.post('/renderChannel', async function (req, res) {
     let beforeCreateChannelSql = "select link,name from sale_booking.channel"
     let allChannel = await mysql.query(beforeCreateChannelSql)
-
+    console.log('render');
     res.send(JSON.stringify({
         'channel': allChannel[0],
         'render channel': 'succeed',
