@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node index.js",
+    "start": "npx babel-node index.js",
     "debug": "nodemon src/index.js --exec babel-node",
     "build": "npx babel src --out-dir dist"
   },
