@@ -52,6 +52,15 @@ import { exec } from 'child_process';
  * post('/create_account')      : create account
  */
 
+ savingLog()
+ async function savingLog() {
+     fs.access('/var/log/bookinguserLoginTrace.log', fs.F_OK, (err) => {
+         if(err){
+             fs.appendFileSync('/var/log/bookinguserLoginTrace.log','')
+         }
+     })
+ }
+
 let router = express.Router();
 router.get('/', function (req, res) {
     let title = 'NOW Booking '
@@ -82,7 +91,7 @@ router.post('/', async function (req, res) {
 
         console.log(loginTime + " " + userName + " 已登入 Type: " + userType)
         let userLoginTrace = loginTime + " " + userName + "已登入 Type: " + userType + "\n"
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
             if (error) console.log(error)
         })
 
@@ -291,7 +300,7 @@ router.post('/update_order', async function (req, res) {
 
         console.log(update_date + " " + req.session.user.account + " updateOrder: " + updateOrderData)
         let userLoginTrace = update_date + " " + req.session.user.account + " updateOrder: " + updateOrderData + "\n"
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
             if (error) console.log(error)
         })
 
@@ -326,7 +335,7 @@ router.post('/create_order', async function (req, res) {
         await mysql.query(createOrderSql, createOrderData)
 
         console.log(req.session.user.name + ' create name ' + name);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create order ' + name + '\n', function (error) {
             if (error) console.log(error)
         })
 
@@ -354,7 +363,7 @@ router.post('/delete_order', async function (req, res) {
         let deleteOrderScheduleData = [delId]
         await mysql.query(deleteOrderScheduleSql, deleteOrderScheduleData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete order ' + delId + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete order ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete order ' + delId);
@@ -486,7 +495,7 @@ router.post('/update_position', async function (req, res) {
 
         console.log(update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData)
         let userLoginTrace = update_date + " " + req.session.user.account + " updatePosition: " + updatePositionData + "\n"
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
             if (error) console.log(error)
         })
 
@@ -520,7 +529,7 @@ router.post('/create_position', async function (req, res) {
         await mysql.query(createPositionSql, createPositionData)
 
         console.log(req.session.user.name + ' create position : ' + name);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', createTime + " " + req.session.user.name + ' create position : ' + name + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', createTime + " " + req.session.user.name + ' create position : ' + name + '\n', function (error) {
             if (error) console.log(error)
         })
 
@@ -548,7 +557,7 @@ router.post('/delete_position', async function (req, res) {
         let updateScheduleData = [delId]
         await mysql.query(updateScheduleSql, updateScheduleData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete postion ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete postion ' + delId);
@@ -683,7 +692,7 @@ router.post('/update_customer', async function (req, res) {
 
         console.log(update_date + " " + req.session.user.account + " updateCustomer: " + updateCustomerData)
         let userLoginTrace = update_date + " " + req.session.user.account + " updateCustomer: " + updateCustomerData + "\n"
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
             if (error) console.log(error)
         })
 
@@ -731,7 +740,7 @@ router.post('/create_customer', async function (req, res) {
         }
 
         console.log(req.session.user.name + ' create customer ' + code);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create customer ' + code + '\n', function (error) {
             if (error) console.log(error)
         })
 
@@ -754,7 +763,7 @@ router.post('/delete_customer', async function (req, res) {
         await mysql.query(deleteCustomerSql, deleteCustomerData)
 
         console.log(req.session.user.name + ' delete customer ' + delId);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete customer ' + delId + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete customer ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
 
@@ -911,7 +920,7 @@ router.post('/update_channel', async function (req, res) {
 
         console.log(update_date + " " + req.session.user.account + " updateChannel: " + updateChannelData)
         let userLoginTrace = update_date + " " + req.session.user.account + " updateChannel: " + updateChannelData + "\n"
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', userLoginTrace, function (error) {
             if (error) console.log(error)
         })
 
@@ -947,7 +956,7 @@ router.post('/create_channel', async function (req, res) {
             }
         });
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create channel ' + name + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create channel ' + name);
@@ -979,7 +988,7 @@ router.post('/delete_channel', async function (req, res) {
         await mysql.query(deleteScheduleListFromThisChannelSql, deleteScheduleListFromThisChannelData)
 
         console.log(req.session.user.name + ' delete channel ID : ' + delId);
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete channel ID : ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
 
@@ -1091,7 +1100,7 @@ router.post('/delete_account', async function (req, res) {
         let deleteAccountData = [delId]
         await mysql.query(deleteAccountSql, deleteAccountData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete account : ' + delId + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' delete account : ' + delId + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' delete account : ' + delId);
@@ -1122,7 +1131,7 @@ router.post('/create_account', async function (req, res) {
         let createAccountData = [account, md5(password), type, name, email, memo, createTime, userName, createTime, userName]
         await mysql.query(createAccountSql, createAccountData)
 
-        fs.appendFile('/var/test/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create account : ' + account + '\n', function (error) {
+        fs.appendFile('/var/log/bookinguserLoginTrace.log', nowDate + " " + req.session.user.name + ' create account : ' + account + '\n', function (error) {
             if (error) console.log(error)
         })
         console.log(req.session.user.name + ' create account : ' + account);
